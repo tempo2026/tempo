@@ -1,0 +1,1513 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TEMPO">
+<meta name="theme-color" content="#f5f2ed">
+<title>TEMPO</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#292927;background:#f5f2ed;--ink:#34322f;--muted:#81796e;--line:#e9e3d9;--card:#fffdfa;--soft:#f0ebe3;--green:#37684b;--wa:#25a35a}
+*{box-sizing:border-box}body{margin:0;background:#f5f2ed}
+.app{max-width:570px;margin:auto;padding:18px 15px 100px}
+h1{font:normal 27px Georgia,serif;margin:4px 0;letter-spacing:.5px}h2{font-size:17px;margin:0}
+p,.muted{color:var(--muted);font-size:13px;line-height:1.5}.small{font-size:11px;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:21px;padding:15px;margin-top:12px}
+.head,.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.button{border:0;border-radius:12px;background:var(--ink);color:#fff;padding:11px 14px;font:inherit;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.outline{border:1px solid #ded8cf;background:var(--card);color:var(--ink)}
+.wa{background:var(--wa);color:#fff}.danger{color:#b2412f}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #a68c70;outline-offset:2px}
+.topline{display:flex;align-items:center;justify-content:space-between;margin:2px 0 4px}
+#dateLabel{margin:4px 0 10px}
+.calendar-controls{margin-top:13px}
+.month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin-top:12px}
+.weekday{text-align:center;color:var(--muted);font-size:11px;padding:4px 0}
+.month-day{border:0;border-radius:10px;min-height:43px;background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer;padding:5px 1px;position:relative}
+.month-day.other{color:#c5beb5}.month-day.offday{color:#db5555}.month-day.selected{background:var(--ink);color:#fff}
+.month-day.today:not(.selected){outline:1px solid #aaa094}
+.month-day.has-bookings:after{content:'•';position:absolute;bottom:0;left:calc(50% - 3px);font-size:13px;color:#67a77a}
+.month-day.selected:after{color:#c4ebc8}
+.schedule-heading{margin:18px 0 10px}
+.slot-free{display:flex;align-items:center;justify-content:space-between;gap:7px;background:#edf5ee;border:1px solid #d8e9db;border-radius:13px;padding:12px;margin:8px 0;color:var(--green)}
+.slot-free strong{font-size:13px}.slot-free small{display:block;font-size:12px;margin-top:3px}
+.slot-free button{padding:9px;font-weight:600;white-space:nowrap;background:#fff;color:var(--green);border:1px solid #a6c6ad}
+.slot-booked{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:8px;align-items:center;padding:13px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.slot-booked.faded{opacity:.5}
+.time-col strong{display:block;font-size:14px}.time-col small{font-size:11px;color:var(--muted)}
+.details{min-width:0}.details b{font-size:13px}.details small{display:block;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.4}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.price{font-size:12px;font-weight:700;white-space:nowrap}
+.mini-wa{border:0;background:#e3f4e9;color:var(--wa);border-radius:9px;padding:5px 8px;font-size:12px;font-weight:600;cursor:pointer}
+.tag{display:inline-block;font-size:10px;padding:3px 7px;border-radius:9px;background:#eae4d9;margin-top:5px}
+.tag.done{background:#e3ede4;color:var(--green)}.tag.noshow{background:#f7e3d9;color:#a2532e}.tag.cancelled{background:#f3e5e1;color:#a03f2e}.tag.moved{background:#ece9f3;color:#5a4f86}
+.offnote{background:#fbecea;color:#a03f2e;border-radius:12px;padding:10px 12px;font-size:13px;margin:6px 0}
+.totals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.totals .panel{margin:0;padding:13px 15px}.totals strong{display:block;font-size:19px;margin-top:5px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:10px 0 max(14px,env(safe-area-inset-bottom));z-index:50}
+.nav button{background:none;border:0;color:var(--muted);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:56px;cursor:pointer}
+.nav button span{font-size:18px}.nav button.active{color:#292927;font-weight:700}
+.view[hidden]{display:none}
+.linkbtn{background:none;border:0;color:var(--muted);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:10px 0 0}
+.duebar.cloud{background:#eef4fb;border-color:#d3e2f2}
+.rep-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 6px}
+.rep-head h1{flex:1;text-align:center;font-size:24px}
+.back{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;cursor:pointer;padding:6px 0}
+.hero{background:var(--ink);color:#fff;border-radius:21px;padding:18px;margin-top:10px}
+.hero small{display:block;font-size:12px;opacity:.75}.hero .big{font-size:32px;font-weight:700;margin:4px 0 2px;letter-spacing:.3px}
+.hero .cmp{font-size:12px;opacity:.85}.hero .cmp b{font-weight:600}
+.hero .up{color:#9fe0b0}.hero .down{color:#ffb4a6}
+.hero .split{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;border-top:1px solid rgba(255,255,255,.15);padding-top:12px}
+.hero .split div{font-size:11px;opacity:.9}.hero .split b{display:block;font-size:15px;margin-top:3px}
+.stats6{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.stats6 div{background:var(--soft);border-radius:12px;padding:10px;font-size:11px;color:var(--muted)}
+.stats6 strong{display:block;color:#292927;font-size:16px;margin-top:3px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:14px}
+.bars .b{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--muted);gap:4px}
+.bars .b i{display:block;width:100%;max-width:34px;background:#cfe3d4;border-radius:7px 7px 3px 3px;min-height:3px}
+.bars .b.top i{background:var(--green)}.bars .b em{font-style:normal;font-size:10px;color:var(--ink);min-height:12px}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.toprow:last-child{border-bottom:0}.toprow small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.toprow b{white-space:nowrap}
+.exp-add{display:grid;grid-template-columns:minmax(0,1fr) 96px auto;gap:6px;margin-top:10px}
+.exp-add .button{padding:11px 13px}
+.reportlink{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:21px;padding:15px;margin-top:12px;font:inherit;font-size:16px;font-weight:600;color:var(--ink);cursor:pointer}
+.reportlink small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:3px;text-align:left}
+.daybar .left button{justify-self:start;color:var(--ink);font-size:13px;font-weight:600;padding:6px 0;text-align:left;line-height:1.25}
+.daybar .left button small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+label{display:block;font-size:12px;color:#5e574e;margin:12px 0 5px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #dcd4c9;border-radius:10px;background:#fff;font:inherit;font-size:16px;min-height:44px;color:#292927}
+textarea{min-height:80px;resize:vertical;line-height:1.4}
+dialog{position:fixed;inset:0;margin:auto;max-height:90dvh;overflow-y:auto;z-index:1000;border:1px solid #ddd5ca;box-shadow:0 0 0 100vmax rgba(28,26,24,.58);width:calc(100% - 28px);max-width:480px;border-radius:20px;padding:22px;background:#f8f6f2}
+dialog:not([open]){display:none!important}dialog::backdrop{background:transparent}
+.formactions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px;flex-wrap:wrap}.formactions .button{min-height:44px}
+.formactions .grow{margin-right:auto}
+.services-heading{margin-top:16px}.picker-wrap{position:relative}
+.service-picker{position:absolute;right:0;top:calc(100% + 5px);width:min(270px,78vw);max-height:310px;overflow-y:auto;z-index:30;background:#fff;border:1px solid #ded8cf;border-radius:13px;box-shadow:0 12px 35px #302a2240;padding:5px}
+.service-picker button,.suggest button{display:block;width:100%;background:#fff;border:0;text-align:left;padding:11px 9px;font-size:15px;border-radius:8px;color:#292927;cursor:pointer}
+.service-picker button small,.suggest button small{color:var(--muted);font-size:12px;margin-left:6px}
+.service-picker button:active,.suggest button:active{background:var(--soft)}
+.service-line{border:1px solid #e7dfd4;border-radius:13px;padding:12px;margin-top:9px;background:#fff}
+.service-line .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.service-line .row button{padding:5px 12px;min-height:40px}
+.summary{display:flex;justify-content:space-between;gap:12px;padding:13px;background:var(--soft);border-radius:12px;margin-top:13px;font-size:13px}.summary strong{display:block;margin-top:4px}
+.suggest-wrap{position:relative}.suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid #ded8cf;border-radius:13px;box-shadow:0 12px 35px #302a2240;padding:5px;z-index:40}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid #ded8cf;background:#fff;border-radius:20px;padding:8px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.client-row{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.client-row:last-child{border-bottom:0}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;font-weight:700;color:#7a6d5e;flex:none}
+.client-row .details{flex:1}
+.callback{background:#fdf4ea;border-color:#f0dcc4}
+.callback .client-row{border-color:#f0dcc4}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stats3 div{background:var(--soft);border-radius:12px;padding:10px;font-size:11px;color:var(--muted)}
+.stats3 strong{display:block;color:#292927;font-size:15px;margin-top:3px}
+.history{margin-top:12px}.history .slot-booked{grid-template-columns:78px 1fr auto;padding:10px 2px}
+.svc-row{display:grid;grid-template-columns:1fr 74px 92px 40px;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.svc-row input{padding:9px;min-height:40px}.svc-row button{min-height:40px;padding:0}
+.svc-head{display:grid;grid-template-columns:1fr 74px 92px 40px;gap:6px;font-size:11px;color:var(--muted);margin-top:10px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toast{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));max-width:546px;margin:auto;background:var(--ink);color:#fff;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;z-index:60;box-shadow:0 10px 30px #0004;font-size:13px}
+.toast[hidden]{display:none}.toast span{flex:1}
+.empty{padding:18px 0;color:#8d8478;font-size:13px;text-align:center}
+.hidden,[hidden]{display:none!important}
+#monthTitle{text-transform:capitalize}
+.album{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:12px}
+.ph{aspect-ratio:1;border:0;padding:0;border-radius:9px;overflow:hidden;background:var(--soft);position:relative;cursor:pointer;display:block;width:100%}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .star{position:absolute;top:5px;right:5px;background:#fffdfadd;color:#b8862e;border-radius:9px;font-size:11px;padding:2px 6px}
+.strip{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:4px}.strip .ph{width:84px;flex:none}
+.bigimg{width:100%;height:auto;max-height:55dvh;min-height:120px;object-fit:contain;border-radius:14px;background:#ebe5dc;display:block}
+label.check{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink);margin:14px 0 0;cursor:pointer}.check input{width:22px;height:22px;min-height:0;flex:none;margin:0}
+.linkbox{background:var(--soft);border-radius:12px;padding:11px 12px;font-size:13px;word-break:break-all;margin-top:14px}
+.preview-frame{width:100%;height:68dvh;border:1px solid var(--line);border-radius:14px;background:#f5f2ed;display:block}
+dialog.wide{padding:12px}
+
+/* v7: расписание как в журнале записей */
+.app{padding-bottom:170px}
+.cal-head{display:flex;align-items:center;gap:8px;margin:2px 0 6px}
+.cal-head h1{flex:1;text-align:center;font-size:23px;text-transform:capitalize}
+.icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:18px;color:var(--ink);cursor:pointer;flex:none}
+.cal-head .button{padding:10px 13px}
+.cal-sheet .month-grid{gap:0;margin-top:4px}
+.cal-sheet .month-day{min-height:50px;font-size:19px;border-radius:50%;width:46px;height:46px;margin:2px auto;padding:0}
+.cal-sheet .month-day.has-bookings:after{bottom:-3px}
+.cal-sheet .month-day.has-bookings.past:after{color:#b9b1a6}
+.month-day.today:not(.selected){outline:0;color:#2f6f8f;font-weight:700}
+.day-line{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 2px 10px;border-top:1px solid var(--line);margin-top:8px}
+.day-line b{font-size:18px}.day-line span{font-size:16px;color:var(--ink)}
+.rcard{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px;margin:0 0 10px;cursor:pointer;width:100%;text-align:left;font:inherit;color:var(--ink)}
+.rcard .t{text-align:right}.rcard .t strong{display:block;font-size:19px;font-weight:600}.rcard .t small{font-size:14px;color:var(--muted)}
+.rcard .d{min-width:0}.rcard .d b{display:block;font-size:18px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcard .d .svc{display:block;color:var(--muted);font-size:15px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcard .d .sum{display:block;color:var(--muted);font-size:15px;margin-top:2px}
+.rcard.faded{opacity:.5}
+.rcard.free{grid-template-columns:62px minmax(0,1fr)}
+.rcard.free .t strong{color:var(--green);font-weight:500;font-size:20px}
+.rcard.free .d b{color:var(--green);font-size:18px}
+.rcard.free .d .svc{font-size:15px}
+.wa-round{width:46px;height:46px;border-radius:50%;border:0;background:#e3f4e9;font-size:20px;cursor:pointer;flex:none}
+.bottom{position:fixed;left:0;right:0;bottom:0;z-index:50}
+.bottom .nav{position:static}
+.daybar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:var(--card);border-top:1px solid var(--line);padding:7px 16px}
+.daybar[hidden]{display:none}
+.daybar .mid{text-align:center}.daybar .mid span{font-size:12px;color:var(--muted);display:block}.daybar .mid strong{font-size:19px}
+.daybar .left{font-size:11px;color:var(--muted)}.daybar .left b{display:block;color:var(--ink);font-size:13px}
+.daybar button{justify-self:end;background:none;border:0;color:var(--green);font:inherit;font-size:17px;font-weight:600;cursor:pointer;padding:8px 0}
+.toast{bottom:calc(140px + env(safe-area-inset-bottom))}
+#dlg .formactions{flex-wrap:nowrap}#dlg .formactions .button{flex:1;padding:11px 8px;font-size:15px}#dlg .formactions .grow{margin-right:0}
+/* шаг 1: выбор времени */
+dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16px 14px}
+.tday{display:flex;align-items:center;gap:8px;margin:12px 0 4px}
+.tdate{position:relative;flex:1;text-align:center;margin:0;font-size:18px;color:var(--ink);font-weight:600;padding:8px 0;cursor:pointer}
+.tdate small{display:block;font-weight:400;font-size:13px;color:var(--muted);margin-top:2px}
+.tdate input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.tfree{background:#edf5ee;border:1px solid #d8e9db;border-radius:18px;padding:12px 14px;margin:0 0 10px}
+.tfree .lbl{color:var(--green);font-size:15px;font-weight:600}.tfree .lbl small{font-weight:400;margin-left:6px}
+.tfree .chips{margin-top:10px}
+.tchip{border:1px solid #a6c6ad;background:#fff;color:var(--green);border-radius:12px;padding:10px 0;width:74px;font:inherit;font-size:16px;font-weight:600;cursor:pointer}
+.tchip:active{background:var(--green);color:#fff}
+.tbusy{display:grid;grid-template-columns:62px minmax(0,1fr);gap:12px;background:#f1ede7;border-radius:18px;padding:12px 14px;margin:0 0 10px;color:var(--muted)}
+.tbusy .t{text-align:right}.tbusy .t strong{display:block;font-size:17px;color:var(--ink)}.tbusy .t small{font-size:13px}
+.tbusy b{display:block;color:var(--ink);font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tbusy span{font-size:14px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tother{display:flex;gap:8px;align-items:center;margin-top:6px}
+.tother input{flex:1}
+.when{display:flex;align-items:center;gap:10px;width:100%;margin-top:14px;background:#edf5ee;border:1px solid #d8e9db;border-radius:14px;padding:12px 14px;font:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+.when div{flex:1}.when small{display:block;font-size:12px;color:var(--muted)}.when b{font-size:17px}
+.when span{color:var(--green);font-weight:600;font-size:14px}
+
+.duebar{display:flex;align-items:center;gap:12px;width:100%;background:#fdf4ea;border:1px solid #f0dcc4;border-radius:18px;padding:13px 14px;margin:4px 0 10px;font:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+.duebar .bell{font-size:24px}.duebar div{flex:1}.duebar b{display:block;font-size:17px}.duebar small{color:var(--muted);font-size:13px}
+.duebar .go{color:#a2532e;font-weight:600;font-size:15px}
+.due-row{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:10px}
+.due-row b{font-size:17px}.due-row small{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+.due-row .acts{display:flex;gap:8px;margin-top:10px}.due-row .acts .wa{flex:1;font-size:15px;min-height:44px}.due-row .acts .outline{font-size:14px}
+
+.svc-sec{font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin:18px 2px 6px}
+.svc-list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.svc-item{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:12px 14px;font:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+.svc-item:last-child{border-bottom:0}
+.svc-item div{flex:1;min-width:0}.svc-item b{display:block;font-size:17px;font-weight:500}.svc-item small{display:block;color:var(--muted);font-size:14px;margin-top:3px}
+.svc-item .ck{width:26px;height:26px;border-radius:50%;border:2px solid #d5cdc1;flex:none;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff}
+.svc-item.on .ck{background:var(--green);border-color:var(--green)}
+.svc-add{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 14px;font:inherit;font-size:17px;color:var(--green);cursor:pointer;margin-top:12px;text-align:left}
+.svc-add .plus{width:28px;height:28px;border-radius:50%;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1}
+.manual{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px 14px 14px;margin-top:10px}
+.sdone{position:sticky;bottom:-16px;background:#f8f6f2;padding:12px 0 4px;margin-top:12px;display:flex;gap:10px;align-items:center}
+.sdone span{flex:1;font-size:14px;color:var(--muted)}.sdone .button{min-height:48px;font-size:16px;padding:0 26px}
+.service-line .svc-name{flex:1;font-size:16px;font-weight:600}
+
+.fsec{font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin:18px 2px 6px}
+.pickrow{display:flex;align-items:center;gap:10px;width:100%;background:#fff;border:1px solid #dcd4c9;border-radius:14px;padding:13px 14px;font:inherit;text-align:left;cursor:pointer;color:var(--ink);min-height:52px}
+.pickrow div{flex:1;min-width:0}.pickrow b{display:block;font-size:17px;font-weight:600}.pickrow small{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.pickrow .ph-ico{color:var(--muted);font-size:22px}.pickrow.empty-pick b{font-weight:400;color:var(--green)}
+.payrow{display:flex;justify-content:space-between;align-items:center;padding:12px 2px 0;font-size:16px}.payrow b{font-size:18px}
+.rcard .d .note{display:block;color:#8a6d3b;font-size:13px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.due-sec{font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin:16px 2px 0}
+
+.seg{display:flex;background:var(--soft);border-radius:12px;padding:3px;margin-top:12px}
+.seg button{flex:1;border:0;background:none;border-radius:10px;padding:10px;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
+.seg button.on{background:#fff;box-shadow:0 1px 3px #0002;font-weight:600}
+.rcard.brk{background:repeating-linear-gradient(135deg,#f1ede7 0 10px,#ebe6de 10px 20px);border-style:dashed}
+.rcard.brk .d b{color:var(--muted)}
+.two-sel{display:grid;grid-template-columns:1fr;gap:6px}
+.two-sel label{margin:6px 0 2px}
+</style>
+</head>
+<body>
+<main class="app">
+
+<!-- КАЛЕНДАРЬ -->
+<section class="view" id="view-cal">
+  <div class="cal-head"><button class="icon-btn" id="prev" type="button" aria-label="Предыдущий месяц">‹</button><h1 id="monthTitle">Календарь</h1><button class="icon-btn" id="next" type="button" aria-label="Следующий месяц">›</button><button class="button" id="add" type="button">+ Запись</button></div>
+  <button type="button" class="duebar cloud" id="cloudNudge" hidden><span class="bell">☁️</span><div><b>Включите облако</b><small>Чтобы записи и фото не пропали, если что-то случится с телефоном</small></div><span class="go">›</span></button>
+  <button type="button" class="duebar" id="duebar" hidden><span class="bell">🔔</span><div><b id="dueTitle"></b><small id="dueSub"></small></div><span class="go">Открыть ›</span></button>
+  <div class="cal-sheet"><div class="month-grid" id="days"></div></div>
+  <div class="day-line"><b id="dateLabel"></b><span id="hoursLabel"></span></div>
+  <div id="entries"></div>
+</section>
+
+<!-- КЛИЕНТЫ -->
+<section class="view" id="view-clients" hidden>
+  <div class="topline"><h1>Клиенты</h1><button class="button" id="addClient">+ Клиент</button></div>
+  <input type="search" id="clientSearch" placeholder="Поиск по имени или телефону" autocomplete="off" style="margin-top:8px">
+  <section class="panel callback" id="callbackPanel">
+    <div class="head"><h2>Пора напомнить</h2><span class="small" id="callbackHint"></span></div>
+    <div id="callbackList"></div>
+  </section>
+  <section class="panel">
+    <div class="head"><h2>Все клиенты</h2><span class="small" id="clientCount"></span></div>
+    <div id="clientList"></div>
+  </section>
+</section>
+
+<!-- РАБОТЫ -->
+<section class="view" id="view-works" hidden>
+  <div class="topline"><h1>Работы</h1><label class="button" style="margin:0">+ Фото<input type="file" id="addPhotos" accept="image/*" multiple hidden></label></div>
+  <p>Фото ваших работ. Отмеченные ★ попадут в визитку для клиенток. Нажмите на фото, чтобы подписать или отметить его.</p>
+  <section class="panel">
+    <div class="head"><h2>Альбом</h2><span class="small" id="photoCount"></span></div>
+    <div class="album" id="album"></div>
+  </section>
+  <section class="panel">
+    <h2>Визитка для клиенток</h2>
+    <p>Страница с вашими работами, ценами и кнопкой записи в WhatsApp. Ссылку можно поставить в шапку Instagram и отправлять новым клиенткам.</p>
+    <label for="vPhone">Ваш WhatsApp для записи</label><input id="vPhone" type="tel" maxlength="20" placeholder="+7 777 123 45 67">
+    <label for="vAbout">Пару слов о себе</label><textarea id="vAbout" maxlength="400" placeholder="Например: маникюр и педикюр с покрытием, наращивание, дизайн. Стерильные инструменты."></textarea>
+    <label for="vAddress">Адрес или район</label><input id="vAddress" maxlength="120" placeholder="Город, район или адрес">
+    <label for="vInsta">Instagram</label><input id="vInsta" maxlength="60" placeholder="@ваш_ник">
+    <label class="check"><input type="checkbox" id="vPrices"> Показывать услуги и цены</label>
+    <label for="vLang">Язык визитки</label><select id="vLang"><option value="">Как в приложении</option><option value="ru">Русский</option><option value="kk">Қазақша</option><option value="en">English</option></select>
+    <div class="formactions" style="justify-content:flex-start"><button class="button" id="cardBuild" type="button">Собрать визитку</button></div>
+    <div class="linkbox"><span class="small">Ссылка на визитку (заработает после загрузки на GitHub):</span><br><b id="cardLink"></b></div>
+    <div class="formactions" style="justify-content:flex-start;margin-top:10px"><button class="button outline" id="cardCopy" type="button">Скопировать ссылку</button><a class="button wa" id="cardShare" target="_blank" rel="noopener">Отправить в WhatsApp</a></div>
+    <p class="small">Как опубликовать: «Собрать визитку» → «Сохранить файл» → загрузите vizitka.html в репозиторий так же, как index.html. После новых фото или цен соберите и загрузите визитку заново.</p>
+  </section>
+</section>
+
+<!-- УСЛУГИ -->
+<section class="view" id="view-services" hidden>
+  <div class="topline"><h1>Услуги</h1><button class="button" id="addSvc">+ Услуга</button></div>
+  <p>Ваш прайс. Эти услуги и цены подставляются в запись, и сумма считается сама. Изменения сохраняются сразу.</p>
+  <section class="panel">
+    <div class="svc-head"><span>Название</span><span>Мин</span><span>Цена, ₸</span><span></span></div>
+    <div id="svcList"></div>
+  </section>
+</section>
+
+<!-- ОТЧЁТ -->
+<section class="view" id="view-report" hidden>
+  <div class="rep-head"><button class="icon-btn" id="rPrev" type="button" aria-label="Предыдущий месяц">‹</button><h1 id="rTitle"></h1><button class="icon-btn" id="rNext" type="button" aria-label="Следующий месяц">›</button></div>
+  <div class="hero">
+    <small>Выручка за месяц</small>
+    <div class="big" id="rRevenue">0 ₸</div>
+    <div class="cmp" id="rCmp"></div>
+    <div class="split"><div>Расходы<b id="rExp">0 ₸</b></div><div>Прибыль<b id="rProfit">0 ₸</b></div><div>Ещё записано<b id="rAhead">0 ₸</b></div></div>
+  </div>
+  <div class="stats6">
+    <div>Визитов<strong id="rVisits">0</strong></div>
+    <div>Средний чек<strong id="rAvg">0 ₸</strong></div>
+    <div>Клиенток<strong id="rClients">0</strong></div>
+    <div>Новых<strong id="rNew">0</strong></div>
+    <div>Не пришли<strong id="rNoshow">0</strong></div>
+    <div>Отменили<strong id="rCancel">0</strong></div>
+  </div>
+  <section class="panel"><div class="head"><h2>По дням недели</h2><span class="small" id="rBusy"></span></div><div class="bars" id="rBars"></div></section>
+  <section class="panel"><h2>Популярные услуги</h2><div id="rSvc"></div></section>
+  <section class="panel"><h2>Лучшие клиентки</h2><div id="rTopC"></div></section>
+  <section class="panel">
+    <div class="head"><h2>Расходы на материалы</h2><span class="small" id="rExpCount"></span></div>
+    <p>Гель-лаки, базы, пилки, аренда — всё, что тратите на работу. Прибыль = выручка − расходы.</p>
+    <div class="exp-add"><input id="eName" maxlength="60" placeholder="На что потратили"><input id="eSum" type="number" min="0" step="100" placeholder="₸" aria-label="Сумма, ₸"><button class="button" id="eAdd" type="button">+</button></div>
+    <div id="rExpList"></div>
+  </section>
+</section>
+
+<!-- ЕЩЁ -->
+<section class="view" id="view-more" hidden>
+  <div class="topline"><h1>Настройки</h1></div>
+  <section class="panel" id="cloudPanel" hidden>
+    <h2>☁️ Облако</h2>
+    <div id="cloudOut">
+      <p>Войдите, и записи, клиентки и фото будут сами сохраняться в облаке. Можно работать с двух телефонов, а если с телефоном что-то случится, ничего не пропадёт.</p>
+      <label for="aEmail">Почта</label><input id="aEmail" type="email" autocomplete="email" inputmode="email" placeholder="name@mail.kz">
+      <label for="aPass">Пароль</label><input id="aPass" type="password" autocomplete="current-password" placeholder="минимум 6 символов">
+      <div class="formactions" style="justify-content:flex-start"><button class="button" id="aLogin" type="button">Войти</button><button class="button outline" id="aSignup" type="button">Создать аккаунт</button></div>
+      <button class="linkbtn" id="aForgot" type="button">Забыли пароль?</button>
+    </div>
+    <div id="cloudIn" hidden>
+      <p id="aWho"></p>
+      <div class="formactions" style="justify-content:flex-start"><button class="button outline" id="aSync" type="button">Синхронизировать</button><button class="button outline danger" id="aLogout" type="button">Выйти</button></div>
+    </div>
+    <div id="cloudNew" hidden>
+      <label for="aNewPass">Новый пароль</label><input id="aNewPass" type="password" autocomplete="new-password" placeholder="минимум 6 символов">
+      <div class="formactions" style="justify-content:flex-start"><button class="button" id="aSetPass" type="button">Сохранить пароль</button></div>
+    </div>
+    <p class="small" id="cloudMsg"></p>
+  </section>
+  <button type="button" class="reportlink" id="openReport"><span>📊 Отчёт за месяц<small>Выручка, прибыль, услуги, клиентки</small></span><span>›</span></button>
+  <section class="panel">
+    <h2>Язык</h2>
+    <p>Язык приложения. Стандартные тексты сообщений клиенткам тоже переключатся, если вы их не меняли.</p>
+    <div class="chips" id="sLang"></div>
+  </section>
+  <section class="panel">
+    <h2>Мастер</h2>
+    <label for="sMaster">Ваше имя (подпись в сообщениях)</label>
+    <input id="sMaster" placeholder="Например, мастер Рано">
+  </section>
+  <section class="panel">
+    <h2>Рабочее время</h2>
+    <div class="two-col">
+      <div><label for="sStart">Начало дня</label><input id="sStart" type="time"></div>
+      <div><label for="sEnd">Конец дня</label><input id="sEnd" type="time"></div>
+    </div>
+    <label>Выходные дни</label>
+    <div class="chips" id="sOff"></div>
+  </section>
+  <section class="panel">
+    <h2>Тексты сообщений</h2>
+    <p>Можно вставлять: {имя} {дата} {время} {услуги} {сумма} {мастер} {визитка} (ссылка на вашу визитку)</p>
+    <label for="sConfirm">Подтверждение записи</label><textarea id="sConfirm"></textarea>
+    <label for="sRemind">1-е напоминание о записи (накануне)</label><textarea id="sRemind"></textarea>
+    <label for="sRemind2">2-е напоминание (в день записи)</label><textarea id="sRemind2"></textarea>
+    <label for="sBack">Сообщение «пора записаться»</label><textarea id="sBack"></textarea>
+    <label>Когда напоминать клиентке после визита</label><div class="chips" id="sBackChips"></div><label for="sBackDays">или своё число дней</label><input id="sBackDays" type="number" min="1" step="1">
+  </section>
+  <section class="panel">
+    <h2>Резервная копия</h2>
+    <p>Все данные хранятся только в этом браузере на этом телефоне. Время от времени скачивайте копию (фото работ тоже в неё входят): если что-то случится с телефоном, её можно будет загрузить обратно.</p>
+    <div class="formactions" style="justify-content:flex-start">
+      <button class="button" id="exportBtn" type="button">Скачать копию</button>
+      <label class="button outline" style="margin:0">Загрузить копию<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+    </div>
+  </section>
+  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 10</p>
+</section>
+</main>
+
+<div class="bottom">
+<div class="daybar" id="daybar"><div class="left"><button type="button" id="monthBtn"><small>📊 За месяц</small><span id="monthTotal">0 ₸</span></button></div><div class="mid"><span>Выручка за день</span><strong id="dayTotal">0 ₸</strong></div><button type="button" id="today">Сегодня</button></div>
+<nav class="nav">
+  <button data-view="cal" class="active"><span>▦</span>Календарь</button>
+  <button data-view="clients"><span>♙</span>Клиенты</button>
+  <button data-view="works"><span>✿</span>Работы</button>
+  <button data-view="services"><span>◈</span>Услуги</button>
+  <button data-view="more"><span>☷</span>Ещё</button>
+</nav>
+</div>
+
+<div class="toast" id="toast" hidden><span id="toastText"></span><a class="button wa" id="toastBtn" target="_blank" rel="noopener">WhatsApp</a><button class="button outline" id="toastClose" type="button" aria-label="Закрыть">×</button></div>
+
+<!-- ДИАЛОГ ЗАПИСИ -->
+<dialog id="dlg"><form id="form" autocomplete="off">
+  <div class="head"><h2 id="formTitle">Новая запись</h2><button class="icon-btn" type="button" id="close" aria-label="Закрыть">×</button></div>
+  <div class="tag cancelled" id="cancelNote" hidden>Клиентка отменила эту запись</div>
+  <div class="seg" id="kindSeg"><button type="button" data-k="rec" class="on">Запись</button><button type="button" data-k="break">Перерыв</button></div>
+  <button type="button" class="when" id="whenBtn"><div><small>Дата и время</small><b id="whenText"></b></div><span>Изменить</span></button>
+  <input id="clientDate" type="hidden"><input id="clientTime" type="hidden">
+  <div id="breakWrap" hidden>
+    <div class="fsec">Перерыв</div>
+    <label for="brkDur" style="margin-top:0">Сколько длится</label>
+    <select id="brkDur"><option value="15">15 мин</option><option value="30">30 мин</option><option value="45">45 мин</option><option value="60" selected>1 час</option><option value="90">1 ч 30 мин</option><option value="120">2 часа</option><option value="180">3 часа</option><option value="240">4 часа</option></select>
+    <label for="brkNote">Подпись</label><input id="brkNote" maxlength="60" placeholder="Например: обед, личные дела">
+  </div>
+  <div id="recWrap">
+  <div class="fsec">Клиент</div>
+  <button type="button" class="pickrow" id="clientBtn"><div><b id="clientBtnName"></b><small id="clientBtnPhone"></small></div><span class="ph-ico">›</span></button>
+  <div id="newClientWrap" hidden>
+    <label for="clientName">Имя</label>
+    <div class="suggest-wrap"><input id="clientName" maxlength="50" placeholder="Имя клиентки"><div class="suggest hidden" id="suggest"></div></div>
+    <label for="clientPhone">Телефон</label>
+    <input id="clientPhone" type="tel" placeholder="+7 777 123 45 67" maxlength="20">
+  </div>
+  <div class="head services-heading"><h2>Услуги</h2><div class="picker-wrap"><button class="button outline" type="button" id="addService">+ Выбрать услуги</button><div id="servicePicker" class="service-picker hidden"></div></div></div>
+  <div id="services"></div>
+  <div class="summary"><div>Общее время<strong id="totalDuration">0 мин</strong></div><div>Общая сумма<strong id="totalPrice">0 ₸</strong></div></div>
+  <label for="totalOverride">Итоговая сумма, ₸ (можно изменить)</label>
+  <input id="totalOverride" type="number" min="0" step="1" required>
+  <div class="fsec">Оплата</div>
+  <label for="prepay" style="margin-top:0">Предоплата, ₸</label>
+  <input id="prepay" type="number" min="0" step="500" placeholder="0">
+  <div class="payrow"><span>К оплате</span><b id="toPay">0 ₸</b></div>
+  <div class="fsec">Напоминание клиентке</div>
+  <div class="two-sel">
+    <label for="remind1">1-е напоминание</label>
+    <select id="remind1"><option value="1440">За 1 день</option><option value="2880">За 2 дня</option><option value="0">Нет</option></select>
+    <label for="remind2">2-е напоминание (в день записи)</label>
+    <select id="remind2"><option value="300">За 5 часов</option><option value="240">За 4 часа</option><option value="180">За 3 часа</option><option value="120">За 2 часа</option><option value="60">За 1 час</option><option value="0">Нет</option></select>
+  </div>
+  <p class="small" style="margin:6px 2px 0">Если клиентка записалась позже первого напоминания (например, накануне), придёт только второе.</p>
+  <div class="fsec">Заметки</div>
+  <textarea id="recNote" maxlength="500" placeholder="Например: дизайн как на фото, снять старое покрытие, аллергия на…"></textarea>
+  </div>
+  <div class="formactions">
+    <button type="button" class="button outline danger grow" id="delete">Удалить</button>
+    <button type="button" class="button outline" id="cancelRec">Отменить</button>
+    <button class="button" type="submit">Сохранить</button>
+  </div>
+</form></dialog>
+
+<!-- ВЫБОР ВРЕМЕНИ -->
+<dialog id="tdlg" class="sheet">
+  <div class="head"><h2>Выберите время</h2><button class="icon-btn" type="button" id="tClose" aria-label="Закрыть">×</button></div>
+  <div class="tday"><button class="icon-btn" type="button" id="tPrev" aria-label="Предыдущий день">‹</button><label class="tdate"><span id="tDateLabel"></span><small id="tHours"></small><input type="date" id="tDate" aria-label="Выбрать дату"></label><button class="icon-btn" type="button" id="tNext" aria-label="Следующий день">›</button></div>
+  <div id="tList"></div>
+  <label for="tCustom">Другое время</label>
+  <div class="tother"><input type="time" id="tCustom"><button class="button" type="button" id="tCustomOk">Выбрать</button></div>
+</dialog>
+
+<!-- ПОРА НАПОМНИТЬ -->
+<dialog id="ddlg" class="sheet">
+  <div class="head"><h2>Пора напомнить</h2><button class="icon-btn" type="button" id="dClose" aria-label="Закрыть">×</button></div>
+  <p id="dHint"></p>
+  <div id="dList"></div>
+</dialog>
+
+<!-- ВЫБОР УСЛУГ -->
+<dialog id="sdlg" class="sheet">
+  <div class="head"><h2>Услуги</h2><button class="icon-btn" type="button" id="sClose" aria-label="Закрыть">×</button></div>
+  <input type="search" id="sSearch" placeholder="Поиск" autocomplete="off" style="margin-top:12px">
+  <button type="button" class="svc-add" id="sManualBtn"><span class="plus">+</span>Добавить услугу вручную</button>
+  <div class="manual hidden" id="sManual">
+    <label for="mName">Название</label><input id="mName" maxlength="60" placeholder="Например, снятие покрытия">
+    <div class="two-col"><div><label for="mDur">Время, мин</label><input id="mDur" type="number" min="0" step="5" value="30"></div><div><label for="mPrice">Цена, ₸</label><input id="mPrice" type="number" min="0" step="500" value="0"></div></div>
+    <label class="check"><input type="checkbox" id="mSave" checked> Сохранить в «Мои услуги»</label>
+    <div class="formactions" style="justify-content:flex-start"><button type="button" class="button" id="mAdd">Добавить</button></div>
+  </div>
+  <div id="sBody"></div>
+  <div class="sdone"><span id="sCount"></span><button type="button" class="button" id="sDone">Готово</button></div>
+</dialog>
+
+<!-- ВЫБОР КЛИЕНТКИ -->
+<dialog id="kdlg" class="sheet">
+  <div class="head"><h2>Клиентка</h2><button class="icon-btn" type="button" id="kClose" aria-label="Закрыть">×</button></div>
+  <input type="search" id="kSearch" placeholder="Поиск по имени или телефону" autocomplete="off" style="margin-top:12px">
+  <button type="button" class="svc-add" id="kNew"><span class="plus">+</span>Новая клиентка</button>
+  <div class="svc-sec">Мои клиентки</div>
+  <div id="kList"></div>
+</dialog>
+
+<!-- ДИАЛОГ КЛИЕНТА -->
+<dialog id="cdlg"><form id="cform" autocomplete="off">
+  <h2 id="cTitle">Клиент</h2>
+  <label for="cName">Имя</label><input id="cName" required maxlength="50">
+  <label for="cPhone">Телефон</label><input id="cPhone" type="tel" maxlength="20" placeholder="+7 777 123 45 67">
+  <label for="cNotes">Заметки (форма, длина, аллергии, любимые цвета…)</label><textarea id="cNotes" maxlength="1000"></textarea>
+  <div id="cExtra">
+    <div class="stats3"><div>Визитов<strong id="cVisits">0</strong></div><div>Потратила<strong id="cSpent">0 ₸</strong></div><div>Последний<strong id="cLast">—</strong></div></div>
+    <div class="formactions" style="justify-content:flex-start">
+      <button type="button" class="button" id="cBook">+ Записать</button>
+      <a class="button wa" id="cWa" target="_blank" rel="noopener">WhatsApp</a>
+      <a class="button outline" id="cCall">Позвонить</a>
+    </div>
+    <div class="head" style="margin-top:16px"><h2>Работы</h2><label class="button outline" style="margin:0;padding:7px 12px">+ Фото<input type="file" id="cPhotos" accept="image/*" multiple hidden></label></div>
+    <div class="strip" id="cStrip"></div>
+    <div class="head" style="margin-top:16px"><h2>История</h2></div>
+    <div class="history" id="cHistory"></div>
+  </div>
+  <div class="formactions">
+    <button type="button" class="button outline danger grow" id="cDelete">Удалить</button>
+    <button type="button" class="button outline" id="cClose">Закрыть</button>
+    <button class="button" type="submit">Сохранить</button>
+  </div>
+</form></dialog>
+
+<!-- ДИАЛОГ ФОТО -->
+<dialog id="pdlg"><form id="pform" autocomplete="off">
+  <img class="bigimg" id="pImg" alt="Фото работы">
+  <p class="small" id="pMeta"></p>
+  <label for="pCaption">Подпись</label><input id="pCaption" maxlength="80" placeholder="Например: френч, гель, длина S">
+  <label class="check"><input type="checkbox" id="pCard"> Показывать в визитке ★</label>
+  <div class="formactions">
+    <button type="button" class="button outline danger grow" id="pDelete">Удалить</button>
+    <button type="button" class="button outline hidden" id="pShare">Поделиться</button>
+    <button type="button" class="button outline" id="pClose">Закрыть</button>
+    <button class="button" type="submit">Сохранить</button>
+  </div>
+</form></dialog>
+
+<!-- ПРЕДПРОСМОТР ВИЗИТКИ -->
+<dialog id="vdlg" class="wide">
+  <iframe id="vFrame" class="preview-frame" title="Визитка"></iframe>
+  <div class="formactions"><button type="button" class="button outline" id="vClose">Закрыть</button><button type="button" class="button" id="vSave">Сохранить файл</button></div>
+</dialog>
+
+<script>
+/* ---------- ЯЗЫКИ ---------- */
+const LANGS={ru:'Русский',kk:'Қазақша',en:'English'};
+const I18N={kk:{},en:{}};
+[
+['Предыдущий месяц','Алдыңғы ай','Previous month'],
+['Календарь','Күнтізбе','Calendar'],
+['Следующий месяц','Келесі ай','Next month'],
+['+ Запись','+ Жазба','+ Booking'],
+['Открыть ›','Ашу ›','Open ›'],
+['Клиенты','Клиенттер','Clients'],
+['+ Клиент','+ Клиент','+ Client'],
+['Поиск по имени или телефону','Аты немесе телефон бойынша іздеу','Search by name or phone'],
+['Пора напомнить','Еске салатын уақыт','Time to remind'],
+['Все клиенты','Барлық клиенттер','All clients'],
+['Работы','Жұмыстар','Portfolio'],
+['+ Фото','+ Фото','+ Photo'],
+['Фото ваших работ. Отмеченные ★ попадут в визитку для клиенток. Нажмите на фото, чтобы подписать или отметить его.','Жұмыстарыңыздың фотолары. ★ белгіленгендері клиенттерге арналған визиткаға шығады. Фотоға сипаттама жазу немесе белгілеу үшін оны басыңыз.','Photos of your work. Those marked ★ appear on your client card. Tap a photo to add a caption or mark it.'],
+['Альбом','Альбом','Album'],
+['Визитка для клиенток','Клиенттерге арналған визитка','Card for clients'],
+['Страница с вашими работами, ценами и кнопкой записи в WhatsApp. Ссылку можно поставить в шапку Instagram и отправлять новым клиенткам.','Жұмыстарыңыз, бағаларыңыз және WhatsApp арқылы жазылу батырмасы бар бет. Сілтемені Instagram профиліне қойып, жаңа клиенттерге жіберуге болады.','A page with your work, prices and a WhatsApp booking button. Put the link in your Instagram bio and send it to new clients.'],
+['Ваш WhatsApp для записи','Жазылуға арналған WhatsApp нөміріңіз','Your WhatsApp for bookings'],
+['Пару слов о себе','Өзіңіз туралы бірер сөз','A few words about you'],
+['Например: маникюр и педикюр с покрытием, наращивание, дизайн. Стерильные инструменты.','Мысалы: жабынды маникюр мен педикюр, ұзарту, дизайн. Стерильді құралдар.','E.g.: gel manicure and pedicure, extensions, nail art. Sterile tools.'],
+['Адрес или район','Мекенжай немесе аудан','Address or area'],
+['Город, район или адрес','Қала, аудан немесе мекенжай','City, area or address'],
+['@ваш_ник','@сіздің_ник','@your_name'],
+['Показывать услуги и цены','Қызметтер мен бағаларды көрсету','Show services and prices'],
+['Язык визитки','Визитка тілі','Card language'],
+['Как в приложении','Қосымшадағыдай','Same as app'],
+['Собрать визитку','Визитканы жинау','Build card'],
+['Ссылка на визитку (заработает после загрузки на GitHub):','Визитка сілтемесі (GitHub-қа жүктегеннен кейін ашылады):','Card link (works after uploading to GitHub):'],
+['Скопировать ссылку','Сілтемені көшіру','Copy link'],
+['Отправить в WhatsApp','WhatsApp-қа жіберу','Send via WhatsApp'],
+['Как опубликовать: «Собрать визитку» → «Сохранить файл» → загрузите vizitka.html в репозиторий так же, как index.html. После новых фото или цен соберите и загрузите визитку заново.','Қалай жариялау керек: «Визитканы жинау» → «Файлды сақтау» → vizitka.html файлын репозиторийге index.html сияқты жүктеңіз. Жаңа фото немесе баға қосқаннан кейін визитканы қайта жинап, жүктеңіз.','How to publish: “Build card” → “Save file” → upload vizitka.html to the repository the same way as index.html. After new photos or prices, build and upload the card again.'],
+['Услуги','Қызметтер','Services'],
+['+ Услуга','+ Қызмет','+ Service'],
+['Ваш прайс. Эти услуги и цены подставляются в запись, и сумма считается сама. Изменения сохраняются сразу.','Сіздің прайсыңыз. Бұл қызметтер мен бағалар жазбаға қойылады, сома өзі есептеледі. Өзгерістер бірден сақталады.','Your price list. These services and prices are used in bookings and the total is calculated automatically. Changes are saved instantly.'],
+['Название','Атауы','Name'],
+['Мин','Мин','Min'],
+['Цена, ₸','Бағасы, ₸','Price, ₸'],
+['Настройки','Баптаулар','Settings'],
+['Язык','Тіл','Language'],
+['Язык приложения. Стандартные тексты сообщений клиенткам тоже переключатся, если вы их не меняли.','Қосымша тілі. Клиенттерге арналған стандартты хабарламалар да ауысады, егер сіз оларды өзгертпеген болсаңыз.','App language. The standard client messages switch too, unless you have edited them.'],
+['Мастер','Шебер','Profile'],
+['Ваше имя (подпись в сообщениях)','Атыңыз (хабарламадағы қолтаңба)','Your name (signature in messages)'],
+['Например, мастер Рано','Мысалы, шебер Рано','E.g. Rano, nail artist'],
+['Рабочее время','Жұмыс уақыты','Working hours'],
+['Начало дня','Күннің басы','Day starts'],
+['Конец дня','Күннің соңы','Day ends'],
+['Выходные дни','Демалыс күндері','Days off'],
+['Тексты сообщений','Хабарлама мәтіндері','Message texts'],
+['Можно вставлять: {имя} {дата} {время} {услуги} {сумма} {мастер} {визитка} (ссылка на вашу визитку)','Қоюға болады: {аты} {күні} {уақыты} {қызметтер} {сома} {шебер} {визитка} (визиткаңыздың сілтемесі)','You can insert: {name} {date} {time} {services} {total} {master} {card} (link to your card)'],
+['Подтверждение записи','Жазылуды растау','Booking confirmation'],
+['1-е напоминание о записи (накануне)','1-ші еске салу (бір күн бұрын)','1st reminder (day before)'],
+['2-е напоминание (в день записи)','2-ші еске салу (жазылған күні)','2nd reminder (on the day)'],
+['Сообщение «пора записаться»','«Қайта жазылу уақыты келді» хабарламасы','“Time to book again” message'],
+['Когда напоминать клиентке после визита','Келгеннен кейін клиентке қашан еске салу','When to remind a client after a visit'],
+['или своё число дней','немесе өз күн саныңыз','or your own number of days'],
+['Резервная копия','Сақтық көшірме','Backup'],
+['Все данные хранятся только в этом браузере на этом телефоне. Время от времени скачивайте копию (фото работ тоже в неё входят): если что-то случится с телефоном, её можно будет загрузить обратно.','Барлық деректер тек осы телефондағы осы браузерде сақталады. Анда-санда көшірмесін жүктеп алып отырыңыз (жұмыс фотолары да кіреді): телефонға бірдеңе болса, оны қайта жүктеуге болады.','All data is stored only in this browser on this phone. Download a backup from time to time (photos included): if something happens to your phone, you can restore it.'],
+['Скачать копию','Көшірмені жүктеп алу','Download backup'],
+['Загрузить копию','Көшірмені қалпына келтіру','Restore backup'],
+['TEMPO · версия 10','TEMPO · 10-нұсқа','TEMPO · version 10'],
+['Выручка за день','Күндік түсім','Revenue for the day'],
+['Сегодня','Бүгін','Today'],
+['Ещё','Тағы','More'],
+['Закрыть','Жабу','Close'],
+['Новая запись','Жаңа жазба','New booking'],
+['Клиентка отменила эту запись','Клиент бұл жазбаны болдырмады','The client cancelled this booking'],
+['Запись','Жазба','Booking'],
+['Перерыв','Үзіліс','Break'],
+['Дата и время','Күні мен уақыты','Date and time'],
+['Изменить','Өзгерту','Change'],
+['Сколько длится','Ұзақтығы','Duration'],
+['15 мин','15 мин','15 min'],['30 мин','30 мин','30 min'],['45 мин','45 мин','45 min'],
+['1 час','1 сағат','1 hour'],['1 ч 30 мин','1 сағ 30 мин','1 h 30 min'],
+['2 часа','2 сағат','2 hours'],['3 часа','3 сағат','3 hours'],['4 часа','4 сағат','4 hours'],
+['Подпись','Сипаттама','Caption'],
+['Например: обед, личные дела','Мысалы: түскі ас, жеке шаруа','E.g.: lunch, errands'],
+['Клиент','Клиент','Client'],
+['Имя','Аты','Name'],
+['Имя клиентки','Клиенттің аты','Client name'],
+['Телефон','Телефон','Phone'],
+['+ Выбрать услуги','+ Қызмет таңдау','+ Choose services'],
+['Общее время','Жалпы уақыт','Total time'],
+['Общая сумма','Жалпы сома','Total amount'],
+['Итоговая сумма, ₸ (можно изменить)','Қорытынды сома, ₸ (өзгертуге болады)','Final amount, ₸ (editable)'],
+['Оплата','Төлем','Payment'],
+['Предоплата, ₸','Алдын ала төлем, ₸','Prepayment, ₸'],
+['К оплате','Төленетін сома','To pay'],
+['Напоминание клиентке','Клиентке еске салу','Client reminder'],
+['1-е напоминание','1-ші еске салу','1st reminder'],
+['За 1 день','1 күн бұрын','1 day before'],['За 2 дня','2 күн бұрын','2 days before'],['Нет','Жоқ','None'],
+['За 5 часов','5 сағат бұрын','5 hours before'],['За 4 часа','4 сағат бұрын','4 hours before'],['За 3 часа','3 сағат бұрын','3 hours before'],['За 2 часа','2 сағат бұрын','2 hours before'],['За 1 час','1 сағат бұрын','1 hour before'],
+['Если клиентка записалась позже первого напоминания (например, накануне), придёт только второе.','Егер клиент бірінші еске салу уақытынан кейін жазылса (мысалы, бір күн бұрын), тек екіншісі шығады.','If the client books after the first reminder time (e.g. the day before), only the second one appears.'],
+['Заметки','Ескертпелер','Notes'],
+['Например: дизайн как на фото, снять старое покрытие, аллергия на…','Мысалы: фотодағыдай дизайн, ескі жабынды алу, аллергия…','E.g.: design like in the photo, remove old gel, allergy to…'],
+['Удалить','Жою','Delete'],
+['Отменить','Болдырмау','Cancel'],
+['Сохранить','Сақтау','Save'],
+['Выберите время','Уақытты таңдаңыз','Choose a time'],
+['Предыдущий день','Алдыңғы күн','Previous day'],
+['Выбрать дату','Күнді таңдау','Choose date'],
+['Следующий день','Келесі күн','Next day'],
+['Другое время','Басқа уақыт','Other time'],
+['Выбрать','Таңдау','Choose'],
+['Поиск','Іздеу','Search'],
+['Добавить услугу вручную','Қызметті қолмен қосу','Add a service manually'],
+['Например, снятие покрытия','Мысалы, жабынды алу','E.g. gel removal'],
+['Время, мин','Уақыты, мин','Time, min'],
+['Сохранить в «Мои услуги»','«Менің қызметтерім» тізіміне сақтау','Save to “My services”'],
+['Добавить','Қосу','Add'],
+['Готово','Дайын','Done'],
+['Клиентка','Клиент','Client'],
+['Новая клиентка','Жаңа клиент','New client'],
+['Мои клиентки','Менің клиенттерім','My clients'],
+['Заметки (форма, длина, аллергии, любимые цвета…)','Ескертпелер (пішіні, ұзындығы, аллергия, сүйікті түстер…)','Notes (shape, length, allergies, favourite colours…)'],
+['Визитов','Келген саны','Visits'],
+['Потратила','Жұмсағаны','Spent'],
+['Последний','Соңғы','Last'],
+['+ Записать','+ Жазу','+ Book'],
+['Позвонить','Қоңырау шалу','Call'],
+['История','Тарих','History'],
+['Фото работы','Жұмыс фотосы','Work photo'],
+['Например: френч, гель, длина S','Мысалы: френч, гель, S ұзындығы','E.g.: French, gel, length S'],
+['Показывать в визитке ★','Визиткада көрсету ★','Show on card ★'],
+['Поделиться','Бөлісу','Share'],
+['Визитка','Визитка','Card'],
+['Сохранить файл','Файлды сақтау','Save file'],
+/* --- из кода --- */
+['Не удалось сохранить данные в браузере','Деректерді браузерде сақтау мүмкін болмады','Could not save data in the browser'],
+['сегодня','бүгін','today'],
+['Выходной день по вашим настройкам','Баптауларыңыз бойынша демалыс күні','Day off according to your settings'],
+['Нет свободного времени','Бос уақыт жоқ','No free time'],
+['создать запись','жазба жасау','create booking'],
+['свободно: {d} (до {t})','бос: {d} ({t} дейін)','free: {d} (until {t})'],
+['предоплата {m}','алдын ала төлем {m}','prepaid {m}'],
+['Ожидается','Күтілуде','Expected'],['Пришла','Келді','Came'],['Не пришла','Келмеді','No-show'],['Отменила','Болдырмады','Cancelled'],['Перенесла','Ауыстырды','Rescheduled'],
+['рабочее время {a} – {b}','жұмыс уақыты {a} – {b}','working hours {a} – {b}'],
+['свободно {d}','бос {d}','free {d}'],
+['Свободного времени в этот день нет. Можно выбрать другой день или указать время ниже.','Бұл күні бос уақыт жоқ. Басқа күнді таңдауға немесе төменде уақытты жазуға болады.','No free time on this day. Choose another day or enter a time below.'],
+['Убрать услугу','Қызметті алып тастау','Remove service'],
+['Добавлены вручную','Қолмен қосылғандар','Added manually'],
+['Ранее у этой клиентки','Бұл клиентте бұрын болғандар','Previously for this client'],
+['Мои услуги','Менің қызметтерім','My services'],
+['Ничего не нашлось','Ештеңе табылмады','Nothing found'],
+['Прайс пуст. Добавьте услуги во вкладке «Услуги».','Прайс бос. «Қызметтер» бөлімінде қызмет қосыңыз.','Your price list is empty. Add services in the “Services” tab.'],
+['Выбрано: {n} · {d} · {m}','Таңдалды: {n} · {d} · {m}','Selected: {n} · {d} · {m}'],
+['Отметьте одну или несколько услуг','Бір немесе бірнеше қызметті белгілеңіз','Tick one or more services'],
+['Изменить запись','Жазбаны өзгерту','Edit booking'],
+['Новый перерыв','Жаңа үзіліс','New break'],
+['Вернуть','Қайтару','Restore'],
+['Выбрать клиентку','Клиентті таңдау','Choose client'],
+['нет телефона · нажмите, чтобы сменить','телефон жоқ · ауыстыру үшін басыңыз','no phone · tap to change'],
+['нет телефона','телефон жоқ','no phone'],
+['Никого не нашлось. Нажмите «Новая клиентка».','Ешкім табылмады. «Жаңа клиент» батырмасын басыңыз.','No one found. Tap “New client”.'],
+['Пока нет клиенток. Нажмите «Новая клиентка».','Әзірге клиент жоқ. «Жаңа клиент» батырмасын басыңыз.','No clients yet. Tap “New client”.'],
+['Вернуть запись? Она снова займёт это время.','Жазбаны қайтарасыз ба? Ол бұл уақытты қайта алады.','Restore this booking? It will take this time slot again.'],
+['Отметить, что клиентка отменила запись? Время освободится, запись останется в её истории.','Клиент жазбаны болдырмады деп белгілейсіз бе? Уақыт босайды, жазба оның тарихында қалады.','Mark this booking as cancelled by the client? The time will be freed and the booking stays in the client’s history.'],
+['В это время уже есть запись. Всё равно поставить перерыв?','Бұл уақытта жазба бар. Бәрібір үзіліс қоясыз ба?','There is already a booking at this time. Add the break anyway?'],
+['Выберите клиентку','Клиентті таңдаңыз','Choose a client'],
+['Выберите услуги кнопкой «+ Выбрать услуги»','«+ Қызмет таңдау» батырмасымен қызметтерді таңдаңыз','Choose services with “+ Choose services”'],
+['Укажите продолжительность услуг','Қызметтердің ұзақтығын көрсетіңіз','Enter the duration of the services'],
+['В это время уже есть запись. Всё равно сохранить?','Бұл уақытта жазба бар. Бәрібір сақтайсыз ба?','There is already a booking at this time. Save anyway?'],
+['Запись сохранена. Отправить клиентке подтверждение?','Жазба сақталды. Клиентке растау жібересіз бе?','Booking saved. Send the client a confirmation?'],
+['Удалить запись насовсем? Если клиентка просто отменила, лучше нажмите «Отменить»: так сохранится история.','Жазбаны біржола жоясыз ба? Клиент жай ғана болдырмаса, «Болдырмау» батырмасын басқан дұрыс: тарих сақталады.','Delete this booking for good? If the client just cancelled, tap “Cancel” instead to keep the history.'],
+['Напомнить: {n}','Еске салу: {n}','Reminders: {n}'],
+['Напомнить о записи: {n}','Жазба туралы еске салу: {n}','Booking reminders: {n}'],
+['Пора записаться: {n}','Қайта жазылу уақыты: {n}','Time to book: {n}'],
+[' и ещё {n}',' және тағы {n}',' and {n} more'],
+['О записи','Жазба туралы','Upcoming bookings'],
+['2-е напоминание · ','2-ші еске салу · ','2nd reminder · '],
+['Накануне · ','Бір күн бұрын · ','Day before · '],
+['{d} в {t}','{d}, сағат {t}','{d} at {t}'],
+['Не нужно','Қажет емес','Skip'],
+['Пора записаться снова','Қайта жазылу уақыты келді','Time to book again'],
+['Напомните о записи. ','Жазба туралы еске салыңыз. ','Remind clients about their bookings. '],
+['Ниже клиентки, которые не были {w} и больше и ещё не записаны. ','Төменде {w} не одан көп келмеген және әлі жазылмаған клиенттер. ','Below are clients who haven’t visited for {w} or more and haven’t booked yet. '],
+['«Отправить» откроет WhatsApp с готовым сообщением.','«Жіберу» дайын хабарламасы бар WhatsApp-ты ашады.','“Send” opens WhatsApp with a ready message.'],
+['Последний визит {d} · {n} дн. назад','Соңғы келуі {d} · {n} күн бұрын','Last visit {d} · {n} days ago'],
+['Всем напомнили 👍','Барлығына еске салынды 👍','Everyone has been reminded 👍'],
+['не были {n}+ дней','{n}+ күн келмеген','not in for {n}+ days'],
+['Не была {n} дн. · последний визит {d}','{n} күн келмеген · соңғы келуі {d}','Not in for {n} days · last visit {d}'],
+['💬 Напомнить','💬 Еске салу','💬 Remind'],
+['{n} чел.','{n} адам','{n} people'],
+['визитов: {n}','келген саны: {n}','visits: {n}'],
+['Запись {d} в {t}','Жазба: {d}, сағат {t}','Booked {d} at {t}'],
+['Пока нет клиентов. Нажмите «+ Клиент» или создайте запись в календаре.','Әзірге клиент жоқ. «+ Клиент» батырмасын басыңыз немесе күнтізбеде жазба жасаңыз.','No clients yet. Tap “+ Client” or create a booking in the calendar.'],
+['Новый клиент','Жаңа клиент','New client'],
+['Визитов пока нет','Әзірге келмеген','No visits yet'],
+['Удалить клиентку из базы? Её записи в календаре останутся.','Клиентті базадан жоясыз ба? Оның күнтізбедегі жазбалары қалады.','Delete this client? Their bookings in the calendar will remain.'],
+['Добавляю фото {i} из {n}…','Фото қосылуда: {i} / {n}…','Adding photo {i} of {n}…'],
+['Добавлено фото: {n}','Фото қосылды: {n}','Photos added: {n}'],
+['Добавлено {ok} из {n}. Остальные не удалось прочитать','{n} фотоның {ok} қосылды. Қалғандарын оқу мүмкін болмады','Added {ok} of {n}. The rest could not be read'],
+['Не получилось добавить фото','Фото қосу мүмкін болмады','Could not add photos'],
+['Работа','Жұмыс','Work'],
+['Здесь будут фото её работ','Мұнда осы клиенттің жұмыс фотолары болады','Photos of this client’s nails will appear here'],
+['клиентка: {n}','клиент: {n}','client: {n}'],
+['Удалить это фото?','Бұл фотоны жоясыз ба?','Delete this photo?'],
+['Фото ещё загружается','Фото әлі жүктелуде','The photo is still loading'],
+['{n} фото','{n} фото','{n} photos'],
+['Пока нет фото. Нажмите «+ Фото» и выберите снимки работ.','Әзірге фото жоқ. «+ Фото» батырмасын басып, жұмыс суреттерін таңдаңыз.','No photos yet. Tap “+ Photo” and choose pictures of your work.'],
+['Ссылка скопирована','Сілтеме көшірілді','Link copied'],
+['Скопируйте ссылку:','Сілтемені көшіріңіз:','Copy the link:'],
+['Ежедневно','Күн сайын','Daily'],
+['Мастер маникюра','Маникюр шебері','Nail artist'],
+['Здравствуйте! Хочу записаться','Сәлеметсіз бе! Жазылғым келеді','Hello! I’d like to book'],
+['Запись онлайн через WhatsApp','WhatsApp арқылы онлайн жазылу','Online booking via WhatsApp'],
+['Хочу такой же дизайн, как на фото №{n}','№{n} фотодағыдай дизайн жасатқым келеді','I’d like the same design as in photo #{n}'],
+['Записаться в WhatsApp','WhatsApp арқылы жазылу','Book via WhatsApp'],
+['Фото {n}','Фото {n}','Photo {n}'],
+['Работа {n}','Жұмыс {n}','Work {n}'],
+['Услуги и цены','Қызметтер мен бағалар','Services and prices'],
+['Нажмите на услугу, чтобы записаться','Жазылу үшін қызметті басыңыз','Tap a service to book'],
+['Сделано в TEMPO','TEMPO арқылы жасалған','Made with TEMPO'],
+['Хочу так же','Маған да осындай','I want this'],
+['Укажите ваш номер WhatsApp: на него клиентки будут писать для записи.','WhatsApp нөміріңізді жазыңыз: клиенттер жазылу үшін соған хабарласады.','Enter your WhatsApp number: clients will message it to book.'],
+['Собираю…','Жиналуда…','Building…'],
+['Не получилось собрать визитку','Визитканы жинау мүмкін болмады','Could not build the card'],
+['Минут','Минут','Minutes'],
+['Цена','Бағасы','Price'],
+['Удалить услугу','Қызметті жою','Delete service'],
+['Удалить «{n}» из прайса?','«{n}» прайстан жойылсын ба?','Remove “{n}” from the price list?'],
+['Новая услуга','Жаңа қызмет','New service'],
+['Готовлю копию с фото…','Фотомен бірге көшірме дайындалуда…','Preparing backup with photos…'],
+['Заменить текущие данные данными из копии?','Қазіргі деректерді көшірмедегі деректермен ауыстырасыз ба?','Replace current data with the data from the backup?'],
+['Копия загружена','Көшірме қалпына келтірілді','Backup restored'],
+['. Не удалось восстановить фото: {n}','. Қалпына келмеген фото: {n}','. Photos that could not be restored: {n}'],
+['Не получилось прочитать файл копии','Көшірме файлын оқу мүмкін болмады','Could not read the backup file']
+].forEach(([ru,kk,en])=>{I18N.kk[ru]=kk;I18N.en[ru]=en});
+
+function t(s,v,lang){lang=lang||LANG;let r=(lang!=='ru'&&I18N[lang]&&I18N[lang][s])||s;if(v)r=r.replace(/\{(\w+)\}/g,(m,k)=>v[k]??m);return r}
+
+const WD_SHORT={ru:['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],kk:['Жс','Дс','Сс','Ср','Бс','Жм','Сб'],en:['Su','Mo','Tu','We','Th','Fr','Sa']};
+const KK_M=['қаңтар','ақпан','наурыз','сәуір','мамыр','маусым','шілде','тамыз','қыркүйек','қазан','қараша','желтоқсан'];
+const KK_MS=['қаң','ақп','нау','сәу','мам','мау','шіл','там','қыр','қаз','қар','жел'];
+const KK_W=['жексенбі','дүйсенбі','сейсенбі','сәрсенбі','бейсенбі','жұма','сенбі'];
+const KK_WS=['жс','дс','сс','ср','бс','жм','сб'];
+const LOCALE={ru:'ru-RU',kk:'kk-KZ',en:'en-GB'};
+function fmtD(d,o,lang){lang=lang||LANG;
+ if(lang!=='kk'){let s=new Intl.DateTimeFormat(LOCALE[lang],o).format(d);return lang==='ru'?s.replace(/ г\.?$/,''):s}
+ let s=o.day?d.getDate()+' '+(o.month==='short'?KK_MS:KK_M)[d.getMonth()]:o.month?KK_M[d.getMonth()]:'';
+ if(o.year)s=s?s+' '+d.getFullYear():String(d.getFullYear());
+ if(o.weekday)s=(o.weekday==='long'?KK_W:KK_WS)[d.getDay()]+', '+s;return s}
+
+const UNITS={ru:['ч','мин'],kk:['сағ','мин'],en:['h','min']};
+
+const TPL={
+ ru:{confirm:'Здравствуйте, {имя}! Вы записаны на {дата} в {время}.\nУслуги: {услуги}\nСумма: {сумма}\nДо встречи! {мастер}',
+  remind:'Здравствуйте, {имя}! Напоминаю, что жду вас {дата} в {время} 💅 Если планы изменились, напишите, пожалуйста. {мастер}',
+  remind2:'Доброе утро, {имя}! Жду вас сегодня в {время} 💅 Подтвердите, пожалуйста, что всё в силе. {мастер}',
+  back:'Здравствуйте, {имя}! Прошло уже несколько недель, пора обновить маникюр 💅 Когда вам удобно записаться? {мастер}'},
+ kk:{confirm:'Сәлеметсіз бе, {аты}! Сіз жазылдыңыз: {күні}, сағат {уақыты}.\nҚызметтер: {қызметтер}\nСомасы: {сома}\nКездескенше! {шебер}',
+  remind:'Сәлеметсіз бе, {аты}! Еске саламын: сізді {күні}, сағат {уақыты} күтемін 💅 Жоспарыңыз өзгерсе, жазып жіберіңізші. {шебер}',
+  remind2:'Қайырлы таң, {аты}! Бүгін сағат {уақыты} сізді күтемін 💅 Бәрі күшінде екенін растап жіберіңізші. {шебер}',
+  back:'Сәлеметсіз бе, {аты}! Бірнеше апта өтті, маникюрді жаңартатын уақыт келді 💅 Сізге қашан жазылу ыңғайлы? {шебер}'},
+ en:{confirm:'Hello {name}! You’re booked for {date} at {time}.\nServices: {services}\nTotal: {total}\nSee you soon! {master}',
+  remind:'Hello {name}! Just a reminder that I’m expecting you on {date} at {time} 💅 If your plans change, please let me know. {master}',
+  remind2:'Good morning, {name}! See you today at {time} 💅 Please confirm that everything is still on. {master}',
+  back:'Hello {name}! It’s been a few weeks, time to refresh your manicure 💅 When would suit you to book? {master}'}};
+const ALIAS={имя:'имя',name:'имя',аты:'имя',дата:'дата',date:'дата',күні:'дата',время:'время',time:'время',уақыты:'время',услуги:'услуги',services:'услуги',қызметтер:'услуги',сумма:'сумма',total:'сумма',сома:'сумма',мастер:'мастер',master:'мастер',шебер:'мастер',визитка:'визитка',card:'визитка'};
+
+const CAT_NAMES={
+ ru:['Маникюр','Маникюр с гелем','Педикюр','Педикюр с гелем','Наращивание','Укрепление','Дизайн ногтей','Другая услуга'],
+ kk:['Маникюр','Гель жабынды маникюр','Педикюр','Гель жабынды педикюр','Тырнақ ұзарту','Тырнақты нығайту','Тырнақ дизайны','Басқа қызмет'],
+ en:['Manicure','Gel manicure','Pedicure','Gel pedicure','Nail extensions','Nail strengthening','Nail art','Other service']};
+
+let LANG=(()=>{let l=null,hasData=false;
+ try{l=localStorage.getItem('tempo_lang');const s=JSON.parse(localStorage.getItem('tempo_v5')||'null');if(s){hasData=true;if(!l&&s.settings&&s.settings.lang)l=s.settings.lang}}catch(e){}
+ if(!l&&!hasData){const n=(navigator.language||'').toLowerCase();l=n.startsWith('kk')?'kk':n.startsWith('en')?'en':'ru'}
+ return LANGS[l]?l:'ru'})();
+
+/* перевод статичных надписей страницы */
+const STATIC=[];
+function collectStatic(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
+ while((n=w.nextNode())){const p=n.parentElement;if(!p||p.closest('script,style,textarea'))continue;const s=n.nodeValue.trim();if(s&&I18N.en[s])STATIC.push({n,orig:n.nodeValue,s})}
+ document.querySelectorAll('[placeholder],[aria-label],[title],[alt]').forEach(e=>{for(const a of ['placeholder','aria-label','title','alt']){const s=e.getAttribute(a);if(s&&I18N.en[s])STATIC.push({e,a,s})}})}
+function applyStatic(){document.documentElement.lang=LANG;for(const x of STATIC){if(x.n)x.n.nodeValue=x.orig.replace(x.s,t(x.s));else x.e.setAttribute(x.a,t(x.s))}}
+
+[
+['📊 За месяц','📊 Ай бойынша','📊 This month'],
+['Выручка за месяц','Айлық түсім','Revenue this month'],
+['Расходы','Шығындар','Expenses'],['Прибыль','Пайда','Profit'],['Ещё записано','Алда жазылған','Still booked'],
+['Средний чек','Орташа чек','Average bill'],['Клиенток','Клиенттер','Clients'],['Новых','Жаңалары','New'],
+['Не пришли','Келмегендер','No-shows'],['Отменили','Болдырмағандар','Cancelled'],
+['По дням недели','Апта күндері бойынша','By day of week'],
+['Популярные услуги','Танымал қызметтер','Popular services'],
+['Лучшие клиентки','Үздік клиенттер','Top clients'],
+['Расходы на материалы','Материалдарға шығын','Material expenses'],
+['Гель-лаки, базы, пилки, аренда — всё, что тратите на работу. Прибыль = выручка − расходы.','Гель-лактар, базалар, егеуіштер, жалдау — жұмысқа жұмсайтынның бәрі. Пайда = түсім − шығындар.','Gel polish, bases, files, rent — everything you spend on work. Profit = revenue − expenses.'],
+['На что потратили','Не үшін жұмсадыңыз','What for'],
+['Сумма, ₸','Сомасы, ₸','Amount, ₸'],
+['📊 Отчёт за месяц','📊 Айлық есеп','📊 Monthly report'],
+['Выручка, прибыль, услуги, клиентки','Түсім, пайда, қызметтер, клиенттер','Revenue, profit, services, clients'],
+['Отчёт','Есеп','Report'],
+['к прошлому месяцу','өткен аймен салыстырғанда','vs last month'],
+['как в прошлом месяце','өткен айдағыдай','same as last month'],
+['в прошлом месяце не было выручки','өткен айда түсім болған жоқ','no revenue last month'],
+['{n} раз · {m}','{n} рет · {m}','{n} times · {m}'],
+['{n} виз. · {m}','{n} рет келді · {m}','{n} visits · {m}'],
+['Пока нет визитов в этом месяце','Бұл айда әзірге келушілер жоқ','No visits this month yet'],
+['Пока нет расходов','Әзірге шығын жоқ','No expenses yet'],
+['{n} шт.','{n} жазба','{n} items'],
+['больше всего: {d}','ең көп: {d}','busiest: {d}'],
+['Удалить расход «{n}»?','«{n}» шығынын жоясыз ба?','Delete expense “{n}”?'],
+['Введите сумму','Соманы жазыңыз','Enter an amount'],
+['Материалы','Материалдар','Materials']
+].forEach(([ru,kk,en])=>{I18N.kk[ru]=kk;I18N.en[ru]=en});
+[
+['Включите облако','Бұлтты қосыңыз','Turn on the cloud'],
+['Чтобы записи и фото не пропали, если что-то случится с телефоном','Телефонға бірдеңе болса, жазбалар мен фотолар жоғалмас үшін','So bookings and photos are safe if something happens to your phone'],
+['☁️ Облако','☁️ Бұлт','☁️ Cloud'],
+['Войдите, и записи, клиентки и фото будут сами сохраняться в облаке. Можно работать с двух телефонов, а если с телефоном что-то случится, ничего не пропадёт.','Кіріңіз — жазбалар, клиенттер мен фотолар бұлтқа өзі сақталады. Екі телефоннан жұмыс істеуге болады, ал телефонға бірдеңе болса, ештеңе жоғалмайды.','Sign in and your bookings, clients and photos are saved to the cloud automatically. You can use two phones, and nothing is lost if something happens to your phone.'],
+['Почта','Пошта','Email'],['Пароль','Құпиясөз','Password'],
+['минимум 6 символов','кемінде 6 таңба','at least 6 characters'],
+['Войти','Кіру','Sign in'],['Создать аккаунт','Аккаунт ашу','Create account'],
+['Забыли пароль?','Құпиясөзді ұмыттыңыз ба?','Forgot password?'],
+['Синхронизировать','Синхрондау','Sync now'],['Выйти','Шығу','Sign out'],
+['Новый пароль','Жаңа құпиясөз','New password'],['Сохранить пароль','Құпиясөзді сақтау','Save password'],
+['Вы вошли как {e}','Сіз {e} ретінде кірдіңіз','Signed in as {e}'],
+['Сохранено в облаке · {t}','Бұлтқа сақталды · {t}','Saved to cloud · {t}'],
+['Нет интернета — сохраню, когда он появится.','Интернет жоқ — пайда болғанда сақтаймын.','No internet — will save when it’s back.'],
+['Не получилось связаться с облаком. Попробую позже.','Бұлтпен байланыс болмады. Кейінірек қайталаймын.','Couldn’t reach the cloud. Will try again later.'],
+['Есть несохранённые изменения','Сақталмаған өзгерістер бар','There are unsaved changes'],
+['Неверная почта или пароль.','Пошта немесе құпиясөз қате.','Wrong email or password.'],
+['Такая почта уже зарегистрирована. Нажмите «Войти».','Бұл пошта тіркелген. «Кіру» батырмасын басыңыз.','This email is already registered. Tap “Sign in”.'],
+['Подтвердите почту: откройте ссылку из письма.','Поштаны растаңыз: хаттағы сілтемені ашыңыз.','Confirm your email: open the link in the message.'],
+['Слишком много попыток. Подождите немного.','Тым көп әрекет. Біраз күтіңіз.','Too many attempts. Please wait a little.'],
+['Пароль слишком простой. Нужно минимум 6 символов.','Құпиясөз тым қарапайым. Кемінде 6 таңба керек.','Password is too weak. Use at least 6 characters.'],
+['Не получилось: {m}','Болмады: {m}','Didn’t work: {m}'],
+['Введите почту','Поштаны жазыңыз','Enter your email'],
+['Пароль — минимум 6 символов','Құпиясөз — кемінде 6 таңба','Password must be at least 6 characters'],
+['Подождите…','Күте тұрыңыз…','Please wait…'],
+['Мы отправили письмо со ссылкой на {e}. Откройте его на этом телефоне.','{e} поштасына сілтемесі бар хат жібердік. Оны осы телефонда ашыңыз.','We sent a link to {e}. Open it on this phone.'],
+['Почти готово! Мы отправили письмо на {e}. Откройте ссылку из письма на этом телефоне — и вы войдёте.','Аз қалды! {e} поштасына хат жібердік. Хаттағы сілтемені осы телефонда ашыңыз — сонда кіресіз.','Almost done! We sent an email to {e}. Open the link on this phone and you’ll be signed in.'],
+['Нет интернета. Попробуйте позже.','Интернет жоқ. Кейінірек көріңіз.','No internet. Try again later.'],
+['Синхронизация…','Синхрондау…','Syncing…'],
+['Сохраняю в облако…','Бұлтқа сақтаудамын…','Saving to cloud…'],
+['Данные есть и на этом телефоне, и в облаке, и они разные.\n\nОК — взять данные из облака.\nОтмена — оставить данные этого телефона и отправить их в облако.','Деректер осы телефонда да, бұлтта да бар және олар әртүрлі.\n\nОК — бұлттағы деректерді алу.\nБас тарту — осы телефонның деректерін қалдырып, бұлтқа жіберу.','There is data both on this phone and in the cloud, and it differs.\n\nOK — use the cloud data.\nCancel — keep this phone’s data and send it to the cloud.'],
+['Выйти из аккаунта? Данные останутся в облаке, а с этого телефона будут удалены. Чтобы вернуть их, просто войдите снова.','Аккаунттан шығасыз ба? Деректер бұлтта қалады, ал осы телефоннан өшіріледі. Қайтару үшін қайта кіріңіз.','Sign out? Your data stays in the cloud and will be removed from this phone. Sign in again to get it back.'],
+['Не получилось сохранить последние изменения в облако. Проверьте интернет и попробуйте ещё раз.','Соңғы өзгерістерді бұлтқа сақтау мүмкін болмады. Интернетті тексеріп, қайталап көріңіз.','Couldn’t save the latest changes to the cloud. Check your internet and try again.'],
+['Пароль изменён','Құпиясөз өзгертілді','Password changed'],
+['Ссылка из письма устарела или уже использована. Попробуйте войти или запросите письмо ещё раз.','Хаттағы сілтеменің мерзімі өтті немесе ол қолданылған. Кіріп көріңіз немесе хатты қайта сұраңыз.','The email link has expired or was already used. Try signing in or request a new email.'],
+['Придумайте новый пароль','Жаңа құпиясөз ойлап табыңыз','Choose a new password'],
+['Почта подтверждена, вы вошли ☁️','Пошта расталды, сіз кірдіңіз ☁️','Email confirmed, you’re signed in ☁️'],
+['Войдите снова: срок входа истёк.','Қайта кіріңіз: кіру мерзімі өтті.','Please sign in again: your session expired.']
+].forEach(([ru,kk,en])=>{I18N.kk[ru]=kk;I18N.en[ru]=en});
+collectStatic();
+
+const KEY='tempo_v5';
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const dateKey=d=>[d.getFullYear(),pad(d.getMonth()+1),pad(d.getDate())].join('-');
+const money=n=>Number(n||0).toLocaleString('ru-RU')+' ₸';
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const mins=t=>{let [h,m]=String(t||'00:00').split(':').map(Number);return (h||0)*60+(m||0)};
+const clock=n=>pad(Math.floor(n/60)%24)+':'+pad(n%60);
+const digits=s=>String(s||'').replace(/\D/g,'');
+const fmt=(key,o,lang)=>fmtD(new Date(key+'T12:00:00'),o,lang);
+const todayKey=()=>dateKey(new Date());
+const daysSince=k=>Math.round((new Date(todayKey()+'T12:00:00')-new Date(k+'T12:00:00'))/864e5);
+function dur(n,lang){const u=UNITS[lang||LANG];let h=Math.floor(n/60),m=n%60;return (h?h+' '+u[0]:'')+(h&&m?' ':'')+(m?m+' '+u[1]:'')||'0 '+u[1]}
+function h(tag,attrs,...kids){const e=document.createElement(tag);for(const [k,v] of Object.entries(attrs||{})){if(v==null||v===false)continue;if(k==='class')e.className=v;else if(k.startsWith('on'))e[k]=v;else e.setAttribute(k,v===true?'':v)}for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c instanceof Node?c:document.createTextNode(String(c)))}return e}
+
+const STATUS={planned:'Ожидается',done:'Пришла',noshow:'Не пришла',cancelled:'Отменила',moved:'Перенесла'};
+const active=r=>!['cancelled','moved'].includes(r.status);
+const earned=r=>active(r)&&r.status!=='noshow';
+const DEFAULT_CATALOG=[[8000,60],[15000,120],[10000,90],[15000,120],[20000,150],[3000,30],[2000,30],[0,30]].map(([price,duration],i)=>({name:CAT_NAMES[LANG][i],price,duration}));
+const DEFAULT_SETTINGS={master:'',start:'09:00',end:'21:00',off:[],backDays:21,vPhone:'',vAbout:'',vAddress:'',vInsta:'',vPrices:true,vLang:'',lang:LANG,...TPL[LANG]};
+
+let db={records:[],clients:[],photos:[],expenses:[],catalog:DEFAULT_CATALOG.map(c=>({...c})),settings:{...DEFAULT_SETTINGS}};
+
+function normalize(x,i){let services=Array.isArray(x.services)&&x.services.length?x.services.map(y=>({name:String(y.name||'Услуга'),price:Number(y.price)||0,duration:Number(y.duration)||0})):[{name:String(x.service||'Услуга'),price:Number(x.price)||0,duration:Number(x.duration)||60}];return {...x,id:String(x.id||'old'+i),name:String(x.name||'Клиент'),phone:String(x.phone||''),clientId:x.clientId||null,services,duration:Number(x.duration)||services.reduce((a,b)=>a+b.duration,0),price:Number(x.price??services.reduce((a,b)=>a+b.price,0))||0,status:STATUS[x.status]?x.status:'planned'}}
+function linkClients(){for(const r of db.records){if(r.kind==='break')continue;if(r.clientId&&db.clients.some(c=>c.id===r.clientId))continue;let c=db.clients.find(c=>c.name.trim().toLowerCase()===r.name.trim().toLowerCase());if(!c){c={id:uid(),name:r.name.trim(),phone:r.phone||'',notes:''};db.clients.push(c)}r.clientId=c.id}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){alert(t('Не удалось сохранить данные в браузере'))}markDirty()}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){db.records=(s.records||[]).map(normalize);db.clients=Array.isArray(s.clients)?s.clients:[];db.photos=Array.isArray(s.photos)?s.photos:[];db.expenses=Array.isArray(s.expenses)?s.expenses:[];if(Array.isArray(s.catalog)&&s.catalog.length)db.catalog=s.catalog;db.settings={...DEFAULT_SETTINGS,...(s.settings||{})};if(LANGS[db.settings.lang])LANG=db.settings.lang;else db.settings.lang=LANG;return}
+ let old=null;for(const k of ['tempo_demo_v4','tempo_demo_v2']){const v=JSON.parse(localStorage.getItem(k)||'null');if(v&&v.records){old=v.records;break}}
+ if(!old)old=JSON.parse(localStorage.getItem('tempo_demo_v1')||'[]')||[];
+ db.records=old.map(normalize);linkClients();persist()}catch(e){console.warn(e)}}
+load();
+
+const getClient=id=>db.clients.find(c=>c.id===id);
+const nameOf=r=>(getClient(r.clientId)||{}).name||r.name;
+const phoneOf=r=>(getClient(r.clientId)||{}).phone||r.phone;
+function cardUrl(){try{return new URL('vizitka.html',location.href).href}catch(e){return 'vizitka.html'}}
+function fill(tpl,v){v={визитка:cardUrl(),...v};return String(tpl||'').replace(/\{([^{}\s]+)\}/g,(m,k)=>{const c=ALIAS[k.toLowerCase()];return c?(v[c]??''):m}).replace(/[ \t]+$/gm,'').trim()}
+function recVars(r){return {имя:String(nameOf(r)||'').split(' ')[0],дата:fmt(r.date,{weekday:'long',day:'numeric',month:'long'}),время:r.time,услуги:r.services.map(s=>s.name).join(', '),сумма:money(r.price),мастер:db.settings.master}}
+function waLink(phone,text){let d=digits(phone);if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return 'https://wa.me/'+(d||'')+'?text='+encodeURIComponent(text)}
+function openWa(phone,text){window.open(waLink(phone,text),'_blank')}
+
+/* ---------- НАВИГАЦИЯ ---------- */
+let view='cal';
+function show(v){view=v;$('daybar').hidden=v!=='cal';document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=='view-'+v);document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));renderAll();window.scrollTo(0,0)}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.view));
+function renderAll(){if(view==='report')renderReport();if(view==='cal')renderCal();if(view==='clients')renderClients();if(view==='works')renderWorks();if(view==='services')renderServices();if(view==='more')renderSettings()}
+
+/* ---------- КАЛЕНДАРЬ ---------- */
+let selected=todayKey(),viewMonth=new Date().getMonth(),viewYear=new Date().getFullYear();
+function goTo(key){selected=key;const d=new Date(key+'T12:00:00');viewMonth=d.getMonth();viewYear=d.getFullYear()}
+function dayItems(key,excludeId){
+ const S=db.settings,recs=db.records.filter(x=>x.date===key&&x.id!==excludeId).sort((a,b)=>a.time.localeCompare(b.time));
+ const rows=recs.filter(active),gone=recs.filter(x=>!active(x)),out=[];
+ const dayStart=mins(S.start),dayEnd=mins(S.end);let cursor=dayStart;
+ const free=(a,b)=>{if(b>a)out.push({free:true,a,b})};
+ for(const x of rows){const st=mins(x.time),e=st+x.duration;if(st>cursor)free(cursor,Math.min(st,dayEnd));out.push({x});cursor=Math.max(cursor,e)}
+ free(cursor,dayEnd);
+ return {items:out,gone,off:S.off.includes(new Date(key+'T12:00:00').getDay())}}
+function renderCal(){
+ const first=new Date(viewYear,viewMonth,1),monthName=cap(fmtD(first,{month:'long',year:'numeric'}));
+ $('monthTitle').textContent=monthName;
+ const S=db.settings,grid=$('days');grid.replaceChildren();
+ for(const n of [1,2,3,4,5,6,0].map(i=>WD_SHORT[LANG][i]))grid.append(h('div',{class:'weekday'},n));
+ const start=(first.getDay()+6)%7,count=Math.ceil((start+new Date(viewYear,viewMonth+1,0).getDate())/7)*7,tk=todayKey();
+ for(let i=0;i<count;i++){const d=new Date(viewYear,viewMonth,i-start+1),key=dateKey(d),other=d.getMonth()!==viewMonth;
+  const cls='month-day'+(other?' other':'')+(S.off.includes(d.getDay())&&!other?' offday':'')+(key===selected?' selected':'')+(key===tk?' today':'')+(db.records.some(x=>x.date===key&&active(x))?' has-bookings':'')+(key<tk?' past':'');
+  grid.append(h('button',{type:'button',class:cls,'aria-label':fmt(key,{day:'numeric',month:'long',year:'numeric'}),onclick:()=>{goTo(key);renderCal()}},d.getDate()))}
+ $('dateLabel').textContent=cap(fmt(selected,{weekday:'short',day:'numeric',month:'long'}))+(selected===tk?' · '+t('сегодня'):'');
+ $('hoursLabel').textContent=S.start+' – '+S.end;
+ const dayRecs=db.records.filter(x=>x.date===selected);
+ $('dayTotal').textContent=money(dayRecs.filter(earned).reduce((s,x)=>s+x.price,0));
+ const mPrefix=viewYear+'-'+pad(viewMonth+1);
+ $('monthTotal').textContent=money(db.records.filter(x=>x.date.startsWith(mPrefix)&&earned(x)).reduce((s,x)=>s+x.price,0));
+ renderDue();
+ const box=$('entries');box.replaceChildren();
+ const L=dayItems(selected);
+ if(L.off)box.append(h('div',{class:'offnote'},t('Выходной день по вашим настройкам')));
+ for(const it of L.items)box.append(it.free?freeCard(it.a,it.b):bookedRow(it.x));
+ for(const x of L.gone)box.append(bookedRow(x,true));
+ if(!box.children.length)box.append(h('div',{class:'empty'},t('Нет свободного времени')));
+}
+function freeCard(a,b){return h('button',{type:'button',class:'rcard free',onclick:()=>openPicker({mode:'new',date:selected,focus:a})},
+ h('div',{class:'t'},h('strong',null,clock(a))),
+ h('div',{class:'d'},h('b',null,t('создать запись')),h('span',{class:'svc'},t('свободно: {d} (до {t})',{d:dur(b-a),t:clock(b)}))))}
+function bookedRow(x,faded){
+ if(x.kind==='break'){const el=h('div',{class:'rcard brk',role:'button',tabindex:0,onclick:()=>openEdit(x)},h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),h('div',{class:'d'},h('b',null,'☕ '+t('Перерыв')),h('span',{class:'svc'},(x.note?x.note+' · ':'')+dur(x.duration))),h('span'));return el}
+ const canRemind=x.status==='planned'&&x.date>=todayKey();
+ const wa=h('span');
+ const el=h('div',{class:'rcard'+(faded?' faded':''),role:'button',tabindex:0,onclick:()=>openEdit(x)},
+  h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),
+  h('div',{class:'d'},h('b',null,nameOf(x)),h('span',{class:'svc'},x.services.map(y=>y.name).join(' + ')),h('span',{class:'sum'},money(x.price)+(x.prepay?' · '+t('предоплата {m}',{m:money(x.prepay)}):'')),x.note?h('span',{class:'note'},'📝 '+x.note):null,x.status!=='planned'?h('span',{class:'tag '+x.status},t(STATUS[x.status])):null),
+  wa);
+ el.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();openEdit(x)}};return el}
+
+/* ---------- ШАГ 1: ВЫБОР ВРЕМЕНИ ---------- */
+let pick={mode:'new',date:null,client:null,exclude:null,focus:null};
+function openPicker(o){pick={mode:'new',client:null,exclude:null,focus:null,...o,date:o.date||selected};drawPicker();if(!$('tdlg').open)$('tdlg').showModal();
+ const f=$('tList').querySelector('.focus');if(f)setTimeout(()=>f.scrollIntoView({block:'center'}),30);else $('tdlg').scrollTop=0}
+function drawPicker(){const key=pick.date,S=db.settings,tk=todayKey();
+ $('tDate').value=key;$('tDateLabel').textContent=cap(fmt(key,{weekday:'short',day:'numeric',month:'long'}))+(key===tk?' · '+t('сегодня'):'');
+ $('tHours').textContent=t('рабочее время {a} – {b}',{a:S.start,b:S.end});
+ const L=dayItems(key,pick.exclude),list=$('tList');list.replaceChildren();
+ if(L.off)list.append(h('div',{class:'offnote'},t('Выходной день по вашим настройкам')));
+ const now=new Date(),nowM=key===tk?now.getHours()*60+now.getMinutes():-1;
+ for(const it of L.items){
+  if(!it.free){const x=it.x;list.append(h('div',{class:'tbusy'},h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),h('div',null,h('b',null,nameOf(x)),h('span',null,x.services.map(y=>y.name).join(' + ')))));continue}
+  const times=[];let tt=it.a;while(tt<it.b){if(tt>=nowM)times.push(tt);tt=tt%30?Math.ceil(tt/30)*30:tt+30}
+  if(!times.length)continue;
+  const inFocus=pick.focus!=null&&pick.focus>=it.a&&pick.focus<it.b;
+  list.append(h('div',{class:'tfree'+(inFocus?' focus':'')},h('div',{class:'lbl'},clock(it.a)+' – '+clock(it.b),h('small',null,t('свободно {d}',{d:dur(it.b-it.a)}))),
+   h('div',{class:'chips'},...times.map(m=>h('button',{type:'button',class:'tchip',onclick:()=>choose(key,clock(m))},clock(m))))))}
+ if(!list.querySelector('.tfree'))list.append(h('div',{class:'empty'},t('Свободного времени в этот день нет. Можно выбрать другой день или указать время ниже.')));
+ $('tCustom').value=''}
+function choose(date,time){$('tdlg').close();
+ if(pick.mode==='change'){$('clientDate').value=date;$('clientTime').value=time;updateWhen();return}
+ openEdit(null,time,pick.client,date)}
+function shiftPick(n){const d=new Date(pick.date+'T12:00:00');d.setDate(d.getDate()+n);pick.date=dateKey(d);pick.focus=null;drawPicker();$('tdlg').scrollTop=0}
+$('tPrev').onclick=()=>shiftPick(-1);$('tNext').onclick=()=>shiftPick(1);
+$('tDate').onchange=()=>{if($('tDate').value){pick.date=$('tDate').value;pick.focus=null;drawPicker()}};
+$('tCustomOk').onclick=()=>{const v=$('tCustom').value;if(!v){$('tCustom').focus();return}choose(pick.date,v)};
+$('tClose').onclick=()=>$('tdlg').close();
+$('whenBtn').onclick=()=>openPicker({mode:'change',date:$('clientDate').value,exclude:editId,focus:mins($('clientTime').value)});
+function updateWhen(){const d=$('clientDate').value,tm=$('clientTime').value;if(!d||!tm){$('whenText').textContent=t('Выбрать');return}
+ const du=formKind==='break'?Number($('brkDur').value)||0:lines.reduce((s,x)=>s+(+x.duration||0),0);
+ $('whenText').textContent=cap(fmt(d,{weekday:'short',day:'numeric',month:'long'}))+' · '+tm+(du?'–'+clock(mins(tm)+du):'')}
+$('add').onclick=()=>openPicker({mode:'new',date:selected});
+$('prev').onclick=()=>{const d=new Date(viewYear,viewMonth-1,1);goTo(dateKey(d));renderCal()};
+$('next').onclick=()=>{const d=new Date(viewYear,viewMonth+1,1);goTo(dateKey(d));renderCal()};
+$('today').onclick=()=>{goTo(todayKey());renderCal()};
+
+/* ---------- ДИАЛОГ ЗАПИСИ ---------- */
+let editId=null,formClientId=null,lines=[],manualTotal=false,formStatus='planned';
+function serviceLine(line){
+ const sel=h('div',{class:'svc-name'},line.name);
+ const two=h('div',{class:'two'});
+ for(const [f,l] of [['duration',t('Время, мин')],['price',t('Цена, ₸')]]){const inp=h('input',{type:'number',min:0,step:1,required:true,'aria-label':l});inp.value=line[f];inp.oninput=()=>{line[f]=Number(inp.value)||0;updateTotals()};two.append(h('div',null,h('label',null,l),inp))}
+ return h('div',{class:'service-line'},h('div',{class:'row'},sel,h('button',{type:'button',class:'button outline','aria-label':t('Убрать услугу'),onclick:()=>{lines=lines.filter(y=>y!==line);drawServices()}},'×')),two)}
+function drawServices(){$('services').replaceChildren(...lines.map(serviceLine));updateTotals()}
+function updateTotals(){const d=lines.reduce((s,x)=>s+(+x.duration||0),0),p=lines.reduce((s,x)=>s+(+x.price||0),0);$('totalDuration').textContent=dur(d);$('totalPrice').textContent=money(p);if(!manualTotal)$('totalOverride').value=p;updateWhen();updatePay()}
+$('totalOverride').oninput=()=>{manualTotal=true};
+function drawStatus(){$('statusChips').replaceChildren(...Object.entries(STATUS).map(([k,v])=>h('button',{type:'button',class:'chip'+(k===formStatus?' on':''),onclick:()=>{formStatus=k;drawStatus()}},v)))}
+function closePicker(){$('servicePicker').classList.add('hidden');$('addService').setAttribute('aria-expanded','false')}
+let picked=[];
+const svcKey=n=>String(n).trim().toLowerCase();
+function svcMeta(c){return (c.price?money(c.price):'0 ₸')+', '+dur(c.duration||0)}
+function isPicked(n){return picked.some(x=>svcKey(x.name)===svcKey(n))}
+function togglePick(c){if(isPicked(c.name))picked=picked.filter(x=>svcKey(x.name)!==svcKey(c.name));else picked.push({name:c.name,price:+c.price||0,duration:+c.duration||0});drawSvcSheet()}
+function clientPast(){let cid=formClientId;if(!cid){const n=svcKey($('clientName').value);const c=n&&db.clients.find(c=>svcKey(c.name)===n);cid=c&&c.id}
+ if(!cid)return [];const seen=new Map();
+ for(const r of db.records.filter(r=>r.clientId===cid&&r.id!==editId).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time)))for(const y of r.services)if(!seen.has(svcKey(y.name)))seen.set(svcKey(y.name),y);
+ return [...seen.values()]}
+function svcItem(c){const on=isPicked(c.name);return h('button',{type:'button',class:'svc-item'+(on?' on':''),onclick:()=>togglePick(c)},h('div',null,h('b',null,c.name),h('small',null,svcMeta(c))),h('span',{class:'ck'},on?'✓':''))}
+function drawSvcSheet(){const q=svcKey($('sSearch').value),f=c=>!q||svcKey(c.name).includes(q),body=$('sBody');body.replaceChildren();
+ const past=clientPast().filter(f),cat=db.catalog.filter(f);
+ const extra=picked.filter(x=>!db.catalog.some(c=>svcKey(c.name)===svcKey(x.name))&&!past.some(c=>svcKey(c.name)===svcKey(x.name))).filter(f);
+ if(extra.length)body.append(h('div',{class:'svc-sec'},t('Добавлены вручную')),h('div',{class:'svc-list'},...extra.map(svcItem)));
+ if(past.length)body.append(h('div',{class:'svc-sec'},t('Ранее у этой клиентки')),h('div',{class:'svc-list'},...past.map(svcItem)));
+ body.append(h('div',{class:'svc-sec'},t('Мои услуги')),cat.length?h('div',{class:'svc-list'},...cat.map(svcItem)):h('div',{class:'empty'},q?t('Ничего не нашлось'):t('Прайс пуст. Добавьте услуги во вкладке «Услуги».')));
+ const d=picked.reduce((s,x)=>s+x.duration,0),p=picked.reduce((s,x)=>s+x.price,0);
+ $('sCount').textContent=picked.length?t('Выбрано: {n} · {d} · {m}',{n:picked.length,d:dur(d),m:money(p)}):t('Отметьте одну или несколько услуг')}
+$('addService').onclick=()=>{picked=lines.map(x=>({...x}));$('sSearch').value='';$('sManual').classList.add('hidden');drawSvcSheet();$('sdlg').showModal();$('sdlg').scrollTop=0};
+$('sSearch').oninput=drawSvcSheet;
+$('sManualBtn').onclick=()=>{const m=$('sManual');m.classList.toggle('hidden');if(!m.classList.contains('hidden')){$('mName').value=$('sSearch').value.trim();$('mDur').value=30;$('mPrice').value=0;$('mName').focus()}};
+$('mAdd').onclick=()=>{const name=$('mName').value.trim();if(!name){$('mName').focus();return}
+ const c={name,duration:Math.max(0,Number($('mDur').value)||0),price:Math.max(0,Number($('mPrice').value)||0)};
+ if($('mSave').checked&&!db.catalog.some(x=>svcKey(x.name)===svcKey(name))){db.catalog.push({...c});persist()}
+ picked=picked.filter(x=>svcKey(x.name)!==svcKey(name));picked.push(c);$('sManual').classList.add('hidden');$('sSearch').value='';drawSvcSheet()};
+$('sDone').onclick=()=>{lines=picked.map(p=>lines.find(l=>svcKey(l.name)===svcKey(p.name))||p);manualTotal=false;drawServices();$('sdlg').close()};
+$('sClose').onclick=()=>$('sdlg').close();
+document.addEventListener('click',e=>{if(!e.target.closest('.picker-wrap'))closePicker();if(!e.target.closest('.suggest-wrap'))$('suggest').classList.add('hidden')});
+$('clientName').oninput=()=>{formClientId=null;const q=$('clientName').value.trim().toLowerCase(),box=$('suggest');
+ const found=q?db.clients.filter(c=>c.name.toLowerCase().includes(q)||(digits(q)&&digits(c.phone).includes(digits(q)))).slice(0,6):[];
+ box.replaceChildren(...found.map(c=>h('button',{type:'button',onclick:()=>{formClientId=c.id;$('clientName').value=c.name;$('clientPhone').value=c.phone||'';box.classList.add('hidden')}},c.name,h('small',null,c.phone||''))));
+ box.classList.toggle('hidden',!found.length)};
+function openEdit(x,time,client,date){
+ if(!x&&!time){openPicker({mode:'new',date:date||selected,client});return}
+ editId=x?x.id:null;formClientId=x?x.clientId:client?client.id:null;const c=formClientId&&getClient(formClientId);
+ $('formTitle').textContent=x?t('Изменить запись'):t('Новая запись');
+ $('clientName').value=c?c.name:(x?x.name:'');$('clientPhone').value=c?(c.phone||''):(x?x.phone:'');
+ $('clientDate').value=x?x.date:(date||selected);$('clientTime').value=x?x.time:time;
+ lines=x?x.services.map(y=>({...y})):[];manualTotal=false;drawServices();
+ if(x){$('totalOverride').value=x.price;manualTotal=x.price!==lines.reduce((s,y)=>s+y.price,0)}
+ formStatus=x?x.status:'planned';$('cancelNote').hidden=formStatus!=='cancelled';
+ $('cancelRec').textContent=formStatus==='cancelled'?t('Вернуть'):t('Отменить');
+ $('newClientWrap').hidden=true;drawClientBtn();
+ $('prepay').value=x&&x.prepay?x.prepay:'';$('recNote').value=x?(x.note||''):'';
+ const S=db.settings,r1=x?(x.remind1??x.remindBefore??1440):(S.remind1??1440),r2=x?(x.remind2??0):(S.remind2Before??180);
+ $('remind1').value=String(r1>=1440?r1:(r1?1440:0));$('remind2').value=String(r2);updatePay();
+ const isBrk=!!(x&&x.kind==='break');$('brkDur').value=String(isBrk?x.duration:60);if(!$('brkDur').value)$('brkDur').value='60';$('brkNote').value=isBrk?(x.note||''):'';
+ $('delete').hidden=!x;$('cancelRec').hidden=!x;$('kindSeg').hidden=!!x;setKind(x&&x.kind==='break'?'break':'rec');$('suggest').classList.add('hidden');closePicker();$('dlg').showModal()}
+$('close').onclick=()=>$('dlg').close();
+function drawClientBtn(){const n=$('clientName').value.trim(),ph=$('clientPhone').value.trim(),newMode=!$('newClientWrap').hidden;
+ $('clientBtn').hidden=newMode&&!formClientId;
+ $('clientBtn').classList.toggle('empty-pick',!n);$('clientBtnName').textContent=n||t('Выбрать клиентку');$('clientBtnPhone').textContent=n?(ph||t('нет телефона · нажмите, чтобы сменить')):''}
+function drawKList(){const q=$('kSearch').value.trim().toLowerCase(),qd=digits(q);
+ const list=db.clients.filter(c=>!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd))).sort((a,b)=>a.name.localeCompare(b.name,'ru'));
+ $('kList').replaceChildren(list.length?h('div',{class:'svc-list'},...list.map(c=>h('button',{type:'button',class:'svc-item'+(c.id===formClientId?' on':''),onclick:()=>{formClientId=c.id;$('clientName').value=c.name;$('clientPhone').value=c.phone||'';$('newClientWrap').hidden=true;$('kdlg').close();drawClientBtn()}},
+  h('div',null,h('b',null,c.name),h('small',null,c.phone||t('нет телефона'))),h('span',{class:'ck'},c.id===formClientId?'✓':'')))):h('div',{class:'empty'},q?t('Никого не нашлось. Нажмите «Новая клиентка».'):t('Пока нет клиенток. Нажмите «Новая клиентка».')))}
+$('clientBtn').onclick=()=>{$('kSearch').value='';drawKList();$('kdlg').showModal()};
+$('kSearch').oninput=drawKList;
+$('kClose').onclick=()=>$('kdlg').close();
+$('kNew').onclick=()=>{const q=$('kSearch').value.trim();formClientId=null;$('clientName').value=digits(q)&&digits(q).length>=5?'':q;$('clientPhone').value=digits(q).length>=5?q:'';$('newClientWrap').hidden=false;$('kdlg').close();drawClientBtn();setTimeout(()=>$('clientName').focus(),50)};
+let formKind='rec';
+function setKind(k){formKind=k;document.querySelectorAll('#kindSeg button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+ $('breakWrap').hidden=k!=='break';$('recWrap').hidden=k==='break';$('formTitle').textContent=t(editId?(k==='break'?'Перерыв':'Изменить запись'):(k==='break'?'Новый перерыв':'Новая запись'));$('cancelRec').hidden=!editId||k==='break';updateWhen()}
+document.querySelectorAll('#kindSeg button').forEach(b=>b.onclick=()=>setKind(b.dataset.k));
+$('brkDur').onchange=()=>updateWhen();
+function updatePay(){const t=Number($('totalOverride').value)||0,pp=Number($('prepay').value)||0;$('toPay').textContent=money(Math.max(0,t-pp))}
+$('prepay').oninput=updatePay;$('totalOverride').addEventListener('input',updatePay);
+function resolveClient(name,phone,id){
+ let c=id&&getClient(id);const pd=digits(phone);
+ if(!c&&pd)c=db.clients.find(x=>digits(x.phone)===pd);
+ if(!c)c=db.clients.find(x=>x.name.trim().toLowerCase()===name.toLowerCase());
+ if(!c){c={id:uid(),name,phone,notes:''};db.clients.push(c)}else{c.name=name;if(phone)c.phone=phone}
+ return c}
+function formRecord(){const duration=lines.reduce((s,x)=>s+(+x.duration||0),0);return {id:editId||uid(),name:$('clientName').value.trim(),phone:$('clientPhone').value.trim(),date:$('clientDate').value,time:$('clientTime').value,services:lines.map(x=>({...x})),duration,price:Number($('totalOverride').value)||0,status:formStatus,prepay:Math.max(0,Number($('prepay').value)||0),note:$('recNote').value.trim(),remind1:Number($('remind1').value)||0,remind2:Number($('remind2').value)||0}}
+$('cancelRec').onclick=()=>{const r=db.records.find(x=>x.id===editId);if(!r)return;const back=r.status==='cancelled';
+ if(!confirm(back?t('Вернуть запись? Она снова займёт это время.'):t('Отметить, что клиентка отменила запись? Время освободится, запись останется в её истории.')))return;
+ r.status=back?'planned':'cancelled';persist();$('dlg').close();renderAll()};
+$('form').onsubmit=e=>{e.preventDefault();
+ if(formKind==='break'){const d=Number($('brkDur').value)||60,label=$('brkNote').value.trim();
+  const rec={id:editId||uid(),kind:'break',name:'Перерыв',phone:'',clientId:null,date:$('clientDate').value,time:$('clientTime').value,services:[{name:label||t('Перерыв'),price:0,duration:d}],duration:d,price:0,status:'planned',note:label};
+  const st=mins(rec.time),en=st+d;
+  if(db.records.some(x=>x.id!==editId&&x.date===rec.date&&active(x)&&st<mins(x.time)+x.duration&&en>mins(x.time))&&!confirm(t('В это время уже есть запись. Всё равно поставить перерыв?')))return;
+  if(editId)db.records=db.records.map(x=>x.id===editId?rec:x);else db.records.push(rec);
+  persist();$('dlg').close();goTo(rec.date);renderAll();return}
+ if(!$('clientName').value.trim()){alert(t('Выберите клиентку'));if(!$('newClientWrap').hidden)$('clientName').focus();return}
+ if(!lines.length){alert(t('Выберите услуги кнопкой «+ Выбрать услуги»'));return}
+ const rec=formRecord();if(rec.duration<=0){alert(t('Укажите продолжительность услуг'));return}
+ const s=mins(rec.time),en=s+rec.duration;
+ if(active(rec)&&db.records.some(x=>x.id!==editId&&x.date===rec.date&&active(x)&&s<mins(x.time)+x.duration&&en>mins(x.time))&&!confirm(t('В это время уже есть запись. Всё равно сохранить?')))return;
+ const c=resolveClient(rec.name,rec.phone,formClientId);rec.clientId=c.id;rec.name=c.name;rec.phone=c.phone||'';
+ const isNew=!editId,old=editId&&db.records.find(x=>x.id===editId);
+ const same=old&&old.date===rec.date&&old.time===rec.time,left=recStart(rec)-Date.now();
+ rec.sent1=same?!!(old.sent1||old.reminded):(!!rec.remind1&&left<=rec.remind1*60000);
+ rec.sent2=same?!!old.sent2:(!!rec.remind2&&left<=rec.remind2*60000);
+ db.settings.remind1=rec.remind1;db.settings.remind2Before=rec.remind2;
+ if(editId)db.records=db.records.map(x=>x.id===editId?rec:x);else db.records.push(rec);
+ persist();$('dlg').close();goTo(rec.date);renderAll();
+ if(isNew)showToast(t('Запись сохранена. Отправить клиентке подтверждение?'),waLink(rec.phone,fill(db.settings.confirm,recVars(rec))))};
+$('delete').onclick=()=>{if(!editId||!confirm(t('Удалить запись насовсем? Если клиентка просто отменила, лучше нажмите «Отменить»: так сохранится история.')))return;db.records=db.records.filter(x=>x.id!==editId);persist();$('dlg').close();renderAll()};
+
+let toastTimer;
+function showToast(text,link){$('toastText').textContent=text;$('toastBtn').classList.toggle('hidden',!link);if(link)$('toastBtn').href=link;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,12000)}
+$('toastClose').onclick=()=>$('toast').hidden=true;$('toastBtn').addEventListener('click',()=>setTimeout(()=>$('toast').hidden=true,300));
+
+/* ---------- КЛИЕНТЫ ---------- */
+function stats(c){const tk=todayKey(),recs=db.records.filter(r=>r.clientId===c.id).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+ const visits=recs.filter(r=>r.status==='done'||(r.status==='planned'&&r.date<tk));
+ const next=recs.filter(r=>r.status==='planned'&&r.date>=tk).pop();
+ return {recs,visits:visits.length,spent:visits.reduce((s,r)=>s+r.price,0),last:visits[0]?visits[0].date:null,next}}
+const initials=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+function dueClients(){const S=db.settings;return db.clients.map(c=>({c,s:stats(c)})).filter(({c,s})=>s.last&&!s.next&&daysSince(s.last)>=S.backDays&&!(c.remindedAt&&c.remindedAt>=s.last)).sort((a,b)=>a.s.last.localeCompare(b.s.last))}
+const plural=(n,a,b,c)=>{n=Math.abs(n)%100;const m=n%10;return n>10&&n<20?c:m===1?a:m>=2&&m<=4?b:c};
+function weeksText(d){const w=d%7===0,n=w?d/7:d;if(LANG==='kk')return n+(w?' апта':' күн');if(LANG==='en')return n+(w?(n===1?' week':' weeks'):(n===1?' day':' days'));return n+' '+(w?plural(n,'неделю','недели','недель'):plural(n,'день','дня','дней'))}
+function backChip(d){const w=d%7===0,n=w?d/7:d;if(LANG==='kk')return n+(w?' аптадан кейін':' күннен кейін');if(LANG==='en')return 'in '+weeksText(d);return 'через '+weeksText(d)}
+function recStart(r){return new Date(r.date+'T'+r.time+':00')}
+function visitStage(r,now){if(r.kind==='break'||r.status!=='planned')return 0;const left=recStart(r)-now;if(left<=0)return 0;
+ const r1=r.remind1??r.remindBefore??1440,r2=r.remind2??0,s1=r.sent1||r.reminded,s2=r.sent2;
+ if(r2&&!s2&&left<=r2*60000)return 2;
+ if(r1&&!s1&&!s2&&left<=r1*60000)return 1;return 0}
+function dueVisits(){const now=Date.now();return db.records.filter(r=>visitStage(r,now)).sort((a,b)=>recStart(a)-recStart(b))}
+function renderDue(){const due=dueClients(),vis=dueVisits(),n=due.length+vis.length;$('duebar').hidden=!n;if(!n)return;
+ $('dueTitle').textContent=vis.length&&due.length?t('Напомнить: {n}',{n}):vis.length?t('Напомнить о записи: {n}',{n:vis.length}):t('Пора записаться: {n}',{n:due.length});
+ const names=[...vis.map(r=>String(nameOf(r)).split(' ')[0]),...due.map(({c})=>c.name.split(' ')[0])];
+ $('dueSub').textContent=names.slice(0,3).join(', ')+(names.length>3?t(' и ещё {n}',{n:names.length-3}):'')}
+function markVisit(r){const st=visitStage(r,Date.now());if(st===2)r.sent2=true;else r.sent1=true;persist();drawDue();renderAll()}
+function markReminded(c){c.remindedAt=todayKey();persist();drawDue();renderAll()}
+function drawDue(){const S=db.settings,due=dueClients();
+  const vis=dueVisits(),out=[];
+ if(vis.length){out.push(h('div',{class:'due-sec'},t('О записи')));for(const r of vis)out.push(h('div',{class:'due-row'},
+  h('b',null,nameOf(r)),h('small',null,t(visitStage(r,Date.now())===2?'2-е напоминание · ':'Накануне · ')+t('{d} в {t}',{d:cap(fmt(r.date,{weekday:'short',day:'numeric',month:'long'})),t:r.time})+' · '+r.services.map(y=>y.name).join(', ')),
+  h('div',{class:'acts'},h('a',{class:'button wa',href:waLink(phoneOf(r),fill(visitStage(r,Date.now())===2?(S.remind2||S.remind):S.remind,recVars(r))),target:'_blank',rel:'noopener',onclick:()=>setTimeout(()=>markVisit(r),400)},'💬 '+t('Отправить в WhatsApp')),
+   h('button',{type:'button',class:'button outline',onclick:()=>markVisit(r)},t('Не нужно')))))}
+ if(due.length)out.push(h('div',{class:'due-sec'},t('Пора записаться снова')));
+ $('dHint').textContent=(vis.length?t('Напомните о записи. '):'')+(due.length?t('Ниже клиентки, которые не были {w} и больше и ещё не записаны. ',{w:weeksText(S.backDays)}):'')+t('«Отправить» откроет WhatsApp с готовым сообщением.');
+ $('dList').replaceChildren(...out,...(due.length?due.map(({c,s})=>h('div',{class:'due-row'},
+  h('b',null,c.name),h('small',null,t('Последний визит {d} · {n} дн. назад',{d:fmt(s.last,{day:'numeric',month:'long'}),n:daysSince(s.last)})+(c.phone?'':' · '+t('нет телефона'))),
+  h('div',{class:'acts'},
+   h('a',{class:'button wa',href:waLink(c.phone,fill(S.back,{имя:c.name.split(' ')[0],мастер:S.master})),target:'_blank',rel:'noopener',onclick:()=>setTimeout(()=>markReminded(c),400)},'💬 '+t('Отправить в WhatsApp')),
+   h('button',{type:'button',class:'button outline',onclick:()=>markReminded(c)},t('Не нужно'))))):out.length?[]:[h('div',{class:'empty'},t('Всем напомнили 👍'))]))}
+setInterval(()=>{if(view==='cal')renderDue()},60000);
+$('duebar').onclick=()=>{drawDue();$('ddlg').showModal()};
+$('dClose').onclick=()=>$('ddlg').close();
+function renderClients(){
+ const q=$('clientSearch').value.trim().toLowerCase(),qd=digits(q),S=db.settings;
+ const all=db.clients.map(c=>({c,s:stats(c)}));
+ const cb=dueClients();
+ $('callbackPanel').hidden=!cb.length||!!q;$('callbackHint').textContent=t('не были {n}+ дней',{n:S.backDays});
+ $('callbackList').replaceChildren(...cb.map(({c,s})=>h('div',{class:'client-row',onclick:()=>openClient(c)},h('div',{class:'avatar'},initials(c.name)),h('div',{class:'details'},h('b',null,c.name),h('small',null,t('Не была {n} дн. · последний визит {d}',{n:daysSince(s.last),d:fmt(s.last,{day:'numeric',month:'long'})}))),
+  h('button',{type:'button',class:'mini-wa',onclick:ev=>{ev.stopPropagation();openWa(c.phone,fill(S.back,{имя:c.name.split(' ')[0],мастер:S.master}));setTimeout(()=>markReminded(c),400)}},t('💬 Напомнить')))));
+ const list=all.filter(({c})=>!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd))).sort((a,b)=>a.c.name.localeCompare(b.c.name,'ru'));
+ $('clientCount').textContent=t('{n} чел.',{n:db.clients.length});
+ $('clientList').replaceChildren(...(list.length?list.map(({c,s})=>h('div',{class:'client-row',onclick:()=>openClient(c)},h('div',{class:'avatar'},initials(c.name)),
+  h('div',{class:'details'},h('b',null,c.name),h('small',null,[c.phone||t('нет телефона'),s.visits?t('визитов: {n}',{n:s.visits}):null].filter(Boolean).join(' · ')),s.next?h('span',{class:'tag done'},t('Запись {d} в {t}',{d:fmt(s.next.date,{day:'numeric',month:'short'}),t:s.next.time})):null))):[h('div',{class:'empty'},q?t('Ничего не нашлось'):t('Пока нет клиентов. Нажмите «+ Клиент» или создайте запись в календаре.'))]))}
+$('clientSearch').oninput=renderClients;
+let cEditId=null;
+function openClient(c){cEditId=c?c.id:null;$('cTitle').textContent=c?c.name:t('Новый клиент');$('cName').value=c?c.name:'';$('cPhone').value=c?(c.phone||''):'';$('cNotes').value=c?(c.notes||''):'';
+ $('cExtra').hidden=!c;$('cDelete').hidden=!c;
+ if(c){const s=stats(c);$('cVisits').textContent=s.visits;$('cSpent').textContent=money(s.spent);$('cLast').textContent=s.last?fmt(s.last,{day:'numeric',month:'short'}):'—';
+  $('cWa').href=waLink(c.phone,fill(db.settings.back,{имя:c.name.split(' ')[0],мастер:db.settings.master}));
+  $('cCall').href='tel:'+(c.phone||'');$('cCall').classList.toggle('hidden',!c.phone);renderClientPhotos(c.id);
+  $('cHistory').replaceChildren(...(s.recs.length?s.recs.map(r=>h('div',{class:'slot-booked',onclick:()=>{$('cdlg').close();show('cal');goTo(r.date);renderCal();openEdit(r)}},h('div',{class:'time-col'},h('strong',null,fmt(r.date,{day:'numeric',month:'short'})),h('small',null,fmt(r.date,{year:'numeric'})+' · '+r.time)),
+   h('div',{class:'details'},h('small',{style:'margin:0'},r.services.map(y=>y.name).join(' + ')),r.status!=='planned'?h('span',{class:'tag '+r.status},t(STATUS[r.status])):null),h('div',{class:'price'},money(r.price)))):[h('div',{class:'empty'},t('Визитов пока нет'))]))}
+ $('cdlg').showModal()}
+function saveClientForm(){const name=$('cName').value.trim();if(!name)return null;let c=cEditId&&getClient(cEditId);if(!c){c={id:uid()};db.clients.push(c)}c.name=name;c.phone=$('cPhone').value.trim();c.notes=$('cNotes').value.trim();for(const r of db.records)if(r.clientId===c.id){r.name=c.name;r.phone=c.phone}persist();return c}
+$('addClient').onclick=()=>openClient(null);
+$('cClose').onclick=()=>$('cdlg').close();
+$('cform').onsubmit=e=>{e.preventDefault();if(saveClientForm()){$('cdlg').close();renderAll()}};
+$('cBook').onclick=()=>{const c=saveClientForm();if(!c)return;$('cdlg').close();show('cal');openEdit(null,null,c)};
+$('cDelete').onclick=()=>{if(!cEditId||!confirm(t('Удалить клиентку из базы? Её записи в календаре останутся.')))return;db.clients=db.clients.filter(c=>c.id!==cEditId);for(const r of db.records)if(r.clientId===cEditId)r.clientId=null;for(const p of db.photos)if(p.clientId===cEditId)p.clientId=null;persist();$('cdlg').close();renderAll()};
+
+/* ---------- ФОТО (хранятся в IndexedDB, в db.photos только описания) ---------- */
+const idbP=new Promise((res,rej)=>{if(!window.indexedDB)return rej(new Error('no indexedDB'));const r=indexedDB.open('tempo_photos',1);r.onupgradeneeded=()=>r.result.createObjectStore('img');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+idbP.catch(e=>console.warn(e));
+function idbTx(mode,fn){return idbP.then(d=>new Promise((res,rej)=>{const t=d.transaction('img',mode);let out;const q=fn(t.objectStore('img'));if(q)q.onsuccess=()=>out=q.result;t.oncomplete=()=>res(out);t.onerror=t.onabort=()=>rej(t.error)}))}
+const idbGet=k=>idbTx('readonly',s=>s.get(k));
+const idbPut=(k,v)=>idbTx('readwrite',s=>{s.put(v,k)});
+const idbDel=id=>idbTx('readwrite',s=>{s.delete(id+':f');s.delete(id+':t')});
+const idbClear=()=>idbTx('readwrite',s=>{s.clear()});
+const urlCache={},dataCache={};
+async function thumbUrl(id){if(urlCache[id])return urlCache[id];const b=(await idbGet(id+':t'))||(await idbGet(id+':f'));if(!b)return '';return urlCache[id]=URL.createObjectURL(b)}
+function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('image'));i.src=src})}
+async function resize(blob,max,q){const url=URL.createObjectURL(blob);try{const img=await loadImg(url);const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*k));c.height=Math.max(1,Math.round(img.naturalHeight*k));c.getContext('2d').drawImage(img,0,0,c.width,c.height);const out=await new Promise(r=>c.toBlob(r,'image/jpeg',q));if(!out)throw new Error('toBlob');return out}finally{URL.revokeObjectURL(url)}}
+const blobToData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(b)});
+async function savePhotoBlob(id,full){const thumb=await resize(full,420,.75);await idbPut(id+':f',full);await idbPut(id+':t',thumb)}
+async function addPhotos(files,clientId){
+ files=[...files];if(!files.length)return;
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+ let ok=0;
+ for(const [i,f] of files.entries()){showToast(t('Добавляю фото {i} из {n}…',{i:i+1,n:files.length}));
+  try{const id=uid();await savePhotoBlob(id,await resize(f,1400,.82));db.photos.unshift({id,date:todayKey(),caption:'',clientId:clientId||null,inCard:false});ok++;persist()}catch(e){console.warn(e)}}
+ showToast(ok===files.length?t('Добавлено фото: {n}',{n:ok}):ok?t('Добавлено {ok} из {n}. Остальные не удалось прочитать',{ok,n:files.length}):t('Не получилось добавить фото'));refreshPhotos()}
+function refreshPhotos(){renderAll();if($('cdlg').open&&cEditId)renderClientPhotos(cEditId)}
+function photoTile(p){const img=h('img',{alt:p.caption||t('Работа')});thumbUrl(p.id).then(u=>{if(u)img.src=u}).catch(()=>{});
+ return h('button',{type:'button',class:'ph','aria-label':p.caption||t('Фото работы'),onclick:()=>openPhoto(p)},img,p.inCard?h('span',{class:'star'},'★'):null)}
+function renderClientPhotos(cid){const ps=db.photos.filter(p=>p.clientId===cid);$('cStrip').replaceChildren(...(ps.length?ps.map(photoTile):[h('div',{class:'small',style:'padding:4px 0'},t('Здесь будут фото её работ'))]))}
+$('addPhotos').onchange=async e=>{const files=[...e.target.files];e.target.value='';await addPhotos(files)};
+$('cPhotos').onchange=async e=>{const files=[...e.target.files];e.target.value='';if(!cEditId)return;await addPhotos(files,cEditId)};
+
+let pId=null,fullUrl=null;
+async function openPhoto(p){pId=p.id;$('pImg').removeAttribute('src');$('pCaption').value=p.caption||'';$('pCard').checked=!!p.inCard;
+ const c=p.clientId&&getClient(p.clientId);$('pMeta').textContent=[fmt(p.date,{day:'numeric',month:'long',year:'numeric'}),c?t('клиентка: {n}',{n:c.name}):null].filter(Boolean).join(' · ');
+ $('pShare').classList.toggle('hidden',!navigator.canShare);$('pdlg').showModal();
+ try{const f=await idbGet(p.id+':f');if(f&&pId===p.id){if(fullUrl)URL.revokeObjectURL(fullUrl);fullUrl=URL.createObjectURL(f);$('pImg').src=fullUrl}}catch(e){console.warn(e)}}
+$('pClose').onclick=()=>$('pdlg').close();
+$('pform').onsubmit=e=>{e.preventDefault();const p=db.photos.find(x=>x.id===pId);if(p){p.caption=$('pCaption').value.trim();p.inCard=$('pCard').checked;persist()}$('pdlg').close();refreshPhotos()};
+$('pDelete').onclick=async()=>{if(!pId||!confirm(t('Удалить это фото?')))return;const id=pId;db.photos=db.photos.filter(x=>x.id!==id);persist();if(urlCache[id]){URL.revokeObjectURL(urlCache[id]);delete urlCache[id]}delete dataCache[id];$('pdlg').close();refreshPhotos();try{await idbDel(id)}catch(e){}deleteCloudPhoto(id)};
+let shareFile=null;
+$('pShare').onclick=()=>{if(!shareFile){alert(t('Фото ещё загружается'));return}if(navigator.canShare&&navigator.canShare({files:[shareFile]}))navigator.share({files:[shareFile]}).catch(()=>{})};
+$('pImg').onload=()=>{shareFile=null;idbGet(pId+':f').then(f=>{if(f)shareFile=new File([f],'tempo-'+pId+'.jpg',{type:'image/jpeg'})})};
+
+/* ---------- ВКЛАДКА РАБОТЫ И ВИЗИТКА ---------- */
+function renderWorks(){const S=db.settings;
+ $('photoCount').textContent=db.photos.length?t('{n} фото',{n:db.photos.length}):'';
+ $('album').replaceChildren(...(db.photos.length?db.photos.map(photoTile):[h('div',{class:'empty',style:'grid-column:1/-1'},t('Пока нет фото. Нажмите «+ Фото» и выберите снимки работ.'))]));
+ $('vPhone').value=S.vPhone;$('vAbout').value=S.vAbout;$('vAddress').value=S.vAddress;$('vInsta').value=S.vInsta;$('vLang').value=S.vLang||'';$('vPrices').checked=S.vPrices!==false;
+ $('cardLink').textContent=cardUrl();$('cardShare').href='https://wa.me/?text='+encodeURIComponent(cardUrl())}
+$('vPrices').onchange=()=>{db.settings.vPrices=$('vPrices').checked;persist()};
+$('cardCopy').onclick=async()=>{try{await navigator.clipboard.writeText(cardUrl());showToast(t('Ссылка скопирована'))}catch(e){prompt(t('Скопируйте ссылку:'),cardUrl())}};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function workDays(off,lang){const names=[1,2,3,4,5,6,0].map(i=>WD_SHORT[lang][i]),on=[1,2,3,4,5,6,0].map(d=>!off.includes(d));if(on.every(Boolean))return t('Ежедневно',null,lang);const parts=[];let i=0;
+ while(i<7){if(!on[i]){i++;continue}let j=i;while(j+1<7&&on[j+1])j++;parts.push(j-i>=2?names[i]+'–'+names[j]:j>i?names[i]+', '+names[j]:names[i]);i=j+1}return parts.join(', ')}
+async function buildCard(){
+ const S=db.settings,CL=LANGS[S.vLang]?S.vLang:LANG,tc=(s,v)=>t(s,v,CL);let ps=db.photos.filter(p=>p.inCard);if(!ps.length)ps=db.photos.slice(0,12);ps=ps.slice(0,24);
+ const imgs=[];for(const p of ps){try{const f=await idbGet(p.id+':f');if(!f)continue;imgs.push({src:await blobToData(await resize(f,900,.72)),cap:p.caption||''})}catch(e){console.warn(e)}}
+ const name=S.master.trim()||tc('Мастер маникюра'),hello=tc('Здравствуйте! Хочу записаться'),wa=t=>waLink(S.vPhone,t);
+ const insta=S.vInsta.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i,'').replace(/^@/,'').replace(/[/?#].*$/,'');
+ const services=S.vPrices!==false?db.catalog.filter(c=>c.price>0&&c.name.trim()):[];
+ const days=workDays(S.off,CL),meta=[S.vAddress.trim(),(days?days+', ':'')+S.start+'–'+S.end].filter(Boolean);
+ const desc=S.vAbout.trim()||tc('Запись онлайн через WhatsApp');
+ const links=imgs.map((m,i)=>wa(hello+'. '+tc('Хочу такой же дизайн, как на фото №{n}',{n:i+1})+(m.cap?' ('+m.cap+')':'')+'.'));
+ const js=v=>JSON.stringify(v).replace(/</g,'\\u003c');
+ return `<!doctype html>
+<html lang="${CL}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(name)}</title><meta name="description" content="${esc(desc)}"><meta property="og:title" content="${esc(name)}"><meta property="og:description" content="${esc(desc)}"><meta name="theme-color" content="#f5f2ed">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f2ed;color:#292927;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+main{max-width:560px;margin:auto;padding:40px 18px 36px}
+h1{font:normal 32px/1.15 Georgia,serif;margin:0 0 12px;text-align:center;letter-spacing:.3px}
+.about{white-space:pre-line;color:#5e574e;font-size:15px;line-height:1.55;text-align:center;margin:0 0 8px}
+.meta{color:#81796e;font-size:13px;text-align:center;margin:0 0 22px;line-height:1.7}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:14px;padding:15px;font-size:16px;font-weight:600;text-decoration:none;margin-top:10px;border:0;cursor:pointer;width:100%}
+.wa{background:#25a35a;color:#fff}.ghost{background:#fffdfa;border:1px solid #e3dccf;color:#34322f}
+h2{font:normal 21px Georgia,serif;margin:36px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.grid button{aspect-ratio:1;border:0;padding:0;border-radius:10px;overflow:hidden;background:#ebe5dc;cursor:zoom-in}
+.grid img{width:100%;height:100%;object-fit:cover;display:block}
+.svc{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid #e9e3d9;color:inherit;text-decoration:none}
+.svc small{display:block;color:#81796e;font-size:12px;margin-top:3px}.svc b{white-space:nowrap;font-size:15px}
+.note,footer{color:#a39a8e;font-size:12px;text-align:center;margin-top:12px}footer{margin-top:44px}
+.lb{position:fixed;inset:0;background:rgba(24,22,20,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:9}
+.lb[hidden]{display:none}.lb img{max-width:100%;max-height:68vh;border-radius:12px}
+.lb p{color:#eee;font-size:14px;margin:12px 0 4px;min-height:1em;text-align:center}.lb .btn{max-width:340px}
+.x{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:50%;width:44px;height:44px;font-size:24px;cursor:pointer}
+</style></head><body><main>
+<h1>${esc(name)}</h1>
+${S.vAbout.trim()?`<p class="about">${esc(S.vAbout.trim())}</p>`:''}
+<p class="meta">${meta.map(esc).join('<br>')}</p>
+<a class="btn wa" href="${esc(wa(hello+'.'))}" target="_blank" rel="noopener">${esc(tc('Записаться в WhatsApp'))}</a>
+${insta?`<a class="btn ghost" href="https://instagram.com/${esc(encodeURIComponent(insta))}" target="_blank" rel="noopener">Instagram @${esc(insta)}</a>`:''}
+${imgs.length?`<h2>${esc(tc('Работы'))}</h2><div class="grid">${imgs.map((m,i)=>`<button type="button" data-i="${i}" aria-label="${esc(tc('Фото {n}',{n:i+1}))}"><img src="${m.src}" alt="${esc(m.cap||tc('Работа {n}',{n:i+1}))}" loading="lazy"></button>`).join('')}</div>`:''}
+${services.length?`<h2>${esc(tc('Услуги и цены'))}</h2>${services.map(c=>`<a class="svc" href="${esc(wa(hello+': '+c.name.trim()+'.'))}" target="_blank" rel="noopener"><span>${esc(c.name.trim())}${c.duration?`<small>${esc(dur(c.duration,CL))}</small>`:''}</span><b>${esc(money(c.price))}</b></a>`).join('')}<p class="note">${esc(tc('Нажмите на услугу, чтобы записаться'))}</p>`:''}
+<footer>${esc(tc('Сделано в TEMPO'))}</footer>
+</main>
+<div class="lb" id="lb" hidden><button class="x" id="lbx" type="button" aria-label="${esc(tc('Закрыть'))}">×</button><img id="lbi" alt=""><p id="lbc"></p><a class="btn wa" id="lba" target="_blank" rel="noopener">${esc(tc('Хочу так же'))}</a></div>
+<script>
+var L=${js(links)},C=${js(imgs.map(m=>m.cap))},lb=document.getElementById('lb');
+document.querySelectorAll('.grid button').forEach(function(b){b.onclick=function(){var i=+b.dataset.i;document.getElementById('lbi').src=b.querySelector('img').src;document.getElementById('lbc').textContent=C[i]||'';document.getElementById('lba').href=L[i];lb.hidden=false}});
+document.getElementById('lbx').onclick=function(){lb.hidden=true};lb.onclick=function(e){if(e.target===lb)lb.hidden=true};
+<\/script>
+</body></html>`}
+let cardHtml='';
+$('cardBuild').onclick=async()=>{const S=db.settings;
+ if(digits(S.vPhone).length<10){alert(t('Укажите ваш номер WhatsApp: на него клиентки будут писать для записи.'));$('vPhone').focus();return}
+ const b=$('cardBuild');b.disabled=true;b.textContent=t('Собираю…');
+ try{cardHtml=await buildCard();$('vFrame').srcdoc=cardHtml;$('vdlg').showModal()}catch(e){console.warn(e);alert(t('Не получилось собрать визитку'))}
+ finally{b.disabled=false;b.textContent=t('Собрать визитку')}};
+$('vClose').onclick=()=>$('vdlg').close();
+function downloadFile(file){const a=h('a',{href:URL.createObjectURL(file),download:file.name});document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+$('vSave').onclick=()=>{if(!cardHtml)return;const file=new File([cardHtml],'vizitka.html',{type:'text/html'});
+ if(navigator.canShare&&navigator.canShare({files:[file]}))navigator.share({files:[file]}).catch(e=>{if(e&&e.name!=='AbortError')downloadFile(file)});else downloadFile(file)};
+
+/* ---------- УСЛУГИ ---------- */
+function renderServices(){$('svcList').replaceChildren(...db.catalog.map((c,i)=>{
+ const name=h('input',{'aria-label':t('Название'),maxlength:40});name.value=c.name;name.oninput=()=>{c.name=name.value;persist()};
+ const d=h('input',{type:'number',min:0,step:5,'aria-label':t('Минут')});d.value=c.duration;d.oninput=()=>{c.duration=Number(d.value)||0;persist()};
+ const p=h('input',{type:'number',min:0,step:500,'aria-label':t('Цена')});p.value=c.price;p.oninput=()=>{c.price=Number(p.value)||0;persist()};
+ return h('div',{class:'svc-row'},name,d,p,h('button',{type:'button',class:'button outline','aria-label':t('Удалить услугу'),onclick:()=>{if(confirm(t('Удалить «{n}» из прайса?',{n:c.name}))){db.catalog.splice(i,1);persist();renderServices()}}},'×'))}))}
+$('addSvc').onclick=()=>{db.catalog.push({name:t('Новая услуга'),price:0,duration:30});persist();renderServices();const inputs=$('svcList').querySelectorAll('.svc-row input');const last=inputs[inputs.length-3];if(last){last.focus();last.select()}};
+
+/* ---------- НАСТРОЙКИ ---------- */
+const bind=(id,key,num)=>{$(id).oninput=()=>{db.settings[key]=num?Math.max(1,Number($(id).value)||1):$(id).value;persist()}};
+bind('sMaster','master');bind('sStart','start');bind('sEnd','end');bind('sConfirm','confirm');bind('sRemind','remind');bind('sRemind2','remind2');bind('sBack','back');bind('sBackDays','backDays',true);$('sBackDays').addEventListener('input',drawBackChips);
+function drawBackChips(){const d=db.settings.backDays;$('sBackChips').replaceChildren(...[14,21,28,42].map(n=>h('button',{type:'button',class:'chip'+(n===d?' on':''),onclick:()=>{db.settings.backDays=n;$('sBackDays').value=n;persist();drawBackChips()}},backChip(n))))}
+bind('vPhone','vPhone');bind('vAbout','vAbout');bind('vAddress','vAddress');bind('vInsta','vInsta');
+let backupPrep=null;
+function prepareBackup(){if(backupPrep)return backupPrep;const btn=$('exportBtn'),need=db.photos.filter(p=>!dataCache[p.id]);if(!need.length)return Promise.resolve();
+ btn.disabled=true;btn.textContent=t('Готовлю копию с фото…');
+ backupPrep=(async()=>{for(const p of need){try{const f=await idbGet(p.id+':f');if(f)dataCache[p.id]=await blobToData(f)}catch(e){console.warn(e)}}})().finally(()=>{backupPrep=null;btn.disabled=false;btn.textContent=t('Скачать копию')});return backupPrep}
+function renderSettings(){const S=db.settings;$('sMaster').value=S.master;$('sStart').value=S.start;$('sEnd').value=S.end;$('sConfirm').value=S.confirm;$('sRemind').value=S.remind;$('sRemind2').value=S.remind2;$('sBack').value=S.back;$('sBackDays').value=S.backDays;drawBackChips();prepareBackup();
+ $('sLang').replaceChildren(...Object.entries(LANGS).map(([k,v])=>h('button',{type:'button',class:'chip'+(k===LANG?' on':''),onclick:()=>setLang(k)},v)));
+ $('sOff').replaceChildren(...[1,2,3,4,5,6,0].map(d=>h('button',{type:'button',class:'chip'+(S.off.includes(d)?' on':''),onclick:()=>{S.off=S.off.includes(d)?S.off.filter(x=>x!==d):[...S.off,d];persist();renderSettings()}},WD_SHORT[LANG][d])))}
+$('exportBtn').onclick=()=>{const photoData={};for(const p of db.photos)if(dataCache[p.id])photoData[p.id]=dataCache[p.id];
+ const blob=new Blob([JSON.stringify({...db,photoData},null,1)],{type:'application/json'});const a=h('a',{href:URL.createObjectURL(blob),download:(LANG==='ru'?'tempo-копия-':'tempo-backup-')+todayKey()+'.json'});document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)};
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const s=JSON.parse(await f.text());if(!Array.isArray(s.records))throw 0;if(!confirm(t('Заменить текущие данные данными из копии?')))return;
+ const {photoData,...rest}=s;localStorage.setItem(KEY,JSON.stringify(rest));load();try{localStorage.setItem('tempo_lang',LANG)}catch(e){}applyStatic();
+ for(const k in urlCache){URL.revokeObjectURL(urlCache[k]);delete urlCache[k]}for(const k in dataCache)delete dataCache[k];
+ let lost=0;try{await idbClear();for(const p of db.photos){const d=photoData&&photoData[p.id];if(!d){lost++;continue}try{await savePhotoBlob(p.id,await (await fetch(d)).blob());dataCache[p.id]=d}catch(e){lost++}}}catch(e){lost=db.photos.length}
+ for(const p of db.photos)p.up=false;persist();
+ if(lost){db.photos=db.photos.filter(p=>dataCache[p.id]);persist()}
+ renderAll();alert(t('Копия загружена')+(lost?t('. Не удалось восстановить фото: {n}',{n:lost}):''))}catch(err){alert(t('Не получилось прочитать файл копии'))}e.target.value=''};
+
+$('vLang').onchange=()=>{db.settings.vLang=$('vLang').value;persist()};
+function setLang(l){if(!LANGS[l])return;const S=db.settings;LANG=l;S.lang=l;try{localStorage.setItem('tempo_lang',l)}catch(e){}
+ for(const k of ['confirm','remind','remind2','back'])if(Object.values(TPL).some(T=>T[k]===S[k]))S[k]=TPL[l][k];
+ for(const c of db.catalog)for(const names of Object.values(CAT_NAMES)){const i=names.indexOf(c.name);if(i>=0){c.name=CAT_NAMES[l][i];break}}
+ persist();applyStatic();renderAll()}
+
+/* ---------- ОТЧЁТ ЗА МЕСЯЦ ---------- */
+let repY=new Date().getFullYear(),repM=new Date().getMonth();
+const monthKey=(y,m)=>y+'-'+pad(m+1);
+function monthStats(y,m){const pre=monthKey(y,m),tk=todayKey();
+ const recs=db.records.filter(r=>r.kind!=='break'&&r.date.startsWith(pre));
+ const ok=recs.filter(earned),past=ok.filter(r=>r.date<=tk),ahead=ok.filter(r=>r.date>tk);
+ const exp=db.expenses.filter(e=>String(e.date).startsWith(pre));
+ return {recs,past,ahead,revenue:past.reduce((s,r)=>s+r.price,0),aheadSum:ahead.reduce((s,r)=>s+r.price,0),
+  expSum:exp.reduce((s,e)=>s+(+e.amount||0),0),exp,noshow:recs.filter(r=>r.status==='noshow').length,cancel:recs.filter(r=>r.status==='cancelled'||r.status==='moved').length}}
+function openReport(){repY=viewYear;repM=viewMonth;show('report')}
+function shiftRep(n){const d=new Date(repY,repM+n,1);repY=d.getFullYear();repM=d.getMonth();renderReport()}
+function renderReport(){
+ const S=monthStats(repY,repM),pd=new Date(repY,repM-1,1),P=monthStats(pd.getFullYear(),pd.getMonth());
+ $('rTitle').textContent=cap(fmtD(new Date(repY,repM,1),{month:'long',year:'numeric'}));
+ $('rRevenue').textContent=money(S.revenue);
+ const cmp=$('rCmp');cmp.replaceChildren();
+ if(P.revenue>0){const pc=Math.round((S.revenue-P.revenue)/P.revenue*100);
+  if(pc===0)cmp.textContent=t('как в прошлом месяце');else cmp.append(h('b',{class:pc>0?'up':'down'},(pc>0?'▲ +':'▼ ')+pc+'%'),' ',t('к прошлому месяцу'))}
+ else cmp.textContent=t('в прошлом месяце не было выручки');
+ $('rExp').textContent=money(S.expSum);$('rProfit').textContent=money(S.revenue-S.expSum);$('rAhead').textContent=money(S.aheadSum);
+ const ids=new Set(S.past.map(r=>r.clientId||('n:'+r.name)));
+ const firstVisit={};for(const r of db.records)if(r.kind!=='break'&&earned(r)){const k=r.clientId||('n:'+r.name);if(!firstVisit[k]||r.date<firstVisit[k])firstVisit[k]=r.date}
+ const pre=monthKey(repY,repM),nNew=[...ids].filter(k=>String(firstVisit[k]||'').startsWith(pre)).length;
+ $('rVisits').textContent=S.past.length;$('rAvg').textContent=money(S.past.length?Math.round(S.revenue/S.past.length):0);
+ $('rClients').textContent=ids.size;$('rNew').textContent=nNew;$('rNoshow').textContent=S.noshow;$('rCancel').textContent=S.cancel;
+ // дни недели
+ const wd=[0,0,0,0,0,0,0];for(const r of S.past)wd[new Date(r.date+'T12:00:00').getDay()]+=r.price;
+ const order=[1,2,3,4,5,6,0],max=Math.max(...wd);
+ $('rBars').replaceChildren(...order.map(d=>h('div',{class:'b'+(max&&wd[d]===max?' top':'')},h('em',null,wd[d]?(wd[d]>=1000?Math.round(wd[d]/1000)+({ru:' тыс',kk:' мың',en:'k'}[LANG]):wd[d]):''),h('i',{style:'height:'+(max?Math.max(3,Math.round(wd[d]/max*88)):3)+'px'}),WD_SHORT[LANG][d])));
+ $('rBusy').textContent=max?t('больше всего: {d}',{d:WD_SHORT[LANG][wd.indexOf(max)]}):'';
+ // услуги
+ const sv={};for(const r of S.past)for(const s of r.services){const k=s.name.trim();if(!k)continue;sv[k]=sv[k]||{n:0,m:0};sv[k].n++;sv[k].m+=+s.price||0}
+ const svl=Object.entries(sv).sort((a,b)=>b[1].n-a[1].n||b[1].m-a[1].m).slice(0,6);
+ $('rSvc').replaceChildren(...(svl.length?svl.map(([k,v])=>h('div',{class:'toprow'},h('span',null,k,h('small',null,t('{n} раз · {m}',{n:v.n,m:money(v.m)}))),h('b',null,v.n))):[h('div',{class:'empty'},t('Пока нет визитов в этом месяце'))]));
+ // клиентки
+ const cl={};for(const r of S.past){const k=r.clientId||('n:'+r.name);cl[k]=cl[k]||{name:nameOf(r),n:0,m:0,id:r.clientId};cl[k].n++;cl[k].m+=r.price}
+ const cll=Object.values(cl).sort((a,b)=>b.m-a.m).slice(0,5);
+ $('rTopC').replaceChildren(...(cll.length?cll.map(c=>h('div',{class:'toprow',style:c.id?'cursor:pointer':null,onclick:c.id?()=>{const x=getClient(c.id);if(x)openClient(x)}:null},h('span',null,c.name,h('small',null,t('{n} виз. · {m}',{n:c.n,m:money(c.m)}))),h('b',null,money(c.m)))):[h('div',{class:'empty'},t('Пока нет визитов в этом месяце'))]));
+ // расходы
+ $('rExpCount').textContent=S.exp.length?t('{n} шт.',{n:S.exp.length}):'';
+ const el=[...S.exp].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ $('rExpList').replaceChildren(...(el.length?el.map(e=>h('div',{class:'toprow'},h('span',null,e.name||t('Материалы'),h('small',null,fmt(e.date,{day:'numeric',month:'long'}))),h('span',{style:'display:flex;align-items:center;gap:10px'},h('b',null,money(e.amount)),
+  h('button',{type:'button',class:'button outline','aria-label':t('Удалить'),style:'padding:6px 10px',onclick:()=>{if(confirm(t('Удалить расход «{n}»?',{n:e.name||t('Материалы')}))){db.expenses=db.expenses.filter(x=>x.id!==e.id);persist();renderReport()}}},'×')))):[h('div',{class:'empty'},t('Пока нет расходов'))]))}
+$('rPrev').onclick=()=>shiftRep(-1);$('rNext').onclick=()=>shiftRep(1);
+$('monthBtn').onclick=openReport;$('openReport').onclick=()=>{repY=new Date().getFullYear();repM=new Date().getMonth();show('report')};
+$('eAdd').onclick=()=>{const amount=Math.max(0,Number($('eSum').value)||0);if(!amount){alert(t('Введите сумму'));$('eSum').focus();return}
+ const tk=todayKey(),pre=monthKey(repY,repM),date=tk.startsWith(pre)?tk:pre+'-01';
+ db.expenses.push({id:uid(),date,name:$('eName').value.trim(),amount});persist();$('eName').value='';$('eSum').value='';renderReport()};
+
+/* ---------- ОБЛАКО (Supabase, без библиотек) ---------- */
+var SUPA_URL='https://dmhncscoyvopvwidvdea.supabase.co',SUPA_KEY='sb_publishable_XgQgJfV-OKmlsb9FGBtdLA_njxq1_xV';
+function cloudOn(){return !!(SUPA_URL&&SUPA_KEY&&SUPA_URL.indexOf('__')<0&&SUPA_KEY.indexOf('__')<0)}
+var auth=null,sync={uid:null,syncedAt:null,dirty:false},editRev=0,pushTimer=null,pushing=false,pulling=false,photoBusy=false,recoveryMode=false,cloudState='idle',cloudMsg='';
+try{auth=JSON.parse(localStorage.getItem('tempo_auth')||'null')}catch(e){}
+try{sync={...sync,...JSON.parse(localStorage.getItem('tempo_sync')||'{}')}}catch(e){}
+function saveAuth(){try{auth?localStorage.setItem('tempo_auth',JSON.stringify(auth)):localStorage.removeItem('tempo_auth')}catch(e){}}
+function saveSync(){try{localStorage.setItem('tempo_sync',JSON.stringify(sync))}catch(e){}}
+function markDirty(){if(!sync||!cloudOn())return;editRev++;sync.dirty=true;saveSync();if(auth){clearTimeout(pushTimer);pushTimer=setTimeout(()=>push(),2500)}}
+const hasData=()=>db.records.length||db.clients.length||db.photos.length||db.expenses.length;
+const jsonH={'Content-Type':'application/json'};
+
+function setSession(j){auth={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Date.now()+((+j.expires_in||3600)*1000),user:{id:j.user.id,email:j.user.email}};saveAuth()}
+async function refresh(){if(!auth)return false;
+ try{const r=await fetch(SUPA_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SUPA_KEY,...jsonH},body:JSON.stringify({refresh_token:auth.refresh_token})});
+  if(!r.ok){if(r.status>=400&&r.status<500){auth=null;saveAuth();setCloud('error',t('Войдите снова: срок входа истёк.'))}return false}
+  setSession(await r.json());return true}catch(e){return false}}
+async function api(path,opt){opt=opt||{};const headers={apikey:SUPA_KEY,...(opt.headers||{})};
+ if(auth){if(auth.expires_at-Date.now()<60000)await refresh();if(auth)headers.Authorization='Bearer '+auth.access_token}
+ const r=await fetch(SUPA_URL+path,{method:opt.method||'GET',headers,body:opt.body});
+ if(r.status===401&&auth&&!opt.retried&&await refresh())return api(path,{...opt,retried:true});
+ return r}
+
+function setCloud(st,msg){cloudState=st;cloudMsg=msg||'';drawCloud()}
+function drawCloud(){const on=cloudOn();$('cloudPanel').hidden=!on;$('cloudNudge').hidden=!on||!!auth;if(!on)return;
+ $('cloudOut').hidden=!!auth||recoveryMode;$('cloudIn').hidden=!auth||recoveryMode;$('cloudNew').hidden=!recoveryMode;
+ if(auth)$('aWho').textContent=t('Вы вошли как {e}',{e:auth.user.email});
+ let m=cloudMsg;
+ if(!m&&auth){if(cloudState==='ok'&&sync.syncedAt){const d=new Date(sync.syncedAt);m='☁️ '+t('Сохранено в облаке · {t}',{t:pad(d.getHours())+':'+pad(d.getMinutes())})}
+  else if(cloudState==='offline')m=t('Нет интернета — сохраню, когда он появится.');
+  else if(cloudState==='error')m=t('Не получилось связаться с облаком. Попробую позже.');
+  else if(sync.dirty)m=t('Есть несохранённые изменения');}
+ $('cloudMsg').textContent=m;$('cloudMsg').style.color=cloudState==='error'?'#b2412f':''}
+
+function authErr(j){const m=String(j.error_code||'')+' '+String(j.error_description||j.msg||j.message||j.error||'');
+ if(/invalid_credentials|invalid login/i.test(m))return t('Неверная почта или пароль.');
+ if(/user_already_exists|already registered/i.test(m))return t('Такая почта уже зарегистрирована. Нажмите «Войти».');
+ if(/email_not_confirmed|not confirmed/i.test(m))return t('Подтвердите почту: откройте ссылку из письма.');
+ if(/rate|too many/i.test(m))return t('Слишком много попыток. Подождите немного.');
+ if(/weak_password|password/i.test(m))return t('Пароль слишком простой. Нужно минимум 6 символов.');
+ return t('Не получилось: {m}',{m:m.trim()||'?'})}
+async function authCall(kind){const email=$('aEmail').value.trim(),pw=$('aPass').value;
+ if(!/^\S+@\S+\.\S+$/.test(email)){alert(t('Введите почту'));$('aEmail').focus();return}
+ if(kind!=='recover'&&pw.length<6){alert(t('Пароль — минимум 6 символов'));$('aPass').focus();return}
+ const back=encodeURIComponent(location.href.split('#')[0]);setCloud('busy',t('Подождите…'));
+ try{const path=kind==='login'?'/auth/v1/token?grant_type=password':kind==='signup'?'/auth/v1/signup?redirect_to='+back:'/auth/v1/recover?redirect_to='+back;
+  const r=await fetch(SUPA_URL+path,{method:'POST',headers:{apikey:SUPA_KEY,...jsonH},body:JSON.stringify(kind==='recover'?{email}:{email,password:pw})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){setCloud('error',authErr(j));return}
+  if(kind==='recover'){setCloud('idle',t('Мы отправили письмо со ссылкой на {e}. Откройте его на этом телефоне.',{e:email}));return}
+  if(j.access_token){setSession(j);$('aPass').value='';cloudMsg='';await afterLogin()}
+  else setCloud('idle',t('Почти готово! Мы отправили письмо на {e}. Откройте ссылку из письма на этом телефоне — и вы войдёте.',{e:email}))
+ }catch(e){setCloud('offline',t('Нет интернета. Попробуйте позже.'))}}
+
+async function afterLogin(){if(sync.uid!==auth.user.id){sync={uid:auth.user.id,syncedAt:null,dirty:!!hasData()};saveSync()}drawCloud();await pull()}
+
+async function pull(){if(!cloudOn()||!auth||pulling||pushing)return;pulling=true;setCloud('busy',t('Синхронизация…'));
+ let then=null;
+ try{const r=await api('/rest/v1/tempo_data?select=data,updated_at&user_id=eq.'+auth.user.id);if(!r.ok)throw new Error('pull '+r.status);
+  const row=(await r.json())[0];
+  if(!row)then='push';
+  else if(!sync.syncedAt||row.updated_at>sync.syncedAt){
+   if(sync.dirty&&hasData()&&!confirm(t('Данные есть и на этом телефоне, и в облаке, и они разные.\n\nОК — взять данные из облака.\nОтмена — оставить данные этого телефона и отправить их в облако.')))then='push';
+   else applyRemote(row)}
+  else if(sync.dirty)then='push';
+  if(!then){cloudMsg='';setCloud('ok');uploadPhotos()}
+ }catch(e){console.warn(e);setCloud(navigator.onLine?'error':'offline')}finally{pulling=false}
+ if(then==='push')await push(true)}
+
+function applyRemote(row){const s=row.data||{};
+ db.records=(s.records||[]).map(normalize);db.clients=Array.isArray(s.clients)?s.clients:[];db.photos=Array.isArray(s.photos)?s.photos:[];db.expenses=Array.isArray(s.expenses)?s.expenses:[];
+ if(Array.isArray(s.catalog)&&s.catalog.length)db.catalog=s.catalog;db.settings={...DEFAULT_SETTINGS,...(s.settings||{})};
+ if(LANGS[db.settings.lang])LANG=db.settings.lang;
+ try{localStorage.setItem(KEY,JSON.stringify(db));localStorage.setItem('tempo_lang',LANG)}catch(e){}
+ sync.syncedAt=row.updated_at;sync.dirty=false;saveSync();applyStatic();renderAll();fetchPhotos()}
+
+async function push(force){if(!cloudOn()||!auth)return;
+ if(pushing||pulling){clearTimeout(pushTimer);pushTimer=setTimeout(()=>push(force),2000);return}
+ if(!navigator.onLine){setCloud('offline');return}
+ pushing=true;setCloud('busy',t('Сохраняю в облако…'));const rev=editRev;let conflict=false;
+ try{
+  if(!force&&sync.syncedAt){const c=await api('/rest/v1/tempo_data?select=updated_at&user_id=eq.'+auth.user.id);
+   if(c.ok){const row=(await c.json())[0];if(row&&row.updated_at>sync.syncedAt)conflict=true}}
+  if(!conflict){
+   const now=new Date().toISOString();
+   const r=await api('/rest/v1/tempo_data?on_conflict=user_id',{method:'POST',headers:{...jsonH,Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({user_id:auth.user.id,data:db,updated_at:now})});
+   if(!r.ok)throw new Error('push '+r.status+' '+(await r.text()));
+   const row=(await r.json())[0];sync.syncedAt=(row&&row.updated_at)||now;sync.uid=auth.user.id;if(editRev===rev)sync.dirty=false;saveSync();
+   cloudMsg='';setCloud('ok')}
+ }catch(e){console.warn(e);setCloud(navigator.onLine?'error':'offline')}finally{pushing=false}
+ if(conflict){await pull();return}
+ if(sync.dirty&&editRev!==rev){clearTimeout(pushTimer);pushTimer=setTimeout(()=>push(),1500)}
+ else uploadPhotos()}
+
+const photoPath=(id,suf)=>'photos/'+auth.user.id+'/'+id+'_'+suf+'.jpg';
+async function uploadPhotos(){if(photoBusy||!auth)return;photoBusy=true;let changed=false;
+ try{for(const p of db.photos.filter(p=>!p.up)){const f=await idbGet(p.id+':f');if(!f)continue;const th=(await idbGet(p.id+':t'))||f;
+   for(const [suf,b] of [['f',f],['t',th]]){const r=await api('/storage/v1/object/'+photoPath(p.id,suf),{method:'POST',headers:{'Content-Type':'image/jpeg','x-upsert':'true'},body:b});if(!r.ok)throw new Error('photo '+r.status)}
+   p.up=true;changed=true}
+ }catch(e){console.warn(e)}finally{photoBusy=false;if(changed)persist()}}
+async function fetchPhotos(){if(!auth)return;let got=false;
+ for(const p of db.photos){if(!p.up)continue;try{if(await idbGet(p.id+':t'))continue;
+  for(const suf of ['t','f']){const r=await api('/storage/v1/object/authenticated/'+photoPath(p.id,suf));if(r.ok){await idbPut(p.id+':'+suf,await r.blob());got=true}}}catch(e){console.warn(e)}}
+ if(got)refreshPhotos()}
+async function deleteCloudPhoto(id){if(!auth)return;try{await api('/storage/v1/object/photos',{method:'DELETE',headers:jsonH,body:JSON.stringify({prefixes:[auth.user.id+'/'+id+'_f.jpg',auth.user.id+'/'+id+'_t.jpg']})})}catch(e){console.warn(e)}}
+
+async function logout(){if(!confirm(t('Выйти из аккаунта? Данные останутся в облаке, а с этого телефона будут удалены. Чтобы вернуть их, просто войдите снова.')))return;
+ await uploadPhotos();if(sync.dirty){clearTimeout(pushTimer);await push(true)}
+ if(sync.dirty||db.photos.some(p=>!p.up)){alert(t('Не получилось сохранить последние изменения в облако. Проверьте интернет и попробуйте ещё раз.'));return}
+ try{await api('/auth/v1/logout',{method:'POST'})}catch(e){}
+ auth=null;saveAuth();sync={uid:null,syncedAt:null,dirty:false};saveSync();
+ try{localStorage.removeItem(KEY)}catch(e){}try{await idbClear()}catch(e){}location.reload()}
+
+async function setNewPass(){const pw=$('aNewPass').value;if(pw.length<6){alert(t('Пароль — минимум 6 символов'));return}
+ try{const r=await api('/auth/v1/user',{method:'PUT',headers:jsonH,body:JSON.stringify({password:pw})});const j=await r.json().catch(()=>({}));
+  if(!r.ok){setCloud('error',authErr(j));return}recoveryMode=false;$('aNewPass').value='';setCloud('ok',t('Пароль изменён'));await afterLogin()}catch(e){setCloud('offline',t('Нет интернета. Попробуйте позже.'))}}
+
+async function cloudInit(){drawCloud();if(!cloudOn())return;
+ const hs=new URLSearchParams(location.hash.slice(1));
+ if(hs.get('access_token')||hs.get('error')){history.replaceState(null,'',location.pathname+location.search)}
+ if(hs.get('error')){show('more');setCloud('error',t('Ссылка из письма устарела или уже использована. Попробуйте войти или запросите письмо ещё раз.'))}
+ else if(hs.get('access_token')){try{const r=await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+hs.get('access_token')}});const u=await r.json();
+  if(r.ok){setSession({access_token:hs.get('access_token'),refresh_token:hs.get('refresh_token'),expires_in:hs.get('expires_in'),user:u});
+   if(hs.get('type')==='recovery'){recoveryMode=true;show('more');setCloud('idle',t('Придумайте новый пароль'));return}
+   show('more');showToast(t('Почта подтверждена, вы вошли ☁️'))}}catch(e){console.warn(e)}}
+ if(auth)await afterLogin()}
+$('aLogin').onclick=()=>authCall('login');$('aSignup').onclick=()=>authCall('signup');$('aForgot').onclick=()=>authCall('recover');
+$('aSync').onclick=async()=>{if(sync.dirty)await push();else await pull()};$('aLogout').onclick=logout;$('aSetPass').onclick=setNewPass;
+$('cloudNudge').onclick=()=>show('more');
+window.addEventListener('online',()=>{if(auth)sync.dirty?push():pull()});window.addEventListener('offline',()=>{if(auth)setCloud('offline')});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&auth&&!sync.dirty)pull()});
+
+applyStatic();
+renderCal();
+cloudInit();
+</script>
+</body>
+</html>

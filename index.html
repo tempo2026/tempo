@@ -146,6 +146,16 @@ dialog.wide{padding:12px}
 .rcard .d .svc{display:block;color:var(--muted);font-size:15px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rcard .d .sum{display:block;color:var(--muted);font-size:15px;margin-top:2px}
 .rcard.faded{opacity:.5}
+.nameline{display:flex;align-items:baseline;gap:8px}.nameline b{flex:1;min-width:0}
+.rcard .live{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.rcard .live.now{color:var(--green)}.rcard .live.now:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#3fa463;margin-right:5px;vertical-align:1px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}@media (prefers-reduced-motion:reduce){.rcard .live.now:before{animation:none}}
+.rcard.now{border-color:#a6c6ad;box-shadow:0 0 0 1px #a6c6ad inset}
+.marks{grid-column:2/-1;display:flex;gap:8px;margin-top:-2px}.marks button{flex:1}
+.marks button{border:1px solid #dcd4c9;background:#fff;border-radius:10px;padding:7px 11px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+.marks .yes{border-color:#a6c6ad;color:var(--green);font-weight:600}.marks .no{color:#a2532e}
+.mbar{display:flex;height:4px;border-radius:3px;overflow:hidden;background:var(--soft);margin-top:4px;width:96px}
+.mbar i{background:#4f9a67}.mbar b{background:#c9ddcf}
 .rcard.free{grid-template-columns:62px minmax(0,1fr);background:transparent;border:1.5px dashed #c9dccd;padding:9px 14px;border-radius:14px}
 .rcard.free:hover,.rcard.free:active{background:#edf5ee}
 .rcard.free .t strong{color:var(--green);font-weight:500;font-size:17px}
@@ -380,7 +390,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
 </main>
 
 <div class="bottom">
-<div class="daybar" id="daybar"><div class="left"><button type="button" id="monthBtn"><small>📊 За месяц</small><span id="monthTotal">0 ₸</span></button></div><div class="mid"><span>Выручка за день</span><strong id="dayTotal">0 ₸</strong></div><button type="button" id="today">Сегодня</button></div>
+<div class="daybar" id="daybar"><div class="left"><button type="button" id="monthBtn"><small>📊 За месяц</small><span id="monthTotal">0 ₸</span><span class="mbar" id="monthBar"><i></i><b></b></span></button></div><div class="mid"><span>Выручка за день</span><strong id="dayTotal">0 ₸</strong></div><button type="button" id="today">Сегодня</button></div>
 <nav class="nav">
   <button data-view="cal" class="active"><span>▦</span>Календарь</button>
   <button data-view="clients"><span>♙</span>Клиенты</button>
@@ -398,6 +408,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   <div class="tag cancelled" id="cancelNote" hidden>Клиентка отменила эту запись</div>
   <div class="seg" id="kindSeg"><button type="button" data-k="rec" class="on">Запись</button><button type="button" data-k="break">Перерыв</button></div>
   <button type="button" class="when" id="whenBtn"><div><small>Дата и время</small><b id="whenText"></b></div><span>Изменить</span></button>
+  <div class="seg" id="statusSeg" hidden><button type="button" data-s="planned">Ожидается</button><button type="button" data-s="done">Пришла</button><button type="button" data-s="noshow">Не пришла</button></div>
   <input id="clientDate" type="hidden"><input id="clientTime" type="hidden">
   <div id="breakWrap" hidden>
     <div class="fsec">Перерыв</div>
@@ -452,7 +463,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
 
 <!-- ПОРА НАПОМНИТЬ -->
 <dialog id="ddlg" class="sheet">
-  <div class="head"><h2>Пора напомнить</h2><button class="icon-btn" type="button" id="dClose" aria-label="Закрыть">×</button></div>
+  <div class="head"><h2>Что нужно сделать</h2><button class="icon-btn" type="button" id="dClose" aria-label="Закрыть">×</button></div>
   <p id="dHint"></p>
   <div id="dList"></div>
 </dialog>
@@ -590,6 +601,14 @@ const I18N={kk:{},en:{}};
 ['Скачать копию','Көшірмені жүктеп алу','Download backup'],
 ['Загрузить копию','Көшірмені қалпына келтіру','Restore backup'],
 ['TEMPO · версия 11','TEMPO · 11-нұсқа','TEMPO · version 11'],
+['сейчас','қазір','now'],['через {d}','{d} кейін','in {d}'],
+['Нужно внимание: {n}','Назар аударыңыз: {n}','Needs attention: {n}'],['Отметить визиты: {n}','Келгендерді белгілеу: {n}','Mark visits: {n}'],
+['Отметьте, кто пришёл','Кім келгенін белгілеңіз','Mark who came'],
+['Отметьте прошедшие визиты — так отчёт будет точным. ','Өткен келулерді белгілеңіз — сонда есеп дәл болады. ','Mark past visits so the report is accurate. '],
+['Всё отмечено 👍','Бәрі белгіленді 👍','All done 👍'],
+['заработано {a} · ещё записано {b}','табыс {a} · әлі жазылған {b}','earned {a} · still booked {b}'],
+['За месяц','Ай бойынша','This month'],
+['Что нужно сделать','Не істеу керек','To do'],
 ['Скрыть на 2 недели','2 аптаға жасыру','Hide for 2 weeks'],
 ['Весь месяц ▾','Толық ай ▾','Whole month ▾'],
 ['Только неделя ▴','Тек апта ▴','Week only ▴'],
@@ -961,7 +980,10 @@ function renderCal(){
  const dayRecs=db.records.filter(x=>x.date===selected);
  $('dayTotal').textContent=money(dayRecs.filter(earned).reduce((s,x)=>s+x.price,0));
  const mPrefix=viewYear+'-'+pad(viewMonth+1);
- $('monthTotal').textContent=money(db.records.filter(x=>x.date.startsWith(mPrefix)&&earned(x)).reduce((s,x)=>s+x.price,0));
+ {const now=Date.now(),mr=db.records.filter(x=>x.kind!=='break'&&x.date.startsWith(mPrefix)&&earned(x)),isFact=x=>x.status==='done'||recStart(x).getTime()+x.duration*60000<=now;
+  const fact=mr.filter(isFact).reduce((s,x)=>s+x.price,0),ahead=mr.filter(x=>!isFact(x)).reduce((s,x)=>s+x.price,0),all=fact+ahead;
+  $('monthTotal').textContent=money(fact);const bar=$('monthBar');bar.hidden=!all;bar.children[0].style.flex=String(fact);bar.children[1].style.flex=String(ahead);
+  $('monthBtn').title=t('заработано {a} · ещё записано {b}',{a:money(fact),b:money(ahead)});$('monthBtn').setAttribute('aria-label',t('За месяц')+': '+$('monthBtn').title)}
  renderDue();
  const box=$('entries');box.replaceChildren();
  const L=dayItems(selected);
@@ -981,7 +1003,13 @@ function bookedRow(x,faded){
   h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),
   h('div',{class:'d'},h('b',null,nameOf(x)),h('span',{class:'svc'},x.services.map(y=>y.name).join(' + ')),h('span',{class:'sum'},money(x.price)+(x.prepay?' · '+t('предоплата {m}',{m:money(x.prepay)}):'')),x.note?h('span',{class:'note'},'📝 '+x.note):null,x.status!=='planned'?h('span',{class:'tag '+x.status},t(STATUS[x.status])):null),
   wa);
- el.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();openEdit(x)}};return el}
+ if(x.status==='planned'&&!faded){const now=new Date(),st=recStart(x),en=new Date(st.getTime()+x.duration*60000),left=Math.round((st-now)/60000);
+  let lab=null;if(st<=now&&now<en){el.classList.add('now');lab=h('span',{class:'live now'},t('сейчас'))}
+  else if(left>0&&left<=180&&x.date===todayKey())lab=h('span',{class:'live'},t('через {d}',{d:dur(left)}));
+  if(lab){const b=el.querySelector('.d b'),line=h('div',{class:'nameline'});b.replaceWith(line);line.append(b,lab)}
+  if(st<=now){const mk=s=>ev=>{ev.stopPropagation();x.status=s;persist();renderAll()};
+   el.append(h('div',{class:'marks'},h('button',{type:'button',class:'yes',onclick:mk('done')},'✓ '+t('Пришла')),h('button',{type:'button',class:'no',onclick:mk('noshow')},t('Не пришла'))))}}
+ el.onkeydown=ev=>{if(ev.target!==el)return;if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();openEdit(x)}};return el}
 
 /* ---------- ШАГ 1: ВЫБОР ВРЕМЕНИ ---------- */
 let pick={mode:'new',date:null,client:null,exclude:null,focus:null};
@@ -1033,7 +1061,9 @@ function serviceLine(line){
 function drawServices(){$('services').replaceChildren(...lines.map(serviceLine));updateTotals()}
 function updateTotals(){const d=lines.reduce((s,x)=>s+(+x.duration||0),0),p=lines.reduce((s,x)=>s+(+x.price||0),0);$('totalDuration').textContent=dur(d);$('totalPrice').textContent=money(p);if(!manualTotal)$('totalOverride').value=p;updateWhen();updatePay()}
 $('totalOverride').oninput=()=>{manualTotal=true};
-function drawStatus(){$('statusChips').replaceChildren(...Object.entries(STATUS).map(([k,v])=>h('button',{type:'button',class:'chip'+(k===formStatus?' on':''),onclick:()=>{formStatus=k;drawStatus()}},v)))}
+function drawStatus(){const r=editId&&db.records.find(x=>x.id===editId);$('statusSeg').hidden=!r||formKind==='break'||!active(r);
+ document.querySelectorAll('#statusSeg button').forEach(b=>b.classList.toggle('on',b.dataset.s===formStatus))}
+document.querySelectorAll('#statusSeg button').forEach(b=>b.onclick=()=>{formStatus=b.dataset.s;drawStatus()});
 function closePicker(){$('servicePicker').classList.add('hidden');$('addService').setAttribute('aria-expanded','false')}
 let picked=[];
 const svcKey=n=>String(n).trim().toLowerCase();
@@ -1097,7 +1127,7 @@ $('kClose').onclick=()=>$('kdlg').close();
 $('kNew').onclick=()=>{const q=$('kSearch').value.trim();formClientId=null;$('clientName').value=digits(q)&&digits(q).length>=5?'':q;$('clientPhone').value=digits(q).length>=5?q:'';$('newClientWrap').hidden=false;$('kdlg').close();drawClientBtn();setTimeout(()=>$('clientName').focus(),50)};
 let formKind='rec';
 function setKind(k){formKind=k;document.querySelectorAll('#kindSeg button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
- $('breakWrap').hidden=k!=='break';$('recWrap').hidden=k==='break';$('formTitle').textContent=t(editId?(k==='break'?'Перерыв':'Изменить запись'):(k==='break'?'Новый перерыв':'Новая запись'));$('cancelRec').hidden=!editId||k==='break';updateWhen()}
+ $('breakWrap').hidden=k!=='break';drawStatus();$('recWrap').hidden=k==='break';$('formTitle').textContent=t(editId?(k==='break'?'Перерыв':'Изменить запись'):(k==='break'?'Новый перерыв':'Новая запись'));$('cancelRec').hidden=!editId||k==='break';updateWhen()}
 document.querySelectorAll('#kindSeg button').forEach(b=>b.onclick=()=>setKind(b.dataset.k));
 $('brkDur').onchange=()=>updateWhen();
 function updatePay(){const t=Number($('totalOverride').value)||0,pp=Number($('prepay').value)||0;$('toPay').textContent=money(Math.max(0,t-pp))}
@@ -1155,27 +1185,35 @@ function visitStage(r,now){if(r.kind==='break'||r.status!=='planned')return 0;co
  const r1=r.remind1??r.remindBefore??1440,r2=r.remind2??0,s1=r.sent1||r.reminded,s2=r.sent2;
  if(r2&&!s2&&left<=r2*60000)return 2;
  if(r1&&!s1&&!s2&&left<=r1*60000)return 1;return 0}
+function dueMarks(){const now=Date.now(),from=dateKey(new Date(now-30*864e5));return db.records.filter(r=>r.kind!=='break'&&r.status==='planned'&&r.date>=from&&recStart(r).getTime()+r.duration*60000<=now).sort((a,b)=>recStart(a)-recStart(b))}
 function dueVisits(){const now=Date.now();return db.records.filter(r=>visitStage(r,now)).sort((a,b)=>recStart(a)-recStart(b))}
-function renderDue(){const due=dueClients(),vis=dueVisits(),n=due.length+vis.length;$('duebar').hidden=!n;if(!n)return;
- $('dueTitle').textContent=vis.length&&due.length?t('Напомнить: {n}',{n}):vis.length?t('Напомнить о записи: {n}',{n:vis.length}):t('Пора записаться: {n}',{n:due.length});
- const names=[...vis.map(r=>String(nameOf(r)).split(' ')[0]),...due.map(({c})=>c.name.split(' ')[0])];
+function renderDue(){const due=dueClients(),vis=dueVisits(),mk=dueMarks(),n=due.length+vis.length+mk.length;$('duebar').hidden=!n;if(!n)return;
+ const kinds=[vis.length,due.length,mk.length].filter(Boolean).length;
+ $('dueTitle').textContent=kinds>1?t('Нужно внимание: {n}',{n}):mk.length?t('Отметить визиты: {n}',{n}):vis.length?t('Напомнить о записи: {n}',{n:vis.length}):t('Пора записаться: {n}',{n:due.length});
+ const names=[...new Set([...mk.map(r=>String(nameOf(r)).split(' ')[0]),...vis.map(r=>String(nameOf(r)).split(' ')[0]),...due.map(({c})=>c.name.split(' ')[0])])];
  $('dueSub').textContent=names.slice(0,3).join(', ')+(names.length>3?t(' и ещё {n}',{n:names.length-3}):'')}
 function markVisit(r){const st=visitStage(r,Date.now());if(st===2)r.sent2=true;else r.sent1=true;persist();drawDue();renderAll()}
 function markReminded(c){c.remindedAt=todayKey();persist();drawDue();renderAll()}
 function drawDue(){const S=db.settings,due=dueClients();
-  const vis=dueVisits(),out=[];
+  const vis=dueVisits(),mk=dueMarks(),out=[];
+ if(mk.length){out.push(h('div',{class:'due-sec'},t('Отметьте, кто пришёл')));for(const r of mk){const set=s=>()=>{r.status=s;persist();drawDue();renderAll()};out.push(h('div',{class:'due-row'},
+  h('b',null,nameOf(r)),h('small',null,t('{d} в {t}',{d:cap(fmt(r.date,{weekday:'short',day:'numeric',month:'long'})),t:r.time})+' · '+r.services.map(y=>y.name).join(', ')),
+  h('div',{class:'acts'},h('button',{type:'button',class:'button',onclick:set('done')},'✓ '+t('Пришла')),h('button',{type:'button',class:'button outline',onclick:set('noshow')},t('Не пришла')))))}}
  if(vis.length){out.push(h('div',{class:'due-sec'},t('О записи')));for(const r of vis)out.push(h('div',{class:'due-row'},
   h('b',null,nameOf(r)),h('small',null,t(visitStage(r,Date.now())===2?'2-е напоминание · ':'Накануне · ')+t('{d} в {t}',{d:cap(fmt(r.date,{weekday:'short',day:'numeric',month:'long'})),t:r.time})+' · '+r.services.map(y=>y.name).join(', ')),
   h('div',{class:'acts'},h('a',{class:'button wa',href:waLink(phoneOf(r),fill(visitStage(r,Date.now())===2?(S.remind2||S.remind):S.remind,recVars(r))),target:'_blank',rel:'noopener',onclick:()=>setTimeout(()=>markVisit(r),400)},'💬 '+t('Отправить в WhatsApp')),
    h('button',{type:'button',class:'button outline',onclick:()=>markVisit(r)},t('Не нужно')))))}
  if(due.length)out.push(h('div',{class:'due-sec'},t('Пора записаться снова')));
- $('dHint').textContent=(vis.length?t('Напомните о записи. '):'')+(due.length?t('Ниже клиентки, которые не были {w} и больше и ещё не записаны. ',{w:weeksText(S.backDays)}):'')+t('«Отправить» откроет WhatsApp с готовым сообщением.');
+ $('dHint').textContent=(mk.length?t('Отметьте прошедшие визиты — так отчёт будет точным. '):'')+(vis.length?t('Напомните о записи. '):'')+(due.length?t('Ниже клиентки, которые не были {w} и больше и ещё не записаны. ',{w:weeksText(S.backDays)}):'')+t('«Отправить» откроет WhatsApp с готовым сообщением.');
  $('dList').replaceChildren(...out,...(due.length?due.map(({c,s})=>h('div',{class:'due-row'},
   h('b',null,c.name),h('small',null,t('Последний визит {d} · {n} дн. назад',{d:fmt(s.last,{day:'numeric',month:'long'}),n:daysSince(s.last)})+(c.phone?'':' · '+t('нет телефона'))),
   h('div',{class:'acts'},
    h('a',{class:'button wa',href:waLink(c.phone,fill(S.back,{имя:c.name.split(' ')[0],мастер:S.master})),target:'_blank',rel:'noopener',onclick:()=>setTimeout(()=>markReminded(c),400)},'💬 '+t('Отправить в WhatsApp')),
-   h('button',{type:'button',class:'button outline',onclick:()=>markReminded(c)},t('Не нужно'))))):out.length?[]:[h('div',{class:'empty'},t('Всем напомнили 👍'))]))}
-setInterval(()=>{if(view==='cal')renderDue()},60000);
+   h('button',{type:'button',class:'button outline',onclick:()=>markReminded(c)},t('Не нужно'))))):out.length?[]:[h('div',{class:'empty'},t('Всё отмечено 👍'))]))}
+let lastDay=todayKey();
+function tick(){const tk=todayKey();if(tk!==lastDay){if(selected===lastDay)goTo(tk);lastDay=tk;renderAll()}
+ if(view==='cal'&&!document.querySelector('dialog[open]'))renderCal();else renderDue()}
+setInterval(tick,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')tick()});
 $('duebar').onclick=()=>{drawDue();$('ddlg').showModal()};
 $('dClose').onclick=()=>$('ddlg').close();
 function renderClients(){

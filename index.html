@@ -970,7 +970,7 @@ function drawPicker(){const key=pick.date,S=db.settings,tk=todayKey();
  if(L.off)list.append(h('div',{class:'offnote'},t('Выходной день по вашим настройкам')));
  const now=new Date(),nowM=key===tk?now.getHours()*60+now.getMinutes():-1;
  for(const it of L.items){
-  if(!it.free){const x=it.x;list.append(h('div',{class:'tbusy'},h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),h('div',null,h('b',null,nameOf(x)),h('span',null,x.services.map(y=>y.name).join(' + ')))));continue}
+  if(!it.free){const x=it.x;list.append(h('div',{class:'tbusy'},h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),x.kind==='break'?h('div',null,h('b',null,'☕ '+t('Перерыв')),h('span',null,(x.note?x.note+' · ':'')+dur(x.duration))):h('div',null,h('b',null,nameOf(x)),h('span',null,x.services.map(y=>y.name).join(' + ')))));continue}
   const times=[];let tt=it.a;while(tt<it.b){if(tt>=nowM)times.push(tt);tt=tt%30?Math.ceil(tt/30)*30:tt+30}
   if(!times.length)continue;
   const inFocus=pick.focus!=null&&pick.focus>=it.a&&pick.focus<it.b;

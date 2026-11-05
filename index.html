@@ -7,16 +7,34 @@
 <meta name="apple-mobile-web-app-title" content="TEMPO">
 <meta name="theme-color" content="#f5f2ed">
 <title>TEMPO</title>
+<script>try{var k=localStorage.getItem('tempo_skin');if(k)document.documentElement.dataset.skin=k}catch(e){}</script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <style>
-:root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#292927;background:#f5f2ed;--ink:#34322f;--muted:#81796e;--line:#e9e3d9;--card:#fffdfa;--soft:#f0ebe3;--green:#37684b;--wa:#25a35a}
-*{box-sizing:border-box}body{margin:0;background:#f5f2ed}
+:root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#292927;--ink:#34322f;--muted:#81796e;--line:#e9e3d9;--card:#fffdfa;--soft:#f0ebe3;--green:#37684b;--wa:#25a35a;
+ --bg:#f5f2ed;--grad:none;--accent:#34322f;--accent-soft:#e8e2d8;--dlg:#f8f6f2;--bar:#fffdfa;background:var(--bg)}
+/* Темы: мягкие градиенты, белые карточки, свой акцент */
+:root[data-skin]{--chart:var(--accent);--chart-soft:var(--accent-soft)}
+:root[data-skin="pearl"]{--bg:#f6f0f8;--grad:linear-gradient(155deg,#e6f5ea 0%,#efeafb 32%,#fbe9f1 64%,#fdf4dc 100%);--accent:#7656b8;--accent-soft:#ebe3f8;--card:rgba(255,255,255,.84);--soft:rgba(240,234,246,.9);--line:rgba(120,96,150,.14);--dlg:#fbf8fd;--bar:rgba(255,255,255,.8);--muted:#7d7388}
+:root[data-skin="lavender"]{--bg:#f3eefa;--grad:linear-gradient(160deg,#ece4fa 0%,#f5eef9 50%,#e9eefa 100%);--accent:#7656b8;--accent-soft:#e9e1f7;--card:rgba(255,255,255,.86);--soft:#f0eaf8;--line:rgba(110,86,160,.14);--dlg:#faf8fd;--bar:rgba(255,255,255,.82);--muted:#7a7088}
+:root[data-skin="pink"]{--bg:#fbf0f3;--grad:linear-gradient(160deg,#fde6ee 0%,#fbf0f4 50%,#f4ecf9 100%);--accent:#b2577c;--accent-soft:#f8e1ea;--card:rgba(255,255,255,.86);--soft:#f9ebf0;--line:rgba(170,90,120,.14);--dlg:#fdf9fa;--bar:rgba(255,255,255,.82);--muted:#87727a}
+:root[data-skin="vanilla"]{--bg:#fdf7e8;--grad:linear-gradient(160deg,#fff3cf 0%,#fdf5e6 50%,#fbeef0 100%);--accent:#94680f;--accent-soft:#f8ecc9;--card:rgba(255,255,255,.86);--soft:#f9f0dc;--line:rgba(150,115,40,.15);--dlg:#fffcf5;--bar:rgba(255,255,255,.82);--muted:#857a64}
+:root[data-skin="pistachio"]{--bg:#f1f8ec;--grad:linear-gradient(160deg,#e5f5d9 0%,#f1f8ea 50%,#eaf3f6 100%);--accent:#4b7f37;--accent-soft:#e1efd6;--card:rgba(255,255,255,.86);--soft:#ecf4e4;--line:rgba(80,120,60,.15);--dlg:#fafdf7;--bar:rgba(255,255,255,.82);--muted:#727d6c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg) var(--grad) fixed;min-height:100vh}
+.nav,.daybar{background:var(--bar)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.skins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.skin{border:2px solid transparent;background:none;border-radius:16px;padding:6px 4px 8px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.skin i{display:block;width:100%;height:46px;border-radius:12px;border:1px solid rgba(0,0,0,.06);position:relative}
+.skin i:after{content:'';position:absolute;right:8px;bottom:8px;width:14px;height:14px;border-radius:50%;background:var(--dot)}
+.skin.on{border-color:var(--accent)}.skin.on b{font-weight:700}.skin b{font-weight:500}
 .app{max-width:570px;margin:auto;padding:18px 15px 100px}
 h1{font:normal 27px Georgia,serif;margin:4px 0;letter-spacing:.5px}h2{font-size:17px;margin:0}
 p,.muted{color:var(--muted);font-size:13px;line-height:1.5}.small{font-size:11px;color:var(--muted)}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:21px;padding:15px;margin-top:12px}
 .head,.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.button{border:0;border-radius:12px;background:var(--ink);color:#fff;padding:11px 14px;font:inherit;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:5px}
-.outline{border:1px solid #ded8cf;background:var(--card);color:var(--ink)}
+.button{border:0;border-radius:12px;background:var(--accent);color:#fff;padding:11px 14px;font:inherit;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.outline{border:1px solid var(--line);background:var(--card);color:var(--ink)}
 .wa{background:var(--wa);color:#fff}.danger{color:#b2412f}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #a68c70;outline-offset:2px}
 .topline{display:flex;align-items:center;justify-content:space-between;margin:2px 0 4px}
@@ -25,7 +43,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin-top:12px}
 .weekday{text-align:center;color:var(--muted);font-size:11px;padding:4px 0}
 .month-day{border:0;border-radius:10px;min-height:43px;background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer;padding:5px 1px;position:relative}
-.month-day.other{color:#c5beb5}.month-day.offday{color:#db5555}.month-day.selected{background:var(--ink);color:#fff}
+.month-day.other{color:#c5beb5}.month-day.offday{color:#db5555}.month-day.selected{background:var(--accent);color:#fff}
 .month-day.today:not(.selected){outline:1px solid #aaa094}
 .month-day.has-bookings:after{content:'•';position:absolute;bottom:0;left:calc(50% - 3px);font-size:13px;color:#67a77a}
 .month-day.selected:after{color:#c4ebc8}
@@ -47,14 +65,14 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .totals .panel{margin:0;padding:13px 15px}.totals strong{display:block;font-size:19px;margin-top:5px}
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:10px 0 max(14px,env(safe-area-inset-bottom));z-index:50}
 .nav button{background:none;border:0;color:var(--muted);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:56px;cursor:pointer}
-.nav button span{font-size:18px}.nav button.active{color:#292927;font-weight:700}
+.nav button span{font-size:18px}.nav button.active{color:var(--accent);font-weight:700}
 .view[hidden]{display:none}
 .linkbtn{background:none;border:0;color:var(--muted);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:10px 0 0}
 .duebar.cloud{background:#eef4fb;border-color:#d3e2f2}
 .rep-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 6px}
 .rep-head h1{flex:1;text-align:center;font-size:24px}
 .back{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;cursor:pointer;padding:6px 0}
-.hero{background:var(--ink);color:#fff;border-radius:21px;padding:18px;margin-top:10px}
+.hero{background:var(--accent);color:#fff;border-radius:21px;padding:18px;margin-top:10px}
 .hero small{display:block;font-size:12px;opacity:.75}.hero .big{font-size:32px;font-weight:700;margin:4px 0 2px;letter-spacing:.3px}
 .hero .cmp{font-size:12px;opacity:.85}.hero .cmp b{font-weight:600}
 .hero .up{color:#9fe0b0}.hero .down{color:#ffb4a6}
@@ -65,8 +83,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .stats6 strong{display:block;color:#292927;font-size:16px;margin-top:3px}
 .bars{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:14px}
 .bars .b{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--muted);gap:4px}
-.bars .b i{display:block;width:100%;max-width:34px;background:#cfe3d4;border-radius:7px 7px 3px 3px;min-height:3px}
-.bars .b.top i{background:var(--green)}.bars .b em{font-style:normal;font-size:10px;color:var(--ink);min-height:12px}
+.bars .b i{display:block;width:100%;max-width:34px;background:var(--chart-soft,#cfe3d4);border-radius:7px 7px 3px 3px;min-height:3px}
+.bars .b.top i{background:var(--chart,var(--green))}.bars .b em{font-style:normal;font-size:10px;color:var(--ink);min-height:12px}
 .toprow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .toprow:last-child{border-bottom:0}.toprow small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.toprow b{white-space:nowrap}
 .exp-add{display:grid;grid-template-columns:minmax(0,1fr) 96px auto;gap:6px;margin-top:10px}
@@ -78,7 +96,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 label{display:block;font-size:12px;color:#5e574e;margin:12px 0 5px}
 input,select,textarea{width:100%;padding:11px;border:1px solid #dcd4c9;border-radius:10px;background:#fff;font:inherit;font-size:16px;min-height:44px;color:#292927}
 textarea{min-height:80px;resize:vertical;line-height:1.4}
-dialog{position:fixed;inset:0;margin:auto;max-height:90dvh;overflow-y:auto;z-index:1000;border:1px solid #ddd5ca;box-shadow:0 0 0 100vmax rgba(28,26,24,.58);width:calc(100% - 28px);max-width:480px;border-radius:20px;padding:22px;background:#f8f6f2}
+dialog{position:fixed;inset:0;margin:auto;max-height:90dvh;overflow-y:auto;z-index:1000;border:1px solid #ddd5ca;box-shadow:0 0 0 100vmax rgba(28,26,24,.58);width:calc(100% - 28px);max-width:480px;border-radius:20px;padding:22px;background:var(--dlg)}
 dialog:not([open]){display:none!important}dialog::backdrop{background:transparent}
 .formactions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px;flex-wrap:wrap}.formactions .button{min-height:44px}
 .formactions .grow{margin-right:auto}
@@ -93,7 +111,7 @@ dialog:not([open]){display:none!important}dialog::backdrop{background:transparen
 .suggest-wrap{position:relative}.suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid #ded8cf;border-radius:13px;box-shadow:0 12px 35px #302a2240;padding:5px;z-index:40}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{border:1px solid #ded8cf;background:#fff;border-radius:20px;padding:8px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
-.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .client-row{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer}
 .client-row:last-child{border-bottom:0}
 .avatar{width:40px;height:40px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;font-weight:700;color:#7a6d5e;flex:none}
@@ -104,11 +122,14 @@ dialog:not([open]){display:none!important}dialog::backdrop{background:transparen
 .stats3 div{background:var(--soft);border-radius:12px;padding:10px;font-size:11px;color:var(--muted)}
 .stats3 strong{display:block;color:#292927;font-size:15px;margin-top:3px}
 .history{margin-top:12px}.history .slot-booked{grid-template-columns:78px 1fr auto;padding:10px 2px}
-.svc-row{display:grid;grid-template-columns:1fr 74px 92px 40px;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
-.svc-row input{padding:9px;min-height:40px}.svc-row button{min-height:40px;padding:0}
-.svc-head{display:grid;grid-template-columns:1fr 74px 92px 40px;gap:6px;font-size:11px;color:var(--muted);margin-top:10px}
+.svc-row{display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.svc-row:last-child{border-bottom:0}
+.svc-row input{padding:9px 11px;min-height:42px;width:100%}.svc-row>input{font-weight:600;font-size:16px}.svc-row>button{min-height:42px;padding:0}
+.svc-nums{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.3fr;gap:8px}
+label.unit{position:relative;display:block;margin:0}label.unit input{padding-right:46px}
+label.unit span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.toast{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));max-width:546px;margin:auto;background:var(--ink);color:#fff;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;z-index:60;box-shadow:0 10px 30px #0004;font-size:13px}
+.toast{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));max-width:546px;margin:auto;background:var(--accent);color:#fff;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;z-index:60;box-shadow:0 10px 30px #0004;font-size:13px}
 .toast[hidden]{display:none}.toast span{flex:1}
 .empty{padding:18px 0;color:#8d8478;font-size:13px;text-align:center}
 .hidden,[hidden]{display:none!important}
@@ -136,17 +157,37 @@ dialog.wide{padding:12px}
 .cal-sheet .month-day.has-bookings.past:after{color:#b9b1a6}
 .month-day.today:not(.selected){outline:0;color:#2f6f8f;font-weight:700}
 .day-line{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 2px 10px;border-top:1px solid var(--line);margin-top:8px}
-.day-line b{font-size:18px}.day-line span{font-size:16px;color:var(--ink)}
+.day-line{flex-wrap:wrap;row-gap:2px}.day-line b{font-size:18px;white-space:nowrap}.day-line span{font-size:14px;color:var(--muted);white-space:nowrap}
 .rcard{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px;margin:0 0 10px;cursor:pointer;width:100%;text-align:left;font:inherit;color:var(--ink)}
 .rcard .t{text-align:right}.rcard .t strong{display:block;font-size:19px;font-weight:600}.rcard .t small{font-size:14px;color:var(--muted)}
 .rcard .d{min-width:0}.rcard .d b{display:block;font-size:18px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rcard .d .svc{display:block;color:var(--muted);font-size:15px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rcard .d .sum{display:block;color:var(--muted);font-size:15px;margin-top:2px}
 .rcard.faded{opacity:.5}
-.rcard.free{grid-template-columns:62px minmax(0,1fr)}
-.rcard.free .t strong{color:var(--green);font-weight:500;font-size:20px}
-.rcard.free .d b{color:var(--green);font-size:18px}
-.rcard.free .d .svc{font-size:15px}
+.nameline{display:flex;align-items:baseline;gap:8px}.nameline b{flex:1;min-width:0}
+.rcard .live{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.rcard .live.now{color:var(--green)}.rcard .live.now:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#3fa463;margin-right:5px;vertical-align:1px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}@media (prefers-reduced-motion:reduce){.rcard .live.now:before{animation:none}}
+.rcard.now{border-color:#a6c6ad;box-shadow:0 0 0 1px #a6c6ad inset}
+.marks{grid-column:2/-1;display:flex;gap:8px;margin-top:-2px}.marks button{flex:1}
+.marks button{border:1px solid #dcd4c9;background:#fff;border-radius:10px;padding:7px 11px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+.marks .yes{border-color:#a6c6ad;color:var(--green);font-weight:600}.marks .no{color:#a2532e}
+.mbar{display:flex;height:4px;border-radius:3px;overflow:hidden;background:var(--soft);margin-top:4px;width:96px}
+.mbar i{background:#4f9a67}.mbar b{background:#c9ddcf}
+.rcard.free{grid-template-columns:62px minmax(0,1fr);background:transparent;border:1.5px dashed #c9dccd;padding:9px 14px;border-radius:14px}
+.rcard.free:hover,.rcard.free:active{background:#edf5ee}
+.rcard.free .t strong{color:var(--green);font-weight:500;font-size:17px}
+.rcard.free .d{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.rcard.free .d b{color:var(--green);font-size:15px;font-weight:600}
+.rcard.free .d .svc{font-size:13px;margin:0}
+.cal-toggle{display:block;margin:2px auto 0;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;padding:6px 14px;cursor:pointer;border-radius:10px}
+.cal-toggle:hover{background:var(--soft)}
+.cal-sheet{touch-action:pan-y}
+.cal-sheet.week .month-grid{animation:none}
+.nudge{position:relative}.nudge .duebar{padding-right:44px}
+.nudge-x{position:absolute;top:6px;right:6px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:18px;cursor:pointer}
+.nudge-x:hover{background:#dde8f4}
+.nudge .duebar .go{display:none}
 .wa-round{width:46px;height:46px;border-radius:50%;border:0;background:#e3f4e9;font-size:20px;cursor:pointer;flex:none}
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:50}
 .bottom .nav{position:static}
@@ -194,7 +235,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
 .svc-add{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 14px;font:inherit;font-size:17px;color:var(--green);cursor:pointer;margin-top:12px;text-align:left}
 .svc-add .plus{width:28px;height:28px;border-radius:50%;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1}
 .manual{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px 14px 14px;margin-top:10px}
-.sdone{position:sticky;bottom:-16px;background:#f8f6f2;padding:12px 0 4px;margin-top:12px;display:flex;gap:10px;align-items:center}
+.sdone{position:sticky;bottom:-16px;background:var(--dlg);padding:12px 0 4px;margin-top:12px;display:flex;gap:10px;align-items:center}
 .sdone span{flex:1;font-size:14px;color:var(--muted)}.sdone .button{min-height:48px;font-size:16px;padding:0 26px}
 .service-line .svc-name{flex:1;font-size:16px;font-weight:600}
 
@@ -221,9 +262,9 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
 <!-- КАЛЕНДАРЬ -->
 <section class="view" id="view-cal">
   <div class="cal-head"><button class="icon-btn" id="prev" type="button" aria-label="Предыдущий месяц">‹</button><h1 id="monthTitle">Календарь</h1><button class="icon-btn" id="next" type="button" aria-label="Следующий месяц">›</button><button class="button" id="add" type="button">+ Запись</button></div>
-  <button type="button" class="duebar cloud" id="cloudNudge" hidden><span class="bell">☁️</span><div><b>Включите облако</b><small>Чтобы записи и фото не пропали, если что-то случится с телефоном</small></div><span class="go">›</span></button>
+  <div class="nudge" id="cloudWrap" hidden><button type="button" class="duebar cloud" id="cloudNudge"><span class="bell">☁️</span><div><b>Включите облако</b><small>Чтобы записи и фото не пропали, если что-то случится с телефоном</small></div><span class="go">›</span></button><button type="button" class="nudge-x" id="cloudLater" aria-label="Скрыть на 2 недели">×</button></div>
   <button type="button" class="duebar" id="duebar" hidden><span class="bell">🔔</span><div><b id="dueTitle"></b><small id="dueSub"></small></div><span class="go">Открыть ›</span></button>
-  <div class="cal-sheet"><div class="month-grid" id="days"></div></div>
+  <div class="cal-sheet" id="calSheet"><div class="month-grid" id="days"></div><button type="button" class="cal-toggle" id="calToggle"></button></div>
   <div class="day-line"><b id="dateLabel"></b><span id="hoursLabel"></span></div>
   <div id="entries"></div>
 </section>
@@ -271,7 +312,6 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   <div class="topline"><h1>Услуги</h1><button class="button" id="addSvc">+ Услуга</button></div>
   <p>Ваш прайс. Эти услуги и цены подставляются в запись, и сумма считается сама. Изменения сохраняются сразу.</p>
   <section class="panel">
-    <div class="svc-head"><span>Название</span><span>Мин</span><span>Цена, ₸</span><span></span></div>
     <div id="svcList"></div>
   </section>
 </section>
@@ -333,6 +373,10 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
     <div class="chips" id="sLang"></div>
   </section>
   <section class="panel">
+    <h2>Оформление</h2>
+    <div class="skins" id="sSkin"></div>
+  </section>
+  <section class="panel">
     <h2>Мастер</h2>
     <label for="sMaster">Ваше имя (подпись в сообщениях)</label>
     <input id="sMaster" placeholder="Например, мастер Рано">
@@ -363,12 +407,12 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
       <label class="button outline" style="margin:0">Загрузить копию<input type="file" id="importFile" accept=".json,application/json" hidden></label>
     </div>
   </section>
-  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 10</p>
+  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 12</p>
 </section>
 </main>
 
 <div class="bottom">
-<div class="daybar" id="daybar"><div class="left"><button type="button" id="monthBtn"><small>📊 За месяц</small><span id="monthTotal">0 ₸</span></button></div><div class="mid"><span>Выручка за день</span><strong id="dayTotal">0 ₸</strong></div><button type="button" id="today">Сегодня</button></div>
+<div class="daybar" id="daybar"><div class="left"><button type="button" id="monthBtn"><small>📊 За месяц</small><span id="monthTotal">0 ₸</span><span class="mbar" id="monthBar"><i></i><b></b></span></button></div><div class="mid"><span>Выручка за день</span><strong id="dayTotal">0 ₸</strong></div><button type="button" id="today">Сегодня</button></div>
 <nav class="nav">
   <button data-view="cal" class="active"><span>▦</span>Календарь</button>
   <button data-view="clients"><span>♙</span>Клиенты</button>
@@ -386,6 +430,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   <div class="tag cancelled" id="cancelNote" hidden>Клиентка отменила эту запись</div>
   <div class="seg" id="kindSeg"><button type="button" data-k="rec" class="on">Запись</button><button type="button" data-k="break">Перерыв</button></div>
   <button type="button" class="when" id="whenBtn"><div><small>Дата и время</small><b id="whenText"></b></div><span>Изменить</span></button>
+  <div class="seg" id="statusSeg" hidden><button type="button" data-s="planned">Ожидается</button><button type="button" data-s="done">Пришла</button><button type="button" data-s="noshow">Не пришла</button></div>
   <input id="clientDate" type="hidden"><input id="clientTime" type="hidden">
   <div id="breakWrap" hidden>
     <div class="fsec">Перерыв</div>
@@ -440,7 +485,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
 
 <!-- ПОРА НАПОМНИТЬ -->
 <dialog id="ddlg" class="sheet">
-  <div class="head"><h2>Пора напомнить</h2><button class="icon-btn" type="button" id="dClose" aria-label="Закрыть">×</button></div>
+  <div class="head"><h2>Что нужно сделать</h2><button class="icon-btn" type="button" id="dClose" aria-label="Закрыть">×</button></div>
   <p id="dHint"></p>
   <div id="dList"></div>
 </dialog>
@@ -577,7 +622,23 @@ const I18N={kk:{},en:{}};
 ['Все данные хранятся только в этом браузере на этом телефоне. Время от времени скачивайте копию (фото работ тоже в неё входят): если что-то случится с телефоном, её можно будет загрузить обратно.','Барлық деректер тек осы телефондағы осы браузерде сақталады. Анда-санда көшірмесін жүктеп алып отырыңыз (жұмыс фотолары да кіреді): телефонға бірдеңе болса, оны қайта жүктеуге болады.','All data is stored only in this browser on this phone. Download a backup from time to time (photos included): if something happens to your phone, you can restore it.'],
 ['Скачать копию','Көшірмені жүктеп алу','Download backup'],
 ['Загрузить копию','Көшірмені қалпына келтіру','Restore backup'],
-['TEMPO · версия 10','TEMPO · 10-нұсқа','TEMPO · version 10'],
+['TEMPO · версия 12','TEMPO · 12-нұсқа','TEMPO · version 12'],
+['сейчас','қазір','now'],['через {d}','{d} кейін','in {d}'],
+['Нужно внимание: {n}','Назар аударыңыз: {n}','Needs attention: {n}'],['Отметить визиты: {n}','Келгендерді белгілеу: {n}','Mark visits: {n}'],
+['Отметьте, кто пришёл','Кім келгенін белгілеңіз','Mark who came'],
+['Отметьте прошедшие визиты — так отчёт будет точным. ','Өткен келулерді белгілеңіз — сонда есеп дәл болады. ','Mark past visits so the report is accurate. '],
+['Всё отмечено 👍','Бәрі белгіленді 👍','All done 👍'],
+['заработано {a} · ещё записано {b}','табыс {a} · әлі жазылған {b}','earned {a} · still booked {b}'],
+['За месяц','Ай бойынша','This month'],
+['Оформление','Безендіру','Appearance'],['Беж','Беж','Beige'],['Перламутр','Інжу','Pearl'],['Лаванда','Лаванда','Lavender'],['Пудра','Ұнтақ','Powder'],['Ваниль','Ваниль','Vanilla'],['Фисташка','Пісте','Pistachio'],
+['Что нужно сделать','Не істеу керек','To do'],
+['Скрыть на 2 недели','2 аптаға жасыру','Hide for 2 weeks'],
+['Весь месяц ▾','Толық ай ▾','Whole month ▾'],
+['Только неделя ▴','Тек апта ▴','Week only ▴'],
+['Предыдущая неделя','Алдыңғы апта','Previous week'],
+['Следующая неделя','Келесі апта','Next week'],
+['Предыдущий месяц','Алдыңғы ай','Previous month'],
+['Следующий месяц','Келесі ай','Next month'],
 ['Выручка за день','Күндік түсім','Revenue for the day'],
 ['Сегодня','Бүгін','Today'],
 ['Ещё','Тағы','More'],
@@ -914,6 +975,7 @@ function renderAll(){if(view==='report')renderReport();if(view==='cal')renderCal
 
 /* ---------- КАЛЕНДАРЬ ---------- */
 let selected=todayKey(),viewMonth=new Date().getMonth(),viewYear=new Date().getFullYear();
+let calMode=(()=>{try{return localStorage.getItem('tempo_calmode')||'week'}catch(e){return 'week'}})();
 function goTo(key){selected=key;const d=new Date(key+'T12:00:00');viewMonth=d.getMonth();viewYear=d.getFullYear()}
 function dayItems(key,excludeId){
  const S=db.settings,recs=db.records.filter(x=>x.date===key&&x.id!==excludeId).sort((a,b)=>a.time.localeCompare(b.time));
@@ -928,16 +990,23 @@ function renderCal(){
  $('monthTitle').textContent=monthName;
  const S=db.settings,grid=$('days');grid.replaceChildren();
  for(const n of [1,2,3,4,5,6,0].map(i=>WD_SHORT[LANG][i]))grid.append(h('div',{class:'weekday'},n));
- const start=(first.getDay()+6)%7,count=Math.ceil((start+new Date(viewYear,viewMonth+1,0).getDate())/7)*7,tk=todayKey();
- for(let i=0;i<count;i++){const d=new Date(viewYear,viewMonth,i-start+1),key=dateKey(d),other=d.getMonth()!==viewMonth;
+ let start=(first.getDay()+6)%7,count=Math.ceil((start+new Date(viewYear,viewMonth+1,0).getDate())/7)*7,tk=todayKey();
+ const week=calMode==='week';$('calSheet').classList.toggle('week',week);
+ if(week){const sd=new Date(selected+'T12:00:00');start=-(sd.getDate()-1-((sd.getDay()+6)%7));count=7}
+ $('calToggle').textContent=t(week?'Весь месяц ▾':'Только неделя ▴');
+ $('prev').setAttribute('aria-label',t(week?'Предыдущая неделя':'Предыдущий месяц'));$('next').setAttribute('aria-label',t(week?'Следующая неделя':'Следующий месяц'));
+ for(let i=0;i<count;i++){const d=new Date(viewYear,viewMonth,i-start+1),key=dateKey(d),other=!week&&d.getMonth()!==viewMonth;
   const cls='month-day'+(other?' other':'')+(S.off.includes(d.getDay())&&!other?' offday':'')+(key===selected?' selected':'')+(key===tk?' today':'')+(db.records.some(x=>x.date===key&&active(x))?' has-bookings':'')+(key<tk?' past':'');
   grid.append(h('button',{type:'button',class:cls,'aria-label':fmt(key,{day:'numeric',month:'long',year:'numeric'}),onclick:()=>{goTo(key);renderCal()}},d.getDate()))}
  $('dateLabel').textContent=cap(fmt(selected,{weekday:'short',day:'numeric',month:'long'}))+(selected===tk?' · '+t('сегодня'):'');
- $('hoursLabel').textContent=S.start+' – '+S.end;
+ {const n=db.records.filter(x=>x.date===selected&&x.kind!=='break'&&active(x)).length;$('hoursLabel').textContent=(n?bookingsText(n)+' · ':'')+S.start+' – '+S.end}
  const dayRecs=db.records.filter(x=>x.date===selected);
  $('dayTotal').textContent=money(dayRecs.filter(earned).reduce((s,x)=>s+x.price,0));
  const mPrefix=viewYear+'-'+pad(viewMonth+1);
- $('monthTotal').textContent=money(db.records.filter(x=>x.date.startsWith(mPrefix)&&earned(x)).reduce((s,x)=>s+x.price,0));
+ {const now=Date.now(),mr=db.records.filter(x=>x.kind!=='break'&&x.date.startsWith(mPrefix)&&earned(x)),isFact=x=>x.status==='done'||recStart(x).getTime()+x.duration*60000<=now;
+  const fact=mr.filter(isFact).reduce((s,x)=>s+x.price,0),ahead=mr.filter(x=>!isFact(x)).reduce((s,x)=>s+x.price,0),all=fact+ahead;
+  $('monthTotal').textContent=money(fact);const bar=$('monthBar');bar.hidden=!all;bar.children[0].style.flex=String(fact);bar.children[1].style.flex=String(ahead);
+  $('monthBtn').title=t('заработано {a} · ещё записано {b}',{a:money(fact),b:money(ahead)});$('monthBtn').setAttribute('aria-label',t('За месяц')+': '+$('monthBtn').title)}
  renderDue();
  const box=$('entries');box.replaceChildren();
  const L=dayItems(selected);
@@ -957,7 +1026,13 @@ function bookedRow(x,faded){
   h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),
   h('div',{class:'d'},h('b',null,nameOf(x)),h('span',{class:'svc'},x.services.map(y=>y.name).join(' + ')),h('span',{class:'sum'},money(x.price)+(x.prepay?' · '+t('предоплата {m}',{m:money(x.prepay)}):'')),x.note?h('span',{class:'note'},'📝 '+x.note):null,x.status!=='planned'?h('span',{class:'tag '+x.status},t(STATUS[x.status])):null),
   wa);
- el.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();openEdit(x)}};return el}
+ if(x.status==='planned'&&!faded){const now=new Date(),st=recStart(x),en=new Date(st.getTime()+x.duration*60000),left=Math.round((st-now)/60000);
+  let lab=null;if(st<=now&&now<en){el.classList.add('now');lab=h('span',{class:'live now'},t('сейчас'))}
+  else if(left>0&&left<=180&&x.date===todayKey())lab=h('span',{class:'live'},t('через {d}',{d:dur(left)}));
+  if(lab){const b=el.querySelector('.d b'),line=h('div',{class:'nameline'});b.replaceWith(line);line.append(b,lab)}
+  if(st<=now){const mk=s=>ev=>{ev.stopPropagation();x.status=s;persist();renderAll()};
+   el.append(h('div',{class:'marks'},h('button',{type:'button',class:'yes',onclick:mk('done')},'✓ '+t('Пришла')),h('button',{type:'button',class:'no',onclick:mk('noshow')},t('Не пришла'))))}}
+ el.onkeydown=ev=>{if(ev.target!==el)return;if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();openEdit(x)}};return el}
 
 /* ---------- ШАГ 1: ВЫБОР ВРЕМЕНИ ---------- */
 let pick={mode:'new',date:null,client:null,exclude:null,focus:null};
@@ -970,7 +1045,7 @@ function drawPicker(){const key=pick.date,S=db.settings,tk=todayKey();
  if(L.off)list.append(h('div',{class:'offnote'},t('Выходной день по вашим настройкам')));
  const now=new Date(),nowM=key===tk?now.getHours()*60+now.getMinutes():-1;
  for(const it of L.items){
-  if(!it.free){const x=it.x;list.append(h('div',{class:'tbusy'},h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),h('div',null,h('b',null,nameOf(x)),h('span',null,x.services.map(y=>y.name).join(' + ')))));continue}
+  if(!it.free){const x=it.x;list.append(h('div',{class:'tbusy'},h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),x.kind==='break'?h('div',null,h('b',null,'☕ '+t('Перерыв')),h('span',null,(x.note?x.note+' · ':'')+dur(x.duration))):h('div',null,h('b',null,nameOf(x)),h('span',null,x.services.map(y=>y.name).join(' + ')))));continue}
   const times=[];let tt=it.a;while(tt<it.b){if(tt>=nowM)times.push(tt);tt=tt%30?Math.ceil(tt/30)*30:tt+30}
   if(!times.length)continue;
   const inFocus=pick.focus!=null&&pick.focus>=it.a&&pick.focus<it.b;
@@ -991,8 +1066,12 @@ function updateWhen(){const d=$('clientDate').value,tm=$('clientTime').value;if(
  const du=formKind==='break'?Number($('brkDur').value)||0:lines.reduce((s,x)=>s+(+x.duration||0),0);
  $('whenText').textContent=cap(fmt(d,{weekday:'short',day:'numeric',month:'long'}))+' · '+tm+(du?'–'+clock(mins(tm)+du):'')}
 $('add').onclick=()=>openPicker({mode:'new',date:selected});
-$('prev').onclick=()=>{const d=new Date(viewYear,viewMonth-1,1);goTo(dateKey(d));renderCal()};
-$('next').onclick=()=>{const d=new Date(viewYear,viewMonth+1,1);goTo(dateKey(d));renderCal()};
+function calStep(n){if(calMode==='week'){const d=new Date(selected+'T12:00:00');d.setDate(d.getDate()+7*n);goTo(dateKey(d))}else goTo(dateKey(new Date(viewYear,viewMonth+n,1)));renderCal()}
+$('prev').onclick=()=>calStep(-1);$('next').onclick=()=>calStep(1);
+$('calToggle').onclick=()=>{calMode=calMode==='week'?'month':'week';try{localStorage.setItem('tempo_calmode',calMode)}catch(e){}renderCal()};
+{let sx=0,sy=0,on=false;const el=$('calSheet');
+ el.addEventListener('touchstart',e=>{const p=e.touches[0];sx=p.clientX;sy=p.clientY;on=true},{passive:true});
+ el.addEventListener('touchend',e=>{if(!on)return;on=false;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)calStep(dx<0?1:-1)},{passive:true})}
 $('today').onclick=()=>{goTo(todayKey());renderCal()};
 
 /* ---------- ДИАЛОГ ЗАПИСИ ---------- */
@@ -1005,7 +1084,9 @@ function serviceLine(line){
 function drawServices(){$('services').replaceChildren(...lines.map(serviceLine));updateTotals()}
 function updateTotals(){const d=lines.reduce((s,x)=>s+(+x.duration||0),0),p=lines.reduce((s,x)=>s+(+x.price||0),0);$('totalDuration').textContent=dur(d);$('totalPrice').textContent=money(p);if(!manualTotal)$('totalOverride').value=p;updateWhen();updatePay()}
 $('totalOverride').oninput=()=>{manualTotal=true};
-function drawStatus(){$('statusChips').replaceChildren(...Object.entries(STATUS).map(([k,v])=>h('button',{type:'button',class:'chip'+(k===formStatus?' on':''),onclick:()=>{formStatus=k;drawStatus()}},v)))}
+function drawStatus(){const r=editId&&db.records.find(x=>x.id===editId);$('statusSeg').hidden=!r||formKind==='break'||!active(r);
+ document.querySelectorAll('#statusSeg button').forEach(b=>b.classList.toggle('on',b.dataset.s===formStatus))}
+document.querySelectorAll('#statusSeg button').forEach(b=>b.onclick=()=>{formStatus=b.dataset.s;drawStatus()});
 function closePicker(){$('servicePicker').classList.add('hidden');$('addService').setAttribute('aria-expanded','false')}
 let picked=[];
 const svcKey=n=>String(n).trim().toLowerCase();
@@ -1069,7 +1150,7 @@ $('kClose').onclick=()=>$('kdlg').close();
 $('kNew').onclick=()=>{const q=$('kSearch').value.trim();formClientId=null;$('clientName').value=digits(q)&&digits(q).length>=5?'':q;$('clientPhone').value=digits(q).length>=5?q:'';$('newClientWrap').hidden=false;$('kdlg').close();drawClientBtn();setTimeout(()=>$('clientName').focus(),50)};
 let formKind='rec';
 function setKind(k){formKind=k;document.querySelectorAll('#kindSeg button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
- $('breakWrap').hidden=k!=='break';$('recWrap').hidden=k==='break';$('formTitle').textContent=t(editId?(k==='break'?'Перерыв':'Изменить запись'):(k==='break'?'Новый перерыв':'Новая запись'));$('cancelRec').hidden=!editId||k==='break';updateWhen()}
+ $('breakWrap').hidden=k!=='break';drawStatus();$('recWrap').hidden=k==='break';$('formTitle').textContent=t(editId?(k==='break'?'Перерыв':'Изменить запись'):(k==='break'?'Новый перерыв':'Новая запись'));$('cancelRec').hidden=!editId||k==='break';updateWhen()}
 document.querySelectorAll('#kindSeg button').forEach(b=>b.onclick=()=>setKind(b.dataset.k));
 $('brkDur').onchange=()=>updateWhen();
 function updatePay(){const t=Number($('totalOverride').value)||0,pp=Number($('prepay').value)||0;$('toPay').textContent=money(Math.max(0,t-pp))}
@@ -1118,6 +1199,7 @@ function stats(c){const tk=todayKey(),recs=db.records.filter(r=>r.clientId===c.i
  return {recs,visits:visits.length,spent:visits.reduce((s,r)=>s+r.price,0),last:visits[0]?visits[0].date:null,next}}
 const initials=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 function dueClients(){const S=db.settings;return db.clients.map(c=>({c,s:stats(c)})).filter(({c,s})=>s.last&&!s.next&&daysSince(s.last)>=S.backDays&&!(c.remindedAt&&c.remindedAt>=s.last)).sort((a,b)=>a.s.last.localeCompare(b.s.last))}
+function bookingsText(n){if(LANG==='kk')return n+' жазба';if(LANG==='en')return n+(n===1?' booking':' bookings');return n+' '+plural(n,'запись','записи','записей')}
 const plural=(n,a,b,c)=>{n=Math.abs(n)%100;const m=n%10;return n>10&&n<20?c:m===1?a:m>=2&&m<=4?b:c};
 function weeksText(d){const w=d%7===0,n=w?d/7:d;if(LANG==='kk')return n+(w?' апта':' күн');if(LANG==='en')return n+(w?(n===1?' week':' weeks'):(n===1?' day':' days'));return n+' '+(w?plural(n,'неделю','недели','недель'):plural(n,'день','дня','дней'))}
 function backChip(d){const w=d%7===0,n=w?d/7:d;if(LANG==='kk')return n+(w?' аптадан кейін':' күннен кейін');if(LANG==='en')return 'in '+weeksText(d);return 'через '+weeksText(d)}
@@ -1126,27 +1208,36 @@ function visitStage(r,now){if(r.kind==='break'||r.status!=='planned')return 0;co
  const r1=r.remind1??r.remindBefore??1440,r2=r.remind2??0,s1=r.sent1||r.reminded,s2=r.sent2;
  if(r2&&!s2&&left<=r2*60000)return 2;
  if(r1&&!s1&&!s2&&left<=r1*60000)return 1;return 0}
+function dueMarks(){const now=Date.now(),from=dateKey(new Date(now-30*864e5));return db.records.filter(r=>r.kind!=='break'&&r.status==='planned'&&r.date>=from&&recStart(r).getTime()+r.duration*60000<=now).sort((a,b)=>recStart(a)-recStart(b))}
 function dueVisits(){const now=Date.now();return db.records.filter(r=>visitStage(r,now)).sort((a,b)=>recStart(a)-recStart(b))}
-function renderDue(){const due=dueClients(),vis=dueVisits(),n=due.length+vis.length;$('duebar').hidden=!n;if(!n)return;
- $('dueTitle').textContent=vis.length&&due.length?t('Напомнить: {n}',{n}):vis.length?t('Напомнить о записи: {n}',{n:vis.length}):t('Пора записаться: {n}',{n:due.length});
- const names=[...vis.map(r=>String(nameOf(r)).split(' ')[0]),...due.map(({c})=>c.name.split(' ')[0])];
+function renderDue(){const due=dueClients(),vis=dueVisits(),mk=dueMarks(),n=due.length+vis.length+mk.length;$('duebar').hidden=!n;if(!n)return;
+ const kinds=[vis.length,due.length,mk.length].filter(Boolean).length;
+ $('dueTitle').textContent=kinds>1?t('Нужно внимание: {n}',{n}):mk.length?t('Отметить визиты: {n}',{n}):vis.length?t('Напомнить о записи: {n}',{n:vis.length}):t('Пора записаться: {n}',{n:due.length});
+ const names=[...new Set([...mk.map(r=>String(nameOf(r)).split(' ')[0]),...vis.map(r=>String(nameOf(r)).split(' ')[0]),...due.map(({c})=>c.name.split(' ')[0])])];
  $('dueSub').textContent=names.slice(0,3).join(', ')+(names.length>3?t(' и ещё {n}',{n:names.length-3}):'')}
 function markVisit(r){const st=visitStage(r,Date.now());if(st===2)r.sent2=true;else r.sent1=true;persist();drawDue();renderAll()}
 function markReminded(c){c.remindedAt=todayKey();persist();drawDue();renderAll()}
 function drawDue(){const S=db.settings,due=dueClients();
-  const vis=dueVisits(),out=[];
+  const vis=dueVisits(),mk=dueMarks(),out=[];
+ if(mk.length){out.push(h('div',{class:'due-sec'},t('Отметьте, кто пришёл')));for(const r of mk){const set=s=>()=>{r.status=s;persist();drawDue();renderAll()};out.push(h('div',{class:'due-row'},
+  h('b',null,nameOf(r)),h('small',null,t('{d} в {t}',{d:cap(fmt(r.date,{weekday:'short',day:'numeric',month:'long'})),t:r.time})+' · '+r.services.map(y=>y.name).join(', ')),
+  h('div',{class:'acts'},h('button',{type:'button',class:'button',onclick:set('done')},'✓ '+t('Пришла')),h('button',{type:'button',class:'button outline',onclick:set('noshow')},t('Не пришла')))))}}
  if(vis.length){out.push(h('div',{class:'due-sec'},t('О записи')));for(const r of vis)out.push(h('div',{class:'due-row'},
   h('b',null,nameOf(r)),h('small',null,t(visitStage(r,Date.now())===2?'2-е напоминание · ':'Накануне · ')+t('{d} в {t}',{d:cap(fmt(r.date,{weekday:'short',day:'numeric',month:'long'})),t:r.time})+' · '+r.services.map(y=>y.name).join(', ')),
   h('div',{class:'acts'},h('a',{class:'button wa',href:waLink(phoneOf(r),fill(visitStage(r,Date.now())===2?(S.remind2||S.remind):S.remind,recVars(r))),target:'_blank',rel:'noopener',onclick:()=>setTimeout(()=>markVisit(r),400)},'💬 '+t('Отправить в WhatsApp')),
    h('button',{type:'button',class:'button outline',onclick:()=>markVisit(r)},t('Не нужно')))))}
  if(due.length)out.push(h('div',{class:'due-sec'},t('Пора записаться снова')));
- $('dHint').textContent=(vis.length?t('Напомните о записи. '):'')+(due.length?t('Ниже клиентки, которые не были {w} и больше и ещё не записаны. ',{w:weeksText(S.backDays)}):'')+t('«Отправить» откроет WhatsApp с готовым сообщением.');
+ $('dHint').textContent=(mk.length?t('Отметьте прошедшие визиты — так отчёт будет точным. '):'')+(vis.length?t('Напомните о записи. '):'')+(due.length?t('Ниже клиентки, которые не были {w} и больше и ещё не записаны. ',{w:weeksText(S.backDays)}):'')+t('«Отправить» откроет WhatsApp с готовым сообщением.');
  $('dList').replaceChildren(...out,...(due.length?due.map(({c,s})=>h('div',{class:'due-row'},
   h('b',null,c.name),h('small',null,t('Последний визит {d} · {n} дн. назад',{d:fmt(s.last,{day:'numeric',month:'long'}),n:daysSince(s.last)})+(c.phone?'':' · '+t('нет телефона'))),
   h('div',{class:'acts'},
    h('a',{class:'button wa',href:waLink(c.phone,fill(S.back,{имя:c.name.split(' ')[0],мастер:S.master})),target:'_blank',rel:'noopener',onclick:()=>setTimeout(()=>markReminded(c),400)},'💬 '+t('Отправить в WhatsApp')),
-   h('button',{type:'button',class:'button outline',onclick:()=>markReminded(c)},t('Не нужно'))))):out.length?[]:[h('div',{class:'empty'},t('Всем напомнили 👍'))]))}
-setInterval(()=>{if(view==='cal')renderDue()},60000);
+   h('button',{type:'button',class:'button outline',onclick:()=>markReminded(c)},t('Не нужно'))))):out.length?[]:[h('div',{class:'empty'},t('Всё отмечено 👍'))]))}
+let lastDay=todayKey();
+function tick(){const tk=todayKey();if(tk!==lastDay){if(selected===lastDay)goTo(tk);lastDay=tk;renderAll()}
+ if(view==='cal'&&!document.querySelector('dialog[open]'))renderCal();else renderDue()}
+setInterval(tick,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')tick()});
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>console.warn(e));
 $('duebar').onclick=()=>{drawDue();$('ddlg').showModal()};
 $('dClose').onclick=()=>$('ddlg').close();
 function renderClients(){
@@ -1169,7 +1260,7 @@ function openClient(c){cEditId=c?c.id:null;$('cTitle').textContent=c?c.name:t('�
   $('cCall').href='tel:'+(c.phone||'');$('cCall').classList.toggle('hidden',!c.phone);renderClientPhotos(c.id);
   $('cHistory').replaceChildren(...(s.recs.length?s.recs.map(r=>h('div',{class:'slot-booked',onclick:()=>{$('cdlg').close();show('cal');goTo(r.date);renderCal();openEdit(r)}},h('div',{class:'time-col'},h('strong',null,fmt(r.date,{day:'numeric',month:'short'})),h('small',null,fmt(r.date,{year:'numeric'})+' · '+r.time)),
    h('div',{class:'details'},h('small',{style:'margin:0'},r.services.map(y=>y.name).join(' + ')),r.status!=='planned'?h('span',{class:'tag '+r.status},t(STATUS[r.status])):null),h('div',{class:'price'},money(r.price)))):[h('div',{class:'empty'},t('Визитов пока нет'))]))}
- $('cdlg').showModal()}
+ $('cdlg').showModal();if(c)document.activeElement&&document.activeElement.blur()}
 function saveClientForm(){const name=$('cName').value.trim();if(!name)return null;let c=cEditId&&getClient(cEditId);if(!c){c={id:uid()};db.clients.push(c)}c.name=name;c.phone=$('cPhone').value.trim();c.notes=$('cNotes').value.trim();for(const r of db.records)if(r.clientId===c.id){r.name=c.name;r.phone=c.phone}persist();return c}
 $('addClient').onclick=()=>openClient(null);
 $('cClose').onclick=()=>$('cdlg').close();
@@ -1208,7 +1299,7 @@ $('cPhotos').onchange=async e=>{const files=[...e.target.files];e.target.value='
 let pId=null,fullUrl=null;
 async function openPhoto(p){pId=p.id;$('pImg').removeAttribute('src');$('pCaption').value=p.caption||'';$('pCard').checked=!!p.inCard;
  const c=p.clientId&&getClient(p.clientId);$('pMeta').textContent=[fmt(p.date,{day:'numeric',month:'long',year:'numeric'}),c?t('клиентка: {n}',{n:c.name}):null].filter(Boolean).join(' · ');
- $('pShare').classList.toggle('hidden',!navigator.canShare);$('pdlg').showModal();
+ $('pShare').classList.toggle('hidden',!navigator.canShare);$('pdlg').showModal();document.activeElement&&document.activeElement.blur();
  try{const f=await idbGet(p.id+':f');if(f&&pId===p.id){if(fullUrl)URL.revokeObjectURL(fullUrl);fullUrl=URL.createObjectURL(f);$('pImg').src=fullUrl}}catch(e){console.warn(e)}}
 $('pClose').onclick=()=>$('pdlg').close();
 $('pform').onsubmit=e=>{e.preventDefault();const p=db.photos.find(x=>x.id===pId);if(p){p.caption=$('pCaption').value.trim();p.inCard=$('pCard').checked;persist()}$('pdlg').close();refreshPhotos()};
@@ -1293,7 +1384,8 @@ function renderServices(){$('svcList').replaceChildren(...db.catalog.map((c,i)=>
  const name=h('input',{'aria-label':t('Название'),maxlength:40});name.value=c.name;name.oninput=()=>{c.name=name.value;persist()};
  const d=h('input',{type:'number',min:0,step:5,'aria-label':t('Минут')});d.value=c.duration;d.oninput=()=>{c.duration=Number(d.value)||0;persist()};
  const p=h('input',{type:'number',min:0,step:500,'aria-label':t('Цена')});p.value=c.price;p.oninput=()=>{c.price=Number(p.value)||0;persist()};
- return h('div',{class:'svc-row'},name,d,p,h('button',{type:'button',class:'button outline','aria-label':t('Удалить услугу'),onclick:()=>{if(confirm(t('Удалить «{n}» из прайса?',{n:c.name}))){db.catalog.splice(i,1);persist();renderServices()}}},'×'))}))}
+ return h('div',{class:'svc-row'},name,h('button',{type:'button',class:'button outline','aria-label':t('Удалить услугу'),onclick:()=>{if(confirm(t('Удалить «{n}» из прайса?',{n:c.name}))){db.catalog.splice(i,1);persist();renderServices()}}},'×'),
+  h('div',{class:'svc-nums'},h('label',{class:'unit'},d,h('span',null,UNITS[LANG][1])),h('label',{class:'unit'},p,h('span',null,'₸'))))}))}
 $('addSvc').onclick=()=>{db.catalog.push({name:t('Новая услуга'),price:0,duration:30});persist();renderServices();const inputs=$('svcList').querySelectorAll('.svc-row input');const last=inputs[inputs.length-3];if(last){last.focus();last.select()}};
 
 /* ---------- НАСТРОЙКИ ---------- */
@@ -1305,7 +1397,7 @@ let backupPrep=null;
 function prepareBackup(){if(backupPrep)return backupPrep;const btn=$('exportBtn'),need=db.photos.filter(p=>!dataCache[p.id]);if(!need.length)return Promise.resolve();
  btn.disabled=true;btn.textContent=t('Готовлю копию с фото…');
  backupPrep=(async()=>{for(const p of need){try{const f=await idbGet(p.id+':f');if(f)dataCache[p.id]=await blobToData(f)}catch(e){console.warn(e)}}})().finally(()=>{backupPrep=null;btn.disabled=false;btn.textContent=t('Скачать копию')});return backupPrep}
-function renderSettings(){const S=db.settings;$('sMaster').value=S.master;$('sStart').value=S.start;$('sEnd').value=S.end;$('sConfirm').value=S.confirm;$('sRemind').value=S.remind;$('sRemind2').value=S.remind2;$('sBack').value=S.back;$('sBackDays').value=S.backDays;drawBackChips();prepareBackup();
+function renderSettings(){const S=db.settings;drawSkins();$('sMaster').value=S.master;$('sStart').value=S.start;$('sEnd').value=S.end;$('sConfirm').value=S.confirm;$('sRemind').value=S.remind;$('sRemind2').value=S.remind2;$('sBack').value=S.back;$('sBackDays').value=S.backDays;drawBackChips();prepareBackup();
  $('sLang').replaceChildren(...Object.entries(LANGS).map(([k,v])=>h('button',{type:'button',class:'chip'+(k===LANG?' on':''),onclick:()=>setLang(k)},v)));
  $('sOff').replaceChildren(...[1,2,3,4,5,6,0].map(d=>h('button',{type:'button',class:'chip'+(S.off.includes(d)?' on':''),onclick:()=>{S.off=S.off.includes(d)?S.off.filter(x=>x!==d):[...S.off,d];persist();renderSettings()}},WD_SHORT[LANG][d])))}
 $('exportBtn').onclick=()=>{const photoData={};for(const p of db.photos)if(dataCache[p.id])photoData[p.id]=dataCache[p.id];
@@ -1319,6 +1411,10 @@ $('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{co
  renderAll();alert(t('Копия загружена')+(lost?t('. Не удалось восстановить фото: {n}',{n:lost}):''))}catch(err){alert(t('Не получилось прочитать файл копии'))}e.target.value=''};
 
 $('vLang').onchange=()=>{db.settings.vLang=$('vLang').value;persist()};
+const SKINS=[['','Беж','#f5f2ed','#34322f'],['pearl','Перламутр','linear-gradient(135deg,#e6f5ea,#efeafb 35%,#fbe9f1 65%,#fdf4dc)','#7656b8'],['lavender','Лаванда','linear-gradient(135deg,#ece4fa,#e9eefa)','#7656b8'],['pink','Пудра','linear-gradient(135deg,#fde6ee,#f4ecf9)','#b2577c'],['vanilla','Ваниль','linear-gradient(135deg,#fff3cf,#fbeef0)','#94680f'],['pistachio','Фисташка','linear-gradient(135deg,#e5f5d9,#eaf3f6)','#4b7f37']];
+function applySkin(k){if(!SKINS.some(x=>x[0]===k))k='';const r=document.documentElement;if(k)r.dataset.skin=k;else delete r.dataset.skin;try{localStorage.setItem('tempo_skin',k)}catch(e){}
+ const m=document.querySelector('meta[name=theme-color]');if(m)m.content=getComputedStyle(r).getPropertyValue('--bg').trim()||'#f5f2ed'}
+function drawSkins(){const cur=db.settings.theme||'';$('sSkin').replaceChildren(...SKINS.map(([k,n,bg,dot])=>h('button',{type:'button',class:'skin'+(k===cur?' on':''),'aria-pressed':String(k===cur),onclick:()=>{db.settings.theme=k;persist();applySkin(k);drawSkins()}},h('i',{style:'background:'+bg+';--dot:'+dot}),h('b',null,t(n)))))}
 function setLang(l){if(!LANGS[l])return;const S=db.settings;LANG=l;S.lang=l;try{localStorage.setItem('tempo_lang',l)}catch(e){}
  for(const k of ['confirm','remind','remind2','back'])if(Object.values(TPL).some(T=>T[k]===S[k]))S[k]=TPL[l][k];
  for(const c of db.catalog)for(const names of Object.values(CAT_NAMES)){const i=names.indexOf(c.name);if(i>=0){c.name=CAT_NAMES[l][i];break}}
@@ -1397,7 +1493,7 @@ async function api(path,opt){opt=opt||{};const headers={apikey:SUPA_KEY,...(opt.
  return r}
 
 function setCloud(st,msg){cloudState=st;cloudMsg=msg||'';drawCloud()}
-function drawCloud(){const on=cloudOn();$('cloudPanel').hidden=!on;$('cloudNudge').hidden=!on||!!auth;if(!on)return;
+function drawCloud(){const on=cloudOn();$('cloudPanel').hidden=!on;let later=0;try{later=+localStorage.getItem('tempo_nudge_until')||0}catch(e){}$('cloudWrap').hidden=!on||!!auth||Date.now()<later;if(!on)return;
  $('cloudOut').hidden=!!auth||recoveryMode;$('cloudIn').hidden=!auth||recoveryMode;$('cloudNew').hidden=!recoveryMode;
  if(auth)$('aWho').textContent=t('Вы вошли как {e}',{e:auth.user.email});
  let m=cloudMsg;
@@ -1446,6 +1542,7 @@ function applyRemote(row){const s=row.data||{};
  db.records=(s.records||[]).map(normalize);db.clients=Array.isArray(s.clients)?s.clients:[];db.photos=Array.isArray(s.photos)?s.photos:[];db.expenses=Array.isArray(s.expenses)?s.expenses:[];
  if(Array.isArray(s.catalog)&&s.catalog.length)db.catalog=s.catalog;db.settings={...DEFAULT_SETTINGS,...(s.settings||{})};
  if(LANGS[db.settings.lang])LANG=db.settings.lang;
+ applySkin(db.settings.theme||'');
  try{localStorage.setItem(KEY,JSON.stringify(db));localStorage.setItem('tempo_lang',LANG)}catch(e){}
  sync.syncedAt=row.updated_at;sync.dirty=false;saveSync();applyStatic();renderAll();fetchPhotos()}
 
@@ -1502,12 +1599,14 @@ async function cloudInit(){drawCloud();if(!cloudOn())return;
 $('aLogin').onclick=()=>authCall('login');$('aSignup').onclick=()=>authCall('signup');$('aForgot').onclick=()=>authCall('recover');
 $('aSync').onclick=async()=>{if(sync.dirty)await push();else await pull()};$('aLogout').onclick=logout;$('aSetPass').onclick=setNewPass;
 $('cloudNudge').onclick=()=>show('more');
+$('cloudLater').onclick=()=>{try{localStorage.setItem('tempo_nudge_until',Date.now()+14*864e5)}catch(e){}$('cloudWrap').hidden=true};
 window.addEventListener('online',()=>{if(auth)sync.dirty?push():pull()});window.addEventListener('offline',()=>{if(auth)setCloud('offline')});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&auth&&!sync.dirty)pull()});
 
 applyStatic();
 renderCal();
 cloudInit();
+applySkin(db.settings.theme||'');
 </script>
 </body>
 </html>

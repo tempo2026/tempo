@@ -104,9 +104,12 @@ dialog:not([open]){display:none!important}dialog::backdrop{background:transparen
 .stats3 div{background:var(--soft);border-radius:12px;padding:10px;font-size:11px;color:var(--muted)}
 .stats3 strong{display:block;color:#292927;font-size:15px;margin-top:3px}
 .history{margin-top:12px}.history .slot-booked{grid-template-columns:78px 1fr auto;padding:10px 2px}
-.svc-row{display:grid;grid-template-columns:1fr 74px 92px 40px;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
-.svc-row input{padding:9px;min-height:40px}.svc-row button{min-height:40px;padding:0}
-.svc-head{display:grid;grid-template-columns:1fr 74px 92px 40px;gap:6px;font-size:11px;color:var(--muted);margin-top:10px}
+.svc-row{display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.svc-row:last-child{border-bottom:0}
+.svc-row input{padding:9px 11px;min-height:42px;width:100%}.svc-row>input{font-weight:600;font-size:16px}.svc-row>button{min-height:42px;padding:0}
+.svc-nums{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.3fr;gap:8px}
+label.unit{position:relative;display:block;margin:0}label.unit input{padding-right:46px}
+label.unit span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .toast{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));max-width:546px;margin:auto;background:var(--ink);color:#fff;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;z-index:60;box-shadow:0 10px 30px #0004;font-size:13px}
 .toast[hidden]{display:none}.toast span{flex:1}
@@ -281,7 +284,6 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   <div class="topline"><h1>Услуги</h1><button class="button" id="addSvc">+ Услуга</button></div>
   <p>Ваш прайс. Эти услуги и цены подставляются в запись, и сумма считается сама. Изменения сохраняются сразу.</p>
   <section class="panel">
-    <div class="svc-head"><span>Название</span><span>Мин</span><span>Цена, ₸</span><span></span></div>
     <div id="svcList"></div>
   </section>
 </section>
@@ -1320,7 +1322,8 @@ function renderServices(){$('svcList').replaceChildren(...db.catalog.map((c,i)=>
  const name=h('input',{'aria-label':t('Название'),maxlength:40});name.value=c.name;name.oninput=()=>{c.name=name.value;persist()};
  const d=h('input',{type:'number',min:0,step:5,'aria-label':t('Минут')});d.value=c.duration;d.oninput=()=>{c.duration=Number(d.value)||0;persist()};
  const p=h('input',{type:'number',min:0,step:500,'aria-label':t('Цена')});p.value=c.price;p.oninput=()=>{c.price=Number(p.value)||0;persist()};
- return h('div',{class:'svc-row'},name,d,p,h('button',{type:'button',class:'button outline','aria-label':t('Удалить услугу'),onclick:()=>{if(confirm(t('Удалить «{n}» из прайса?',{n:c.name}))){db.catalog.splice(i,1);persist();renderServices()}}},'×'))}))}
+ return h('div',{class:'svc-row'},name,h('button',{type:'button',class:'button outline','aria-label':t('Удалить услугу'),onclick:()=>{if(confirm(t('Удалить «{n}» из прайса?',{n:c.name}))){db.catalog.splice(i,1);persist();renderServices()}}},'×'),
+  h('div',{class:'svc-nums'},h('label',{class:'unit'},d,h('span',null,UNITS[LANG][1])),h('label',{class:'unit'},p,h('span',null,'₸'))))}))}
 $('addSvc').onclick=()=>{db.catalog.push({name:t('Новая услуга'),price:0,duration:30});persist();renderServices();const inputs=$('svcList').querySelectorAll('.svc-row input');const last=inputs[inputs.length-3];if(last){last.focus();last.select()}};
 
 /* ---------- НАСТРОЙКИ ---------- */

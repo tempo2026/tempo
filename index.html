@@ -21,7 +21,7 @@
 :root[data-skin="pink"]{--bg:#fbf0f3;--grad:linear-gradient(160deg,#fde6ee 0%,#fbf0f4 50%,#f4ecf9 100%);--accent:#b2577c;--accent-soft:#f8e1ea;--card:rgba(255,255,255,.86);--soft:#f9ebf0;--line:rgba(170,90,120,.14);--dlg:#fdf9fa;--bar:rgba(255,255,255,.82);--muted:#87727a}
 :root[data-skin="vanilla"]{--bg:#fdf7e8;--grad:linear-gradient(160deg,#fff3cf 0%,#fdf5e6 50%,#fbeef0 100%);--accent:#94680f;--accent-soft:#f8ecc9;--card:rgba(255,255,255,.86);--soft:#f9f0dc;--line:rgba(150,115,40,.15);--dlg:#fffcf5;--bar:rgba(255,255,255,.82);--muted:#857a64}
 :root[data-skin="pistachio"]{--bg:#f1f8ec;--grad:linear-gradient(160deg,#e5f5d9 0%,#f1f8ea 50%,#eaf3f6 100%);--accent:#4b7f37;--accent-soft:#e1efd6;--card:rgba(255,255,255,.86);--soft:#ecf4e4;--line:rgba(80,120,60,.15);--dlg:#fafdf7;--bar:rgba(255,255,255,.82);--muted:#727d6c}
-*{box-sizing:border-box}body{margin:0;background:var(--bg) var(--grad) fixed;min-height:100vh}
+*{box-sizing:border-box}input[type=checkbox]{accent-color:var(--accent)}body{margin:0;background:var(--bg) var(--grad) fixed;min-height:100vh}
 .nav,.daybar{background:var(--bar)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .skins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
 .skin{border:2px solid transparent;background:none;border-radius:16px;padding:6px 4px 8px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -89,6 +89,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .toprow:last-child{border-bottom:0}.toprow small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.toprow b{white-space:nowrap}
 .exp-add{display:grid;grid-template-columns:minmax(0,1fr) 96px auto;gap:6px;margin-top:10px}
 .exp-add .button{padding:11px 13px}
+.exp-sum{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}.exp-sum span{background:var(--soft);border-radius:10px;padding:5px 9px;font-size:12px;color:var(--muted)}.exp-sum b{color:var(--ink);font-weight:600}
+#eCats{margin-top:4px}
 .reportlink{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:21px;padding:15px;margin-top:12px;font:inherit;font-size:16px;font-weight:600;color:var(--ink);cursor:pointer}
 .reportlink small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:3px;text-align:left}
 .daybar .left button{justify-self:start;color:var(--ink);font-size:13px;font-weight:600;padding:6px 0;text-align:left;line-height:1.25}
@@ -122,12 +124,7 @@ dialog:not([open]){display:none!important}dialog::backdrop{background:transparen
 .stats3 div{background:var(--soft);border-radius:12px;padding:10px;font-size:11px;color:var(--muted)}
 .stats3 strong{display:block;color:#292927;font-size:15px;margin-top:3px}
 .history{margin-top:12px}.history .slot-booked{grid-template-columns:78px 1fr auto;padding:10px 2px}
-.svc-row{display:grid;grid-template-columns:minmax(0,1fr) 42px;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.svc-row:last-child{border-bottom:0}
-.svc-row input{padding:9px 11px;min-height:42px;width:100%}.svc-row>input{font-weight:600;font-size:16px}.svc-row>button{min-height:42px;padding:0}
-.svc-nums{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.3fr;gap:8px}
-label.unit{position:relative;display:block;margin:0}label.unit input{padding-right:46px}
-label.unit span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.svc-item .chev{color:var(--muted);font-size:22px;flex:none}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .toast{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));max-width:546px;margin:auto;background:var(--accent);color:#fff;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;z-index:60;box-shadow:0 10px 30px #0004;font-size:13px}
 .toast[hidden]{display:none}.toast span{flex:1}
@@ -307,10 +304,9 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
 <!-- УСЛУГИ -->
 <section class="view" id="view-services" hidden>
   <div class="topline"><h1>Услуги</h1><button class="button" id="addSvc">+ Услуга</button></div>
-  <p>Ваш прайс. Эти услуги и цены подставляются в запись, и сумма считается сама. Изменения сохраняются сразу.</p>
-  <section class="panel">
-    <div id="svcList"></div>
-  </section>
+  <p>Ваш прайс. Услуги и цены подставляются в запись, сумма считается сама. Нажмите на услугу, чтобы изменить её.</p>
+  <input type="search" id="svcSearch" placeholder="Поиск" autocomplete="off" style="margin:4px 0 12px">
+  <div id="svcList"></div>
 </section>
 
 <!-- ОТЧЁТ -->
@@ -334,9 +330,12 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   <section class="panel"><h2>Популярные услуги</h2><div id="rSvc"></div></section>
   <section class="panel"><h2>Лучшие клиентки</h2><div id="rTopC"></div></section>
   <section class="panel">
-    <div class="head"><h2>Расходы на материалы</h2><span class="small" id="rExpCount"></span></div>
-    <p>Гель-лаки, базы, пилки, аренда — всё, что тратите на работу. Прибыль = выручка − расходы.</p>
-    <div class="exp-add"><input id="eName" maxlength="60" placeholder="На что потратили"><input id="eSum" type="number" min="0" step="100" placeholder="₸" aria-label="Сумма, ₸"><button class="button" id="eAdd" type="button">+</button></div>
+    <div class="head"><h2>Расходы</h2><span class="small" id="rExpCount"></span></div>
+    <p>Всё, что тратите на работу: материалы, аренда, реклама. Прибыль = выручка − расходы.</p>
+    <div class="chips" id="eCats"></div>
+    <div class="exp-add"><input id="eName" maxlength="60" placeholder="Подпись"><input id="eSum" type="number" min="0" step="100" inputmode="numeric" placeholder="₸" aria-label="Сумма, ₸"><button class="button" id="eAdd" type="button" aria-label="Добавить расход">+</button></div>
+    <label class="check"><input type="checkbox" id="eMonthly"> Повторять каждый месяц</label>
+    <div class="exp-sum" id="rExpCats"></div>
     <div id="rExpList"></div>
   </section>
 </section>
@@ -406,7 +405,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
       <label class="button outline" style="margin:0">Загрузить копию<input type="file" id="importFile" accept=".json,application/json" hidden></label>
     </div>
   </section>
-  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 12</p>
+  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 13</p>
 </section>
 </main>
 
@@ -538,6 +537,18 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   </div>
 </form></dialog>
 
+<!-- ДИАЛОГ УСЛУГИ -->
+<dialog id="svdlg"><form id="svform" autocomplete="off">
+  <div class="head"><h2 id="svTitle">Услуга</h2><button class="icon-btn" type="button" id="svClose" aria-label="Закрыть">×</button></div>
+  <label for="svName">Название</label><input id="svName" maxlength="60" required placeholder="Например, маникюр с покрытием">
+  <div class="two-col"><div><label for="svDur">Время, мин</label><input id="svDur" type="number" min="0" step="5" inputmode="numeric"></div><div><label for="svPrice">Цена, ₸</label><input id="svPrice" type="number" min="0" step="500" inputmode="numeric"></div></div>
+  <label class="check"><input type="checkbox" id="svFrom"> Цена «от» — может быть выше</label>
+  <div class="formactions">
+    <button type="button" class="button outline danger grow" id="svDelete">Удалить</button>
+    <button class="button" type="submit">Сохранить</button>
+  </div>
+</form></dialog>
+
 <!-- ДИАЛОГ ФОТО -->
 <dialog id="pdlg"><form id="pform" autocomplete="off">
   <img class="bigimg" id="pImg" alt="Фото работы">
@@ -621,7 +632,7 @@ const I18N={kk:{},en:{}};
 ['Все данные хранятся только в этом браузере на этом телефоне. Время от времени скачивайте копию (фото работ тоже в неё входят): если что-то случится с телефоном, её можно будет загрузить обратно.','Барлық деректер тек осы телефондағы осы браузерде сақталады. Анда-санда көшірмесін жүктеп алып отырыңыз (жұмыс фотолары да кіреді): телефонға бірдеңе болса, оны қайта жүктеуге болады.','All data is stored only in this browser on this phone. Download a backup from time to time (photos included): if something happens to your phone, you can restore it.'],
 ['Скачать копию','Көшірмені жүктеп алу','Download backup'],
 ['Загрузить копию','Көшірмені қалпына келтіру','Restore backup'],
-['TEMPO · версия 12','TEMPO · 12-нұсқа','TEMPO · version 12'],
+['TEMPO · версия 13','TEMPO · 13-нұсқа','TEMPO · version 13'],
 ['сейчас','қазір','now'],['через {d}','{d} кейін','in {d}'],
 ['Нужно внимание: {n}','Назар аударыңыз: {n}','Needs attention: {n}'],['Отметить визиты: {n}','Келгендерді белгілеу: {n}','Mark visits: {n}'],
 ['Отметьте, кто пришёл','Кім келгенін белгілеңіз','Mark who came'],
@@ -629,6 +640,12 @@ const I18N={kk:{},en:{}};
 ['Всё отмечено 👍','Бәрі белгіленді 👍','All done 👍'],
 ['заработано {a} · ещё записано {b}','табыс {a} · әлі жазылған {b}','earned {a} · still booked {b}'],
 ['За месяц','Ай бойынша','This month'],
+['Расходы','Шығындар','Expenses'],['Всё, что тратите на работу: материалы, аренда, реклама. Прибыль = выручка − расходы.','Жұмысқа жұмсайтынның бәрі: материалдар, жалдау, жарнама. Пайда = түсім − шығындар.','Everything you spend on work: materials, rent, ads. Profit = revenue − expenses.'],
+['Повторять каждый месяц','Ай сайын қайталау','Repeat every month'],['каждый месяц','ай сайын','monthly'],['Добавить расход','Шығын қосу','Add expense'],
+['Материалы','Материалдар','Materials'],['Аренда','Жалдау','Rent'],['Реклама','Жарнама','Advertising'],['Обучение','Оқу','Training'],['Другое','Басқа','Other'],
+['Ваш прайс. Услуги и цены подставляются в запись, сумма считается сама. Нажмите на услугу, чтобы изменить её.','Сіздің прайсыңыз. Қызметтер мен бағалар жазбаға қойылады, сома өзі есептеледі. Өзгерту үшін қызметті басыңыз.','Your price list. Services and prices fill into bookings and the total adds up itself. Tap a service to edit it.'],
+['Поиск','Іздеу','Search'],['Услуга','Қызмет','Service'],['Например, маникюр с покрытием','Мысалы, жабынды маникюр','E.g. gel manicure'],['Цена «от» — может быть выше','«Бастап» бағасы — жоғары болуы мүмкін','“From” price — may be higher'],
+['от','бастап','from'],['Прайс пуст. Нажмите «+ Услуга».','Прайс бос. «+ Қызмет» батырмасын басыңыз.','Price list is empty. Tap “+ Service”.'],
 ['Перенос записи','Жазылуды ауыстыру','Rescheduled booking'],['Отмена записи','Жазылудың күшін жою','Cancelled booking'],
 ['Запись отменена. Написать клиентке?','Жазылу тоқтатылды. Клиентке жазасыз ба?','Booking cancelled. Message the client?'],
 ['Запись перенесена. Отправить клиентке новое время?','Жазылу ауыстырылды. Клиентке жаңа уақытты жібересіз бе?','Booking moved. Send the client the new time?'],
@@ -1096,7 +1113,8 @@ document.querySelectorAll('#statusSeg button').forEach(b=>b.onclick=()=>{formSta
 function closePicker(){$('servicePicker').classList.add('hidden');$('addService').setAttribute('aria-expanded','false')}
 let picked=[];
 const svcKey=n=>String(n).trim().toLowerCase();
-function svcMeta(c){return (c.price?money(c.price):'0 ₸')+', '+dur(c.duration||0)}
+function priceText(c,lang){lang=lang||LANG;const m=money(c.price||0);if(!(c.from&&c.price))return m;return lang==='kk'?m+' '+t('от',null,lang):t('от',null,lang)+' '+m}
+function svcMeta(c){return priceText(c)+', '+dur(c.duration||0)}
 function isPicked(n){return picked.some(x=>svcKey(x.name)===svcKey(n))}
 function togglePick(c){if(isPicked(c.name))picked=picked.filter(x=>svcKey(x.name)!==svcKey(c.name));else picked.push({name:c.name,price:+c.price||0,duration:+c.duration||0});drawSvcSheet()}
 function clientPast(){let cid=formClientId;if(!cid){const n=svcKey($('clientName').value);const c=n&&db.clients.find(c=>svcKey(c.name)===n);cid=c&&c.id}
@@ -1361,7 +1379,7 @@ ${S.vAbout.trim()?`<p class="about">${esc(S.vAbout.trim())}</p>`:''}
 <a class="btn wa" href="${esc(wa(hello+'.'))}" target="_blank" rel="noopener">${esc(tc('Записаться в WhatsApp'))}</a>
 ${insta?`<a class="btn ghost" href="https://instagram.com/${esc(encodeURIComponent(insta))}" target="_blank" rel="noopener">Instagram @${esc(insta)}</a>`:''}
 ${imgs.length?`<h2>${esc(tc('Работы'))}</h2><div class="grid">${imgs.map((m,i)=>`<button type="button" data-i="${i}" aria-label="${esc(tc('Фото {n}',{n:i+1}))}"><img src="${m.src}" alt="${esc(m.cap||tc('Работа {n}',{n:i+1}))}" loading="lazy"></button>`).join('')}</div>`:''}
-${services.length?`<h2>${esc(tc('Услуги и цены'))}</h2>${services.map(c=>`<a class="svc" href="${esc(wa(hello+': '+c.name.trim()+'.'))}" target="_blank" rel="noopener"><span>${esc(c.name.trim())}${c.duration?`<small>${esc(dur(c.duration,CL))}</small>`:''}</span><b>${esc(money(c.price))}</b></a>`).join('')}<p class="note">${esc(tc('Нажмите на услугу, чтобы записаться'))}</p>`:''}
+${services.length?`<h2>${esc(tc('Услуги и цены'))}</h2>${services.map(c=>`<a class="svc" href="${esc(wa(hello+': '+c.name.trim()+'.'))}" target="_blank" rel="noopener"><span>${esc(c.name.trim())}${c.duration?`<small>${esc(dur(c.duration,CL))}</small>`:''}</span><b>${esc(priceText(c,CL))}</b></a>`).join('')}<p class="note">${esc(tc('Нажмите на услугу, чтобы записаться'))}</p>`:''}
 <footer>${esc(tc('Сделано в TEMPO'))}</footer>
 </main>
 <div class="lb" id="lb" hidden><button class="x" id="lbx" type="button" aria-label="${esc(tc('Закрыть'))}">×</button><img id="lbi" alt=""><p id="lbc"></p><a class="btn wa" id="lba" target="_blank" rel="noopener">${esc(tc('Хочу так же'))}</a></div>
@@ -1383,13 +1401,18 @@ $('vSave').onclick=()=>{if(!cardHtml)return;const file=new File([cardHtml],'vizi
  if(navigator.canShare&&navigator.canShare({files:[file]}))navigator.share({files:[file]}).catch(e=>{if(e&&e.name!=='AbortError')downloadFile(file)});else downloadFile(file)};
 
 /* ---------- УСЛУГИ ---------- */
-function renderServices(){$('svcList').replaceChildren(...db.catalog.map((c,i)=>{
- const name=h('input',{'aria-label':t('Название'),maxlength:40});name.value=c.name;name.oninput=()=>{c.name=name.value;persist()};
- const d=h('input',{type:'number',min:0,step:5,'aria-label':t('Минут')});d.value=c.duration;d.oninput=()=>{c.duration=Number(d.value)||0;persist()};
- const p=h('input',{type:'number',min:0,step:500,'aria-label':t('Цена')});p.value=c.price;p.oninput=()=>{c.price=Number(p.value)||0;persist()};
- return h('div',{class:'svc-row'},name,h('button',{type:'button',class:'button outline','aria-label':t('Удалить услугу'),onclick:()=>{if(confirm(t('Удалить «{n}» из прайса?',{n:c.name}))){db.catalog.splice(i,1);persist();renderServices()}}},'×'),
-  h('div',{class:'svc-nums'},h('label',{class:'unit'},d,h('span',null,UNITS[LANG][1])),h('label',{class:'unit'},p,h('span',null,'₸'))))}))}
-$('addSvc').onclick=()=>{db.catalog.push({name:t('Новая услуга'),price:0,duration:30});persist();renderServices();const inputs=$('svcList').querySelectorAll('.svc-row input');const last=inputs[inputs.length-3];if(last){last.focus();last.select()}};
+function renderServices(){const q=svcKey($('svcSearch').value||''),list=db.catalog.filter(c=>!q||svcKey(c.name).includes(q)).sort((a,b)=>a.name.localeCompare(b.name,LOCALE[LANG]));
+ $('svcList').replaceChildren(list.length?h('div',{class:'svc-list'},...list.map(c=>h('button',{type:'button',class:'svc-item',onclick:()=>openSvc(c)},h('div',null,h('b',null,c.name),h('small',null,svcMeta(c))),h('span',{class:'chev'},'›')))):h('div',{class:'empty'},q?t('Ничего не нашлось'):t('Прайс пуст. Нажмите «+ Услуга».')))}
+let svEdit=null;
+function openSvc(c){svEdit=c;$('svTitle').textContent=c?c.name:t('Новая услуга');$('svName').value=c?c.name:'';$('svDur').value=c?c.duration:60;$('svPrice').value=c?c.price:'';$('svFrom').checked=!!(c&&c.from);$('svDelete').hidden=!c;
+ $('svdlg').showModal();if(c)document.activeElement&&document.activeElement.blur();else $('svName').focus()}
+$('svcSearch').oninput=renderServices;
+$('addSvc').onclick=()=>openSvc(null);
+$('svClose').onclick=()=>$('svdlg').close();
+$('svform').onsubmit=e=>{e.preventDefault();const name=$('svName').value.trim();if(!name){$('svName').focus();return}
+ const c=svEdit||{};c.name=name;c.duration=Math.max(0,Number($('svDur').value)||0);c.price=Math.max(0,Number($('svPrice').value)||0);c.from=$('svFrom').checked;
+ if(!svEdit)db.catalog.push(c);persist();$('svdlg').close();renderServices()};
+$('svDelete').onclick=()=>{if(!svEdit||!confirm(t('Удалить «{n}» из прайса?',{n:svEdit.name})))return;db.catalog=db.catalog.filter(x=>x!==svEdit);persist();$('svdlg').close();renderServices()};
 
 /* ---------- НАСТРОЙКИ ---------- */
 const bind=(id,key,num)=>{$(id).oninput=()=>{db.settings[key]=num?Math.max(1,Number($(id).value)||1):$(id).value;persist()}};
@@ -1434,7 +1457,17 @@ function monthStats(y,m){const pre=monthKey(y,m),tk=todayKey();
   expSum:exp.reduce((s,e)=>s+(+e.amount||0),0),exp,noshow:recs.filter(r=>r.status==='noshow').length,cancel:recs.filter(r=>r.status==='cancelled'||r.status==='moved').length}}
 function openReport(){repY=viewYear;repM=viewMonth;show('report')}
 function shiftRep(n){const d=new Date(repY,repM+n,1);repY=d.getFullYear();repM=d.getMonth();renderReport()}
-function renderReport(){
+const EXP_CATS=[['mat','Материалы'],['rent','Аренда'],['ads','Реклама'],['edu','Обучение'],['other','Другое']];
+const expCat=e=>e.cat||(/аренд|жалд|rent/i.test(e.name||'')?'rent':'mat');
+const expCatName=k=>t((EXP_CATS.find(x=>x[0]===k)||EXP_CATS[4])[1]);
+let eCat='mat';
+function drawECats(){$('eCats').replaceChildren(...EXP_CATS.map(([k,n])=>h('button',{type:'button',class:'chip'+(k===eCat?' on':''),onclick:()=>{eCat=k;$('eMonthly').checked=k==='rent';drawECats()}},t(n))))}
+function repeatMonthly(){const cur=todayKey().slice(0,7);let changed=false;
+ for(let guard=0;guard<60;guard++){const due=db.expenses.filter(e=>e.monthly&&String(e.date).slice(0,7)<cur);if(!due.length)break;
+  for(const e of due){const d=new Date(e.date+'T12:00:00'),day=d.getDate(),nx=new Date(d.getFullYear(),d.getMonth()+1,1),last=new Date(nx.getFullYear(),nx.getMonth()+1,0).getDate();nx.setDate(Math.min(day,last));
+   e.monthly=false;db.expenses.push({id:uid(),date:dateKey(nx),name:e.name,amount:e.amount,cat:expCat(e),monthly:true});changed=true}}
+ if(changed)persist()}
+function renderReport(){repeatMonthly();drawECats();
  const S=monthStats(repY,repM),pd=new Date(repY,repM-1,1),P=monthStats(pd.getFullYear(),pd.getMonth());
  $('rTitle').textContent=cap(fmtD(new Date(repY,repM,1),{month:'long',year:'numeric'}));
  $('rRevenue').textContent=money(S.revenue);
@@ -1464,13 +1497,15 @@ function renderReport(){
  // расходы
  $('rExpCount').textContent=S.exp.length?t('{n} шт.',{n:S.exp.length}):'';
  const el=[...S.exp].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
- $('rExpList').replaceChildren(...(el.length?el.map(e=>h('div',{class:'toprow'},h('span',null,e.name||t('Материалы'),h('small',null,fmt(e.date,{day:'numeric',month:'long'}))),h('span',{style:'display:flex;align-items:center;gap:10px'},h('b',null,money(e.amount)),
-  h('button',{type:'button',class:'button outline','aria-label':t('Удалить'),style:'padding:6px 10px',onclick:()=>{if(confirm(t('Удалить расход «{n}»?',{n:e.name||t('Материалы')}))){db.expenses=db.expenses.filter(x=>x.id!==e.id);persist();renderReport()}}},'×')))):[h('div',{class:'empty'},t('Пока нет расходов'))]))}
+ const byCat={};for(const e of S.exp){const k=expCat(e);byCat[k]=(byCat[k]||0)+(+e.amount||0)}
+ $('rExpCats').replaceChildren(...EXP_CATS.filter(([k])=>byCat[k]).map(([k,n])=>h('span',null,t(n)+' ',h('b',null,money(byCat[k])))));
+ $('rExpList').replaceChildren(...(el.length?el.map(e=>h('div',{class:'toprow'},h('span',null,e.name||expCatName(expCat(e)),h('small',null,[e.name?expCatName(expCat(e)):null,fmt(e.date,{day:'numeric',month:'long'}),e.monthly?'↻ '+t('каждый месяц'):null].filter(Boolean).join(' · '))),h('span',{style:'display:flex;align-items:center;gap:10px'},h('b',null,money(e.amount)),
+  h('button',{type:'button',class:'button outline','aria-label':t('Удалить'),style:'padding:6px 10px',onclick:()=>{if(confirm(t('Удалить расход «{n}»?',{n:e.name||expCatName(expCat(e))}))){db.expenses=db.expenses.filter(x=>x.id!==e.id);persist();renderReport()}}},'×')))):[h('div',{class:'empty'},t('Пока нет расходов'))]))}
 $('rPrev').onclick=()=>shiftRep(-1);$('rNext').onclick=()=>shiftRep(1);
 $('monthBtn').onclick=openReport;$('openReport').onclick=()=>{repY=new Date().getFullYear();repM=new Date().getMonth();show('report')};
 $('eAdd').onclick=()=>{const amount=Math.max(0,Number($('eSum').value)||0);if(!amount){alert(t('Введите сумму'));$('eSum').focus();return}
  const tk=todayKey(),pre=monthKey(repY,repM),date=tk.startsWith(pre)?tk:pre+'-01';
- db.expenses.push({id:uid(),date,name:$('eName').value.trim(),amount});persist();$('eName').value='';$('eSum').value='';renderReport()};
+ db.expenses.push({id:uid(),date,name:$('eName').value.trim(),amount,cat:eCat,monthly:$('eMonthly').checked});persist();$('eName').value='';$('eSum').value='';renderReport()};
 
 /* ---------- ОБЛАКО (Supabase, без библиотек) ---------- */
 var SUPA_URL='https://dmhncscoyvopvwidvdea.supabase.co',SUPA_KEY='sb_publishable_XgQgJfV-OKmlsb9FGBtdLA_njxq1_xV';

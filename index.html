@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-title" content="TEMPO">
 <meta name="theme-color" content="#f5f2ed">
 <title>TEMPO</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#292927;background:#f5f2ed;--ink:#34322f;--muted:#81796e;--line:#e9e3d9;--card:#fffdfa;--soft:#f0ebe3;--green:#37684b;--wa:#25a35a}
 *{box-sizing:border-box}body{margin:0;background:#f5f2ed}
@@ -1214,6 +1217,7 @@ let lastDay=todayKey();
 function tick(){const tk=todayKey();if(tk!==lastDay){if(selected===lastDay)goTo(tk);lastDay=tk;renderAll()}
  if(view==='cal'&&!document.querySelector('dialog[open]'))renderCal();else renderDue()}
 setInterval(tick,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')tick()});
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>console.warn(e));
 $('duebar').onclick=()=>{drawDue();$('ddlg').showModal()};
 $('dClose').onclick=()=>$('ddlg').close();
 function renderClients(){

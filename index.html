@@ -136,17 +136,27 @@ dialog.wide{padding:12px}
 .cal-sheet .month-day.has-bookings.past:after{color:#b9b1a6}
 .month-day.today:not(.selected){outline:0;color:#2f6f8f;font-weight:700}
 .day-line{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 2px 10px;border-top:1px solid var(--line);margin-top:8px}
-.day-line b{font-size:18px}.day-line span{font-size:16px;color:var(--ink)}
+.day-line{flex-wrap:wrap;row-gap:2px}.day-line b{font-size:18px;white-space:nowrap}.day-line span{font-size:14px;color:var(--muted);white-space:nowrap}
 .rcard{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px;margin:0 0 10px;cursor:pointer;width:100%;text-align:left;font:inherit;color:var(--ink)}
 .rcard .t{text-align:right}.rcard .t strong{display:block;font-size:19px;font-weight:600}.rcard .t small{font-size:14px;color:var(--muted)}
 .rcard .d{min-width:0}.rcard .d b{display:block;font-size:18px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rcard .d .svc{display:block;color:var(--muted);font-size:15px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rcard .d .sum{display:block;color:var(--muted);font-size:15px;margin-top:2px}
 .rcard.faded{opacity:.5}
-.rcard.free{grid-template-columns:62px minmax(0,1fr)}
-.rcard.free .t strong{color:var(--green);font-weight:500;font-size:20px}
-.rcard.free .d b{color:var(--green);font-size:18px}
-.rcard.free .d .svc{font-size:15px}
+.rcard.free{grid-template-columns:62px minmax(0,1fr);background:transparent;border:1.5px dashed #c9dccd;padding:9px 14px;border-radius:14px}
+.rcard.free:hover,.rcard.free:active{background:#edf5ee}
+.rcard.free .t strong{color:var(--green);font-weight:500;font-size:17px}
+.rcard.free .d{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.rcard.free .d b{color:var(--green);font-size:15px;font-weight:600}
+.rcard.free .d .svc{font-size:13px;margin:0}
+.cal-toggle{display:block;margin:2px auto 0;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;padding:6px 14px;cursor:pointer;border-radius:10px}
+.cal-toggle:hover{background:var(--soft)}
+.cal-sheet{touch-action:pan-y}
+.cal-sheet.week .month-grid{animation:none}
+.nudge{position:relative}.nudge .duebar{padding-right:44px}
+.nudge-x{position:absolute;top:6px;right:6px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:18px;cursor:pointer}
+.nudge-x:hover{background:#dde8f4}
+.nudge .duebar .go{display:none}
 .wa-round{width:46px;height:46px;border-radius:50%;border:0;background:#e3f4e9;font-size:20px;cursor:pointer;flex:none}
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:50}
 .bottom .nav{position:static}
@@ -221,9 +231,9 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
 <!-- КАЛЕНДАРЬ -->
 <section class="view" id="view-cal">
   <div class="cal-head"><button class="icon-btn" id="prev" type="button" aria-label="Предыдущий месяц">‹</button><h1 id="monthTitle">Календарь</h1><button class="icon-btn" id="next" type="button" aria-label="Следующий месяц">›</button><button class="button" id="add" type="button">+ Запись</button></div>
-  <button type="button" class="duebar cloud" id="cloudNudge" hidden><span class="bell">☁️</span><div><b>Включите облако</b><small>Чтобы записи и фото не пропали, если что-то случится с телефоном</small></div><span class="go">›</span></button>
+  <div class="nudge" id="cloudWrap" hidden><button type="button" class="duebar cloud" id="cloudNudge"><span class="bell">☁️</span><div><b>Включите облако</b><small>Чтобы записи и фото не пропали, если что-то случится с телефоном</small></div><span class="go">›</span></button><button type="button" class="nudge-x" id="cloudLater" aria-label="Скрыть на 2 недели">×</button></div>
   <button type="button" class="duebar" id="duebar" hidden><span class="bell">🔔</span><div><b id="dueTitle"></b><small id="dueSub"></small></div><span class="go">Открыть ›</span></button>
-  <div class="cal-sheet"><div class="month-grid" id="days"></div></div>
+  <div class="cal-sheet" id="calSheet"><div class="month-grid" id="days"></div><button type="button" class="cal-toggle" id="calToggle"></button></div>
   <div class="day-line"><b id="dateLabel"></b><span id="hoursLabel"></span></div>
   <div id="entries"></div>
 </section>
@@ -363,7 +373,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
       <label class="button outline" style="margin:0">Загрузить копию<input type="file" id="importFile" accept=".json,application/json" hidden></label>
     </div>
   </section>
-  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 10</p>
+  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 11</p>
 </section>
 </main>
 
@@ -577,7 +587,14 @@ const I18N={kk:{},en:{}};
 ['Все данные хранятся только в этом браузере на этом телефоне. Время от времени скачивайте копию (фото работ тоже в неё входят): если что-то случится с телефоном, её можно будет загрузить обратно.','Барлық деректер тек осы телефондағы осы браузерде сақталады. Анда-санда көшірмесін жүктеп алып отырыңыз (жұмыс фотолары да кіреді): телефонға бірдеңе болса, оны қайта жүктеуге болады.','All data is stored only in this browser on this phone. Download a backup from time to time (photos included): if something happens to your phone, you can restore it.'],
 ['Скачать копию','Көшірмені жүктеп алу','Download backup'],
 ['Загрузить копию','Көшірмені қалпына келтіру','Restore backup'],
-['TEMPO · версия 10','TEMPO · 10-нұсқа','TEMPO · version 10'],
+['TEMPO · версия 11','TEMPO · 11-нұсқа','TEMPO · version 11'],
+['Скрыть на 2 недели','2 аптаға жасыру','Hide for 2 weeks'],
+['Весь месяц ▾','Толық ай ▾','Whole month ▾'],
+['Только неделя ▴','Тек апта ▴','Week only ▴'],
+['Предыдущая неделя','Алдыңғы апта','Previous week'],
+['Следующая неделя','Келесі апта','Next week'],
+['Предыдущий месяц','Алдыңғы ай','Previous month'],
+['Следующий месяц','Келесі ай','Next month'],
 ['Выручка за день','Күндік түсім','Revenue for the day'],
 ['Сегодня','Бүгін','Today'],
 ['Ещё','Тағы','More'],
@@ -914,6 +931,7 @@ function renderAll(){if(view==='report')renderReport();if(view==='cal')renderCal
 
 /* ---------- КАЛЕНДАРЬ ---------- */
 let selected=todayKey(),viewMonth=new Date().getMonth(),viewYear=new Date().getFullYear();
+let calMode=(()=>{try{return localStorage.getItem('tempo_calmode')||'week'}catch(e){return 'week'}})();
 function goTo(key){selected=key;const d=new Date(key+'T12:00:00');viewMonth=d.getMonth();viewYear=d.getFullYear()}
 function dayItems(key,excludeId){
  const S=db.settings,recs=db.records.filter(x=>x.date===key&&x.id!==excludeId).sort((a,b)=>a.time.localeCompare(b.time));
@@ -928,12 +946,16 @@ function renderCal(){
  $('monthTitle').textContent=monthName;
  const S=db.settings,grid=$('days');grid.replaceChildren();
  for(const n of [1,2,3,4,5,6,0].map(i=>WD_SHORT[LANG][i]))grid.append(h('div',{class:'weekday'},n));
- const start=(first.getDay()+6)%7,count=Math.ceil((start+new Date(viewYear,viewMonth+1,0).getDate())/7)*7,tk=todayKey();
- for(let i=0;i<count;i++){const d=new Date(viewYear,viewMonth,i-start+1),key=dateKey(d),other=d.getMonth()!==viewMonth;
+ let start=(first.getDay()+6)%7,count=Math.ceil((start+new Date(viewYear,viewMonth+1,0).getDate())/7)*7,tk=todayKey();
+ const week=calMode==='week';$('calSheet').classList.toggle('week',week);
+ if(week){const sd=new Date(selected+'T12:00:00');start=-(sd.getDate()-1-((sd.getDay()+6)%7));count=7}
+ $('calToggle').textContent=t(week?'Весь месяц ▾':'Только неделя ▴');
+ $('prev').setAttribute('aria-label',t(week?'Предыдущая неделя':'Предыдущий месяц'));$('next').setAttribute('aria-label',t(week?'Следующая неделя':'Следующий месяц'));
+ for(let i=0;i<count;i++){const d=new Date(viewYear,viewMonth,i-start+1),key=dateKey(d),other=!week&&d.getMonth()!==viewMonth;
   const cls='month-day'+(other?' other':'')+(S.off.includes(d.getDay())&&!other?' offday':'')+(key===selected?' selected':'')+(key===tk?' today':'')+(db.records.some(x=>x.date===key&&active(x))?' has-bookings':'')+(key<tk?' past':'');
   grid.append(h('button',{type:'button',class:cls,'aria-label':fmt(key,{day:'numeric',month:'long',year:'numeric'}),onclick:()=>{goTo(key);renderCal()}},d.getDate()))}
  $('dateLabel').textContent=cap(fmt(selected,{weekday:'short',day:'numeric',month:'long'}))+(selected===tk?' · '+t('сегодня'):'');
- $('hoursLabel').textContent=S.start+' – '+S.end;
+ {const n=db.records.filter(x=>x.date===selected&&x.kind!=='break'&&active(x)).length;$('hoursLabel').textContent=(n?bookingsText(n)+' · ':'')+S.start+' – '+S.end}
  const dayRecs=db.records.filter(x=>x.date===selected);
  $('dayTotal').textContent=money(dayRecs.filter(earned).reduce((s,x)=>s+x.price,0));
  const mPrefix=viewYear+'-'+pad(viewMonth+1);
@@ -991,8 +1013,12 @@ function updateWhen(){const d=$('clientDate').value,tm=$('clientTime').value;if(
  const du=formKind==='break'?Number($('brkDur').value)||0:lines.reduce((s,x)=>s+(+x.duration||0),0);
  $('whenText').textContent=cap(fmt(d,{weekday:'short',day:'numeric',month:'long'}))+' · '+tm+(du?'–'+clock(mins(tm)+du):'')}
 $('add').onclick=()=>openPicker({mode:'new',date:selected});
-$('prev').onclick=()=>{const d=new Date(viewYear,viewMonth-1,1);goTo(dateKey(d));renderCal()};
-$('next').onclick=()=>{const d=new Date(viewYear,viewMonth+1,1);goTo(dateKey(d));renderCal()};
+function calStep(n){if(calMode==='week'){const d=new Date(selected+'T12:00:00');d.setDate(d.getDate()+7*n);goTo(dateKey(d))}else goTo(dateKey(new Date(viewYear,viewMonth+n,1)));renderCal()}
+$('prev').onclick=()=>calStep(-1);$('next').onclick=()=>calStep(1);
+$('calToggle').onclick=()=>{calMode=calMode==='week'?'month':'week';try{localStorage.setItem('tempo_calmode',calMode)}catch(e){}renderCal()};
+{let sx=0,sy=0,on=false;const el=$('calSheet');
+ el.addEventListener('touchstart',e=>{const p=e.touches[0];sx=p.clientX;sy=p.clientY;on=true},{passive:true});
+ el.addEventListener('touchend',e=>{if(!on)return;on=false;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)calStep(dx<0?1:-1)},{passive:true})}
 $('today').onclick=()=>{goTo(todayKey());renderCal()};
 
 /* ---------- ДИАЛОГ ЗАПИСИ ---------- */
@@ -1118,6 +1144,7 @@ function stats(c){const tk=todayKey(),recs=db.records.filter(r=>r.clientId===c.i
  return {recs,visits:visits.length,spent:visits.reduce((s,r)=>s+r.price,0),last:visits[0]?visits[0].date:null,next}}
 const initials=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 function dueClients(){const S=db.settings;return db.clients.map(c=>({c,s:stats(c)})).filter(({c,s})=>s.last&&!s.next&&daysSince(s.last)>=S.backDays&&!(c.remindedAt&&c.remindedAt>=s.last)).sort((a,b)=>a.s.last.localeCompare(b.s.last))}
+function bookingsText(n){if(LANG==='kk')return n+' жазба';if(LANG==='en')return n+(n===1?' booking':' bookings');return n+' '+plural(n,'запись','записи','записей')}
 const plural=(n,a,b,c)=>{n=Math.abs(n)%100;const m=n%10;return n>10&&n<20?c:m===1?a:m>=2&&m<=4?b:c};
 function weeksText(d){const w=d%7===0,n=w?d/7:d;if(LANG==='kk')return n+(w?' апта':' күн');if(LANG==='en')return n+(w?(n===1?' week':' weeks'):(n===1?' day':' days'));return n+' '+(w?plural(n,'неделю','недели','недель'):plural(n,'день','дня','дней'))}
 function backChip(d){const w=d%7===0,n=w?d/7:d;if(LANG==='kk')return n+(w?' аптадан кейін':' күннен кейін');if(LANG==='en')return 'in '+weeksText(d);return 'через '+weeksText(d)}
@@ -1169,7 +1196,7 @@ function openClient(c){cEditId=c?c.id:null;$('cTitle').textContent=c?c.name:t('�
   $('cCall').href='tel:'+(c.phone||'');$('cCall').classList.toggle('hidden',!c.phone);renderClientPhotos(c.id);
   $('cHistory').replaceChildren(...(s.recs.length?s.recs.map(r=>h('div',{class:'slot-booked',onclick:()=>{$('cdlg').close();show('cal');goTo(r.date);renderCal();openEdit(r)}},h('div',{class:'time-col'},h('strong',null,fmt(r.date,{day:'numeric',month:'short'})),h('small',null,fmt(r.date,{year:'numeric'})+' · '+r.time)),
    h('div',{class:'details'},h('small',{style:'margin:0'},r.services.map(y=>y.name).join(' + ')),r.status!=='planned'?h('span',{class:'tag '+r.status},t(STATUS[r.status])):null),h('div',{class:'price'},money(r.price)))):[h('div',{class:'empty'},t('Визитов пока нет'))]))}
- $('cdlg').showModal()}
+ $('cdlg').showModal();if(c)document.activeElement&&document.activeElement.blur()}
 function saveClientForm(){const name=$('cName').value.trim();if(!name)return null;let c=cEditId&&getClient(cEditId);if(!c){c={id:uid()};db.clients.push(c)}c.name=name;c.phone=$('cPhone').value.trim();c.notes=$('cNotes').value.trim();for(const r of db.records)if(r.clientId===c.id){r.name=c.name;r.phone=c.phone}persist();return c}
 $('addClient').onclick=()=>openClient(null);
 $('cClose').onclick=()=>$('cdlg').close();
@@ -1208,7 +1235,7 @@ $('cPhotos').onchange=async e=>{const files=[...e.target.files];e.target.value='
 let pId=null,fullUrl=null;
 async function openPhoto(p){pId=p.id;$('pImg').removeAttribute('src');$('pCaption').value=p.caption||'';$('pCard').checked=!!p.inCard;
  const c=p.clientId&&getClient(p.clientId);$('pMeta').textContent=[fmt(p.date,{day:'numeric',month:'long',year:'numeric'}),c?t('клиентка: {n}',{n:c.name}):null].filter(Boolean).join(' · ');
- $('pShare').classList.toggle('hidden',!navigator.canShare);$('pdlg').showModal();
+ $('pShare').classList.toggle('hidden',!navigator.canShare);$('pdlg').showModal();document.activeElement&&document.activeElement.blur();
  try{const f=await idbGet(p.id+':f');if(f&&pId===p.id){if(fullUrl)URL.revokeObjectURL(fullUrl);fullUrl=URL.createObjectURL(f);$('pImg').src=fullUrl}}catch(e){console.warn(e)}}
 $('pClose').onclick=()=>$('pdlg').close();
 $('pform').onsubmit=e=>{e.preventDefault();const p=db.photos.find(x=>x.id===pId);if(p){p.caption=$('pCaption').value.trim();p.inCard=$('pCard').checked;persist()}$('pdlg').close();refreshPhotos()};
@@ -1397,7 +1424,7 @@ async function api(path,opt){opt=opt||{};const headers={apikey:SUPA_KEY,...(opt.
  return r}
 
 function setCloud(st,msg){cloudState=st;cloudMsg=msg||'';drawCloud()}
-function drawCloud(){const on=cloudOn();$('cloudPanel').hidden=!on;$('cloudNudge').hidden=!on||!!auth;if(!on)return;
+function drawCloud(){const on=cloudOn();$('cloudPanel').hidden=!on;let later=0;try{later=+localStorage.getItem('tempo_nudge_until')||0}catch(e){}$('cloudWrap').hidden=!on||!!auth||Date.now()<later;if(!on)return;
  $('cloudOut').hidden=!!auth||recoveryMode;$('cloudIn').hidden=!auth||recoveryMode;$('cloudNew').hidden=!recoveryMode;
  if(auth)$('aWho').textContent=t('Вы вошли как {e}',{e:auth.user.email});
  let m=cloudMsg;
@@ -1502,6 +1529,7 @@ async function cloudInit(){drawCloud();if(!cloudOn())return;
 $('aLogin').onclick=()=>authCall('login');$('aSignup').onclick=()=>authCall('signup');$('aForgot').onclick=()=>authCall('recover');
 $('aSync').onclick=async()=>{if(sync.dirty)await push();else await pull()};$('aLogout').onclick=logout;$('aSetPass').onclick=setNewPass;
 $('cloudNudge').onclick=()=>show('more');
+$('cloudLater').onclick=()=>{try{localStorage.setItem('tempo_nudge_until',Date.now()+14*864e5)}catch(e){}$('cloudWrap').hidden=true};
 window.addEventListener('online',()=>{if(auth)sync.dirty?push():pull()});window.addEventListener('offline',()=>{if(auth)setCloud('offline')});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&auth&&!sync.dirty)pull()});
 

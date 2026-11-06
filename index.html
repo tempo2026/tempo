@@ -159,10 +159,26 @@ dialog.wide{padding:12px}
 .rcard .d .svc{display:block;color:var(--muted);font-size:15px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rcard .d .sum{display:block;color:var(--muted);font-size:15px;margin-top:2px}
 .rcard.faded{opacity:.5}
-:root{--salon:#3e9c9a;--salon-bg:#e0f1f0}
-.rcard.salon{border-left:5px solid var(--salon);padding-left:10px}
-.salon-tag{display:inline-block;vertical-align:2px;margin-left:7px;font-size:11px;font-weight:600;color:#2f7c7a;background:var(--salon-bg);border-radius:8px;padding:2px 7px;letter-spacing:.2px}
-.salon-dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--salon);margin-right:-2px}
+.rcard.grp{border-left:5px solid var(--g);padding-left:10px}
+.gtag{display:inline-block;vertical-align:2px;margin-left:7px;font-size:11px;font-weight:600;color:var(--g);background:color-mix(in srgb,var(--g) 14%,#fff);border-radius:8px;padding:2px 7px;letter-spacing:.2px;white-space:nowrap}
+.gdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--g);margin-right:6px;vertical-align:0}
+.cl-tools{display:flex;gap:8px;align-items:center}
+.gchips{display:flex;gap:6px;overflow-x:auto;margin:10px -2px 0;padding:2px;scrollbar-width:none}.gchips::-webkit-scrollbar{display:none}
+.gchips .chip{white-space:nowrap;flex:none}.gchips .chip small{color:inherit;opacity:.7;margin-left:4px}
+.letter{font-size:13px;font-weight:700;color:var(--muted);padding:12px 2px 2px;border-bottom:1px solid var(--line)}
+.client-row .pick{width:24px;height:24px;border-radius:50%;border:2px solid #d5cdc1;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.client-row.sel .pick{background:var(--accent);border-color:var(--accent)}
+.selbar{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom));z-index:55;background:var(--bar);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px 14px}
+.selbar .in{max-width:570px;margin:auto;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.selbar b{flex:1 0 100%;font-size:14px}
+.selbar .button{padding:9px 12px}
+#view-clients.selecting{padding-bottom:130px}
+.acts-list{display:grid;gap:8px;margin-top:12px}.acts-list .button{width:100%;min-height:48px;font-size:15px}
+.hintbox{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:12px}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}.swatches button{width:34px;height:34px;border-radius:50%;border:3px solid transparent;background:var(--g);cursor:pointer;box-shadow:0 0 0 1px #0001}
+.swatches button.on{border-color:var(--card);box-shadow:0 0 0 2px var(--g)}
+.imp-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:13px;color:var(--muted)}
+.svc-item.dup{opacity:.5}
+.wa-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)}.wa-row div{flex:1;min-width:0}.wa-row small{display:block;color:var(--muted)}.wa-row.done{opacity:.5}
 .nameline{display:flex;align-items:baseline;gap:8px}.nameline b{flex:1;min-width:0}
 .rcard .live{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
 .rcard .live.now{color:var(--green)}.rcard .live.now:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#3fa463;margin-right:5px;vertical-align:1px;animation:pulse 1.6s ease-in-out infinite}
@@ -267,16 +283,25 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
 
 <!-- КЛИЕНТЫ -->
 <section class="view" id="view-clients" hidden>
-  <div class="topline"><h1>Клиенты</h1><button class="button" id="addClient">+ Клиент</button></div>
+  <div class="topline"><h1>Клиенты</h1><div class="cl-tools"><button class="icon-btn" id="clientMenu" type="button" aria-label="Ещё действия">⋯</button><button class="button" id="addClient">+ Клиент</button></div></div>
   <input type="search" id="clientSearch" placeholder="Поиск по имени или телефону" autocomplete="off" style="margin-top:8px">
+  <div class="gchips" id="groupChips"></div>
   <section class="panel callback" id="callbackPanel">
     <div class="head"><h2>Пора напомнить</h2><span class="small" id="callbackHint"></span></div>
     <div id="callbackList"></div>
   </section>
   <section class="panel">
-    <div class="head"><h2>Все клиенты</h2><span class="small" id="clientCount"></span></div>
+    <div class="head"><h2 id="clientListTitle">Все клиенты</h2><span class="small" id="clientCount"></span></div>
     <div id="clientList"></div>
   </section>
+  <input type="file" id="vcfFile" accept=".vcf,.vcard,text/vcard,text/x-vcard,text/directory" hidden>
+  <div class="selbar" id="selBar" hidden><div class="in"><b id="selCount"></b>
+    <button class="button outline" type="button" id="selAll">Все</button>
+    <button class="button outline" type="button" id="selGroup">В группу</button>
+    <button class="button outline" type="button" id="selArch">В архив</button>
+    <button class="button outline" type="button" id="selWa">Написать</button>
+    <button class="button outline danger" type="button" id="selDel">Удалить</button>
+    <button class="button" type="button" id="selDone">Готово</button></div></div>
 </section>
 
 <!-- РАБОТЫ -->
@@ -404,7 +429,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
       <label class="button outline" style="margin:0">Загрузить копию<input type="file" id="importFile" accept=".json,application/json" hidden></label>
     </div>
   </section>
-  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 14</p>
+  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 15</p>
 </section>
 </main>
 
@@ -516,7 +541,8 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   <h2 id="cTitle">Клиент</h2>
   <label for="cName">Имя</label><input id="cName" required maxlength="50">
   <label for="cPhone">Телефон</label><input id="cPhone" type="tel" maxlength="20" placeholder="+7 777 123 45 67">
-  <label class="check salon-check"><input type="checkbox" id="cSalon"> <span class="salon-dot"></span>Клиентка салона</label>
+  <label for="cGroup">Группа</label><select id="cGroup"></select>
+  <label class="check"><input type="checkbox" id="cArch"> В архиве — скрыта из списков</label>
   <label for="cNotes">Заметки (форма, длина, аллергии, любимые цвета…)</label><textarea id="cNotes" maxlength="1000"></textarea>
   <div id="cExtra">
     <div class="stats3"><div>Визитов<strong id="cVisits">0</strong></div><div>Потратила<strong id="cSpent">0 ₸</strong></div><div>Последний<strong id="cLast">—</strong></div></div>
@@ -547,6 +573,39 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
     <button class="button" type="submit">Сохранить</button>
   </div>
 </form></dialog>
+
+<!-- МЕНЮ ДЕЙСТВИЙ -->
+<dialog id="actdlg" class="sheet">
+  <div class="head"><h2 id="actTitle">Выберите действие</h2><button class="icon-btn" type="button" id="actClose" aria-label="Закрыть">×</button></div>
+  <div class="acts-list" id="actList"></div>
+  <div class="hintbox" id="actHint" hidden></div>
+</dialog>
+
+<!-- ЗАГРУЗКА КОНТАКТОВ -->
+<dialog id="impdlg" class="sheet">
+  <div class="head"><h2>Загрузка контактов</h2><button class="icon-btn" type="button" id="impClose" aria-label="Закрыть">×</button></div>
+  <p class="small" id="impInfo" style="margin:8px 0 0"></p>
+  <input type="search" id="impSearch" placeholder="Поиск" autocomplete="off" style="margin-top:10px">
+  <div class="imp-top"><span id="impSel"></span><button type="button" class="linkbtn" id="impToggle"></button></div>
+  <div id="impList" style="margin-top:8px"></div>
+  <label for="impGroup">Добавить в группу</label><select id="impGroup"></select>
+  <div class="sdone"><span></span><button type="button" class="button" id="impDo">Добавить</button></div>
+</dialog>
+
+<!-- ГРУППА -->
+<dialog id="gdlg"><form id="gform" autocomplete="off">
+  <div class="head"><h2 id="gTitle">Новая группа</h2><button class="icon-btn" type="button" id="gClose" aria-label="Закрыть">×</button></div>
+  <label for="gName">Название</label><input id="gName" maxlength="30" required placeholder="Например: Салон, Спящие, Подруги">
+  <label>Цвет</label><div class="swatches" id="gColors"></div>
+  <div class="formactions"><button type="button" class="button outline danger grow" id="gDelete">Удалить группу</button><button class="button" type="submit">Сохранить</button></div>
+</form></dialog>
+
+<!-- НАПИСАТЬ НЕСКОЛЬКИМ -->
+<dialog id="wadlg" class="sheet">
+  <div class="head"><h2>Написать в WhatsApp</h2><button class="icon-btn" type="button" id="waClose" aria-label="Закрыть">×</button></div>
+  <p class="small" style="margin:8px 0 0">Нажимайте по очереди — для каждой откроется WhatsApp с готовым сообщением «пора записаться». Текст меняется в Настройках.</p>
+  <div id="waList" style="margin-top:8px"></div>
+</dialog>
 
 <!-- ДИАЛОГ ФОТО -->
 <dialog id="pdlg"><form id="pform" autocomplete="off">
@@ -631,7 +690,7 @@ const I18N={kk:{},en:{}};
 ['Все данные хранятся только в этом браузере на этом телефоне. Время от времени скачивайте копию (фото работ тоже в неё входят): если что-то случится с телефоном, её можно будет загрузить обратно.','Барлық деректер тек осы телефондағы осы браузерде сақталады. Анда-санда көшірмесін жүктеп алып отырыңыз (жұмыс фотолары да кіреді): телефонға бірдеңе болса, оны қайта жүктеуге болады.','All data is stored only in this browser on this phone. Download a backup from time to time (photos included): if something happens to your phone, you can restore it.'],
 ['Скачать копию','Көшірмені жүктеп алу','Download backup'],
 ['Загрузить копию','Көшірмені қалпына келтіру','Restore backup'],
-['TEMPO · версия 14','TEMPO · 14-нұсқа','TEMPO · version 14'],
+['TEMPO · версия 15','TEMPO · 15-нұсқа','TEMPO · version 15'],
 ['сейчас','қазір','now'],['через {d}','{d} кейін','in {d}'],
 ['Нужно внимание: {n}','Назар аударыңыз: {n}','Needs attention: {n}'],['Отметить визиты: {n}','Келгендерді белгілеу: {n}','Mark visits: {n}'],
 ['Отметьте, кто пришёл','Кім келгенін белгілеңіз','Mark who came'],
@@ -643,7 +702,24 @@ const I18N={kk:{},en:{}};
 ['Расход','Шығын','Expense'],
 ['Ваш прайс. Услуги и цены подставляются в запись, сумма считается сама. Нажмите на услугу, чтобы изменить её.','Сіздің прайсыңыз. Қызметтер мен бағалар жазбаға қойылады, сома өзі есептеледі. Өзгерту үшін қызметті басыңыз.','Your price list. Services and prices fill into bookings and the total adds up itself. Tap a service to edit it.'],
 ['Поиск','Іздеу','Search'],['Услуга','Қызмет','Service'],['Например, маникюр с покрытием','Мысалы, жабынды маникюр','E.g. gel manicure'],['Прайс пуст. Нажмите «+ Услуга».','Прайс бос. «+ Қызмет» батырмасын басыңыз.','Price list is empty. Tap “+ Service”.'],
-['Клиентка салона','Салон клиенті','Salon client'],['салон','салон','salon'],
+['Салон','Салон','Salon'],['Группа','Топ','Group'],['Без группы','Топсыз','No group'],['+ Новая группа…','+ Жаңа топ…','+ New group…'],['Новая группа','Жаңа топ','New group'],
+['В архиве — скрыта из списков','Мұрағатта — тізімдерде көрсетілмейді','Archived — hidden from lists'],['Архив','Мұрағат','Archive'],['Все','Барлығы','All'],
+['Ещё действия','Басқа әрекеттер','More actions'],['Выберите действие','Әрекетті таңдаңыз','Choose an action'],['Новая клиентка','Жаңа клиент','New client'],['Добавить вручную','Қолмен қосу','Add manually'],
+['Из контактов телефона','Телефон контактілерінен','From phone contacts'],['Загрузить из контактов','Контактілерден жүктеу','Import from contacts'],['Выбрать клиенток','Клиенттерді таңдау','Select clients'],
+['Изменить группу «{n}»','«{n}» тобын өзгерту','Edit group “{n}”'],
+['На iPhone: «Контакты» → «Списки» (слева вверху) → нажмите и подержите список → «Экспортировать» → «Сохранить в Файлы». Затем здесь выберите этот файл.','iPhone-да: «Контактілер» → «Тізімдер» (сол жақ жоғарыда) → тізімді басып ұстап тұрыңыз → «Экспорттау» → «Файлдарға сақтау». Содан кейін осы файлды осында таңдаңыз.','On iPhone: Contacts → Lists (top left) → touch and hold a list → Export → Save to Files. Then choose that file here.'],
+['Загрузка контактов','Контактілерді жүктеу','Import contacts'],['Добавить в группу','Топқа қосу','Add to group'],['Добавить','Қосу','Add'],
+['Найдено контактов: {n}','Табылған контактілер: {n}','Contacts found: {n}'],['уже в TEMPO: {n}','TEMPO-да бар: {n}','already in TEMPO: {n}'],['Снимите галочки с тех, кого не нужно добавлять.','Қоспайтындардың белгісін алып тастаңыз.','Untick anyone you don’t want to add.'],
+['уже есть','бар','already added'],['Выбрано: {n}','Таңдалды: {n}','Selected: {n}'],['Снять все','Барлығын алып тастау','Clear all'],['Выбрать все','Барлығын таңдау','Select all'],['Добавить: {n}','Қосу: {n}','Add: {n}'],
+['Добавлено клиенток: {n}','Қосылған клиенттер: {n}','Clients added: {n}'],['В файле не нашлось контактов. Нужен файл .vcf из «Контактов».','Файлда контакт табылмады. «Контактілерден» алынған .vcf файлы керек.','No contacts found in the file. Use a .vcf file from Contacts.'],
+['Название','Атауы','Name'],['Цвет','Түсі','Color'],['Удалить группу','Топты жою','Delete group'],['Например: Салон, Спящие, Подруги','Мысалы: Салон, Ұйықтағандар, Достар','E.g. Salon, Sleeping, Friends'],
+['Удалить группу «{n}»? Клиентки останутся, просто без группы.','«{n}» тобын жоясыз ба? Клиенттер қалады, тек топсыз.','Delete group “{n}”? Clients stay, just without a group.'],
+['В группу','Топқа','To group'],['В архив','Мұрағатқа','Archive'],['Из архива','Мұрағаттан','Unarchive'],['Написать','Жазу','Message'],['Готово','Дайын','Done'],
+['Удалить выбранных клиенток ({n})? Их записи в календаре останутся.','Таңдалған клиенттерді жоясыз ба ({n})? Олардың күнтізбедегі жазбалары қалады.','Delete selected clients ({n})? Their bookings stay in the calendar.'],
+['У выбранных нет номеров телефона','Таңдалғандардың телефон нөмірі жоқ','The selected clients have no phone numbers'],['Написать в WhatsApp','WhatsApp-қа жазу','Message on WhatsApp'],
+['Нажимайте по очереди — для каждой откроется WhatsApp с готовым сообщением «пора записаться». Текст меняется в Настройках.','Кезекпен басыңыз — әрқайсысына «жазылу уақыты келді» дайын хабарламасымен WhatsApp ашылады. Мәтін Баптауларда өзгертіледі.','Tap one by one — WhatsApp opens with the ready “time to book” message for each. Change the text in Settings.'],
+['Пока нет клиентов. Нажмите «+ Клиент» — можно загрузить сразу всех из контактов телефона.','Әзірге клиент жоқ. «+ Клиент» батырмасын басыңыз — телефон контактілерінен бірден бәрін жүктеуге болады.','No clients yet. Tap “+ Client” — you can import everyone from your phone contacts at once.'],
+['В этой группе пока никого нет','Бұл топта әзірге ешкім жоқ','No one in this group yet'],
 ['Перенос записи','Жазылуды ауыстыру','Rescheduled booking'],['Отмена записи','Жазылудың күшін жою','Cancelled booking'],
 ['Запись отменена. Написать клиентке?','Жазылу тоқтатылды. Клиентке жазасыз ба?','Booking cancelled. Message the client?'],
 ['Запись перенесена. Отправить клиентке новое время?','Жазылу ауыстырылды. Клиентке жаңа уақытты жібересіз бе?','Booking moved. Send the client the new time?'],
@@ -970,16 +1046,22 @@ const earned=r=>active(r)&&r.status!=='noshow';
 const DEFAULT_CATALOG=[[8000,60],[15000,120],[10000,90],[15000,120],[20000,150],[3000,30],[2000,30],[0,30]].map(([price,duration],i)=>({name:CAT_NAMES[LANG][i],price,duration}));
 const DEFAULT_SETTINGS={master:'',start:'09:00',end:'21:00',off:[],backDays:21,vPhone:'',vAbout:'',vAddress:'',vInsta:'',vPrices:true,vLang:'',lang:LANG,...TPL[LANG]};
 
-let db={records:[],clients:[],photos:[],expenses:[],catalog:DEFAULT_CATALOG.map(c=>({...c})),settings:{...DEFAULT_SETTINGS}};
+let db={records:[],clients:[],photos:[],expenses:[],groups:[],catalog:DEFAULT_CATALOG.map(c=>({...c})),settings:{...DEFAULT_SETTINGS}};
 
 function normalize(x,i){let services=Array.isArray(x.services)&&x.services.length?x.services.map(y=>({name:String(y.name||'Услуга'),price:Number(y.price)||0,duration:Number(y.duration)||0})):[{name:String(x.service||'Услуга'),price:Number(x.price)||0,duration:Number(x.duration)||60}];return {...x,id:String(x.id||'old'+i),name:String(x.name||'Клиент'),phone:String(x.phone||''),clientId:x.clientId||null,services,duration:Number(x.duration)||services.reduce((a,b)=>a+b.duration,0),price:Number(x.price??services.reduce((a,b)=>a+b.price,0))||0,status:STATUS[x.status]?x.status:'planned'}}
 function linkClients(){for(const r of db.records){if(r.kind==='break')continue;if(r.clientId&&db.clients.some(c=>c.id===r.clientId))continue;let c=db.clients.find(c=>c.name.trim().toLowerCase()===r.name.trim().toLowerCase());if(!c){c={id:uid(),name:r.name.trim(),phone:r.phone||'',notes:''};db.clients.push(c)}r.clientId=c.id}}
+const GROUP_COLORS=['#3e9c9a','#c4607f','#c08a2a','#7a5cc4','#4a7fc1','#5a9a4a','#8a8378'];
+function migrateGroups(){if(!Array.isArray(db.groups))db.groups=[];let ch=false;
+ if(db.clients.some(c=>c.salon)){if(!db.groups.some(g=>g.id==='salon')){db.groups.push({id:'salon',name:t('Салон'),color:GROUP_COLORS[0]});}for(const c of db.clients)if(c.salon){if(!c.group)c.group='salon';delete c.salon;ch=true}}
+ return ch}
+const groupOf=c=>c&&c.group&&db.groups.find(g=>g.id===c.group)||null;
+function groupTag(c){const g=groupOf(c);return g?h('span',{class:'gtag',style:'--g:'+g.color},g.name):null}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){alert(t('Не удалось сохранить данные в браузере'))}markDirty()}
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){db.records=(s.records||[]).map(normalize);db.clients=Array.isArray(s.clients)?s.clients:[];db.photos=Array.isArray(s.photos)?s.photos:[];db.expenses=Array.isArray(s.expenses)?s.expenses:[];if(Array.isArray(s.catalog)&&s.catalog.length)db.catalog=s.catalog;db.settings={...DEFAULT_SETTINGS,...(s.settings||{})};if(LANGS[db.settings.lang])LANG=db.settings.lang;else db.settings.lang=LANG;return}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){db.records=(s.records||[]).map(normalize);db.clients=Array.isArray(s.clients)?s.clients:[];db.photos=Array.isArray(s.photos)?s.photos:[];db.expenses=Array.isArray(s.expenses)?s.expenses:[];db.groups=Array.isArray(s.groups)?s.groups:[];if(Array.isArray(s.catalog)&&s.catalog.length)db.catalog=s.catalog;db.settings={...DEFAULT_SETTINGS,...(s.settings||{})};if(LANGS[db.settings.lang])LANG=db.settings.lang;else db.settings.lang=LANG;return}
  let old=null;for(const k of ['tempo_demo_v4','tempo_demo_v2']){const v=JSON.parse(localStorage.getItem(k)||'null');if(v&&v.records){old=v.records;break}}
  if(!old)old=JSON.parse(localStorage.getItem('tempo_demo_v1')||'[]')||[];
  db.records=old.map(normalize);linkClients();persist()}catch(e){console.warn(e)}}
-load();
+load();if(migrateGroups())try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}
 
 const getClient=id=>db.clients.find(c=>c.id===id);
 const nameOf=r=>(getClient(r.clientId)||{}).name||r.name;
@@ -992,7 +1074,7 @@ function openWa(phone,text){window.open(waLink(phone,text),'_blank')}
 
 /* ---------- НАВИГАЦИЯ ---------- */
 let view='cal';
-function show(v){view=v;$('daybar').hidden=v!=='cal';document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=='view-'+v);document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));renderAll();window.scrollTo(0,0)}
+function show(v){view=v;if(v!=='clients'&&typeof selMode!=='undefined'&&selMode){selMode=false;selIds.clear()}if($('selBar'))$('selBar').hidden=true;$('daybar').hidden=v!=='cal';document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=='view-'+v);document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));renderAll();window.scrollTo(0,0)}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.view));
 function renderAll(){if(view==='report')renderReport();if(view==='cal')renderCal();if(view==='clients')renderClients();if(view==='works')renderWorks();if(view==='services')renderServices();if(view==='more')renderSettings()}
 
@@ -1049,7 +1131,7 @@ function bookedRow(x,faded){
   h('div',{class:'t'},h('strong',null,x.time),h('small',null,clock(mins(x.time)+x.duration))),
   h('div',{class:'d'},h('b',null,nameOf(x)),h('span',{class:'svc'},x.services.map(y=>y.name).join(' + ')),h('span',{class:'sum'},money(x.price)+(x.prepay?' · '+t('предоплата {m}',{m:money(x.prepay)}):'')),x.note?h('span',{class:'note'},'📝 '+x.note):null,x.status!=='planned'?h('span',{class:'tag '+x.status},t(STATUS[x.status])):null),
   wa);
- {const cl=getClient(x.clientId);if(cl&&cl.salon){el.classList.add('salon');const b=el.querySelector('.d b');b.append(h('span',{class:'salon-tag'},t('салон')))}}
+ {const g=groupOf(getClient(x.clientId));if(g){el.classList.add('grp');el.style.setProperty('--g',g.color);el.querySelector('.d b').append(groupTag(getClient(x.clientId)))}}
  if(x.status==='planned'&&!faded){const now=new Date(),st=recStart(x),en=new Date(st.getTime()+x.duration*60000),left=Math.round((st-now)/60000);
   let lab=null;if(st<=now&&now<en){el.classList.add('now');lab=h('span',{class:'live now'},t('сейчас'))}
   else if(left>0&&left<=180&&x.date===todayKey())lab=h('span',{class:'live'},t('через {d}',{d:dur(left)}));
@@ -1164,9 +1246,9 @@ function drawClientBtn(){const n=$('clientName').value.trim(),ph=$('clientPhone'
  $('clientBtn').hidden=newMode&&!formClientId;
  $('clientBtn').classList.toggle('empty-pick',!n);$('clientBtnName').textContent=n||t('Выбрать клиентку');$('clientBtnPhone').textContent=n?(ph||t('нет телефона · нажмите, чтобы сменить')):''}
 function drawKList(){const q=$('kSearch').value.trim().toLowerCase(),qd=digits(q);
- const list=db.clients.filter(c=>!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd))).sort((a,b)=>a.name.localeCompare(b.name,'ru'));
+ const list=db.clients.filter(c=>!c.archived&&(!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd)))).sort((a,b)=>a.name.localeCompare(b.name,'ru'));
  $('kList').replaceChildren(list.length?h('div',{class:'svc-list'},...list.map(c=>h('button',{type:'button',class:'svc-item'+(c.id===formClientId?' on':''),onclick:()=>{formClientId=c.id;$('clientName').value=c.name;$('clientPhone').value=c.phone||'';$('newClientWrap').hidden=true;$('kdlg').close();drawClientBtn()}},
-  h('div',null,h('b',null,c.name),h('small',null,c.phone||t('нет телефона'))),h('span',{class:'ck'},c.id===formClientId?'✓':'')))):h('div',{class:'empty'},q?t('Никого не нашлось. Нажмите «Новая клиентка».'):t('Пока нет клиенток. Нажмите «Новая клиентка».')))}
+  h('div',null,h('b',null,c.name,groupTag(c)),h('small',null,c.phone||t('нет телефона'))),h('span',{class:'ck'},c.id===formClientId?'✓':'')))):h('div',{class:'empty'},q?t('Никого не нашлось. Нажмите «Новая клиентка».'):t('Пока нет клиенток. Нажмите «Новая клиентка».')))}
 $('clientBtn').onclick=()=>{$('kSearch').value='';drawKList();$('kdlg').showModal()};
 $('kSearch').oninput=drawKList;
 $('kClose').onclick=()=>$('kdlg').close();
@@ -1223,7 +1305,7 @@ function stats(c){const tk=todayKey(),recs=db.records.filter(r=>r.clientId===c.i
  const next=recs.filter(r=>r.status==='planned'&&r.date>=tk).pop();
  return {recs,visits:visits.length,spent:visits.reduce((s,r)=>s+r.price,0),last:visits[0]?visits[0].date:null,next}}
 const initials=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-function dueClients(){const S=db.settings;return db.clients.map(c=>({c,s:stats(c)})).filter(({c,s})=>s.last&&!s.next&&daysSince(s.last)>=S.backDays&&!(c.remindedAt&&c.remindedAt>=s.last)).sort((a,b)=>a.s.last.localeCompare(b.s.last))}
+function dueClients(){const S=db.settings;return db.clients.filter(c=>!c.archived).map(c=>({c,s:stats(c)})).filter(({c,s})=>s.last&&!s.next&&daysSince(s.last)>=S.backDays&&!(c.remindedAt&&c.remindedAt>=s.last)).sort((a,b)=>a.s.last.localeCompare(b.s.last))}
 function bookingsText(n){if(LANG==='kk')return n+' жазба';if(LANG==='en')return n+(n===1?' booking':' bookings');return n+' '+plural(n,'запись','записи','записей')}
 const plural=(n,a,b,c)=>{n=Math.abs(n)%100;const m=n%10;return n>10&&n<20?c:m===1?a:m>=2&&m<=4?b:c};
 function weeksText(d){const w=d%7===0,n=w?d/7:d;if(LANG==='kk')return n+(w?' апта':' күн');if(LANG==='en')return n+(w?(n===1?' week':' weeks'):(n===1?' day':' days'));return n+' '+(w?plural(n,'неделю','недели','недель'):plural(n,'день','дня','дней'))}
@@ -1260,20 +1342,36 @@ setInterval(tick,60000);document.addEventListener('visibilitychange',()=>{if(doc
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>console.warn(e));
 $('duebar').onclick=()=>{drawDue();$('ddlg').showModal()};
 $('dClose').onclick=()=>$('ddlg').close();
+let clFilter='all',selMode=false,selIds=new Set();
+function clientRow(c,s){const sel=selIds.has(c.id);
+ return h('div',{class:'client-row'+(sel?' sel':''),onclick:()=>{if(selMode){sel?selIds.delete(c.id):selIds.add(c.id);renderClients()}else openClient(c)}},
+  selMode?h('span',{class:'pick'},sel?'✓':''):h('div',{class:'avatar'},initials(c.name)),
+  h('div',{class:'details'},h('b',null,c.name,groupTag(c)),h('small',null,[c.phone||t('нет телефона'),s.visits?t('визитов: {n}',{n:s.visits}):null].filter(Boolean).join(' · ')),s.next?h('span',{class:'tag done'},t('Запись {d} в {t}',{d:fmt(s.next.date,{day:'numeric',month:'short'}),t:s.next.time})):null))}
 function renderClients(){
  const q=$('clientSearch').value.trim().toLowerCase(),qd=digits(q),S=db.settings;
- const all=db.clients.map(c=>({c,s:stats(c)}));
+ if(clFilter!=='all'&&clFilter!=='arch'&&!db.groups.some(g=>g.id===clFilter))clFilter='all';
+ const live=db.clients.filter(c=>!c.archived),arch=db.clients.length-live.length;
+ const chips=[['all',t('Все'),live.length],...db.groups.map(g=>[g.id,g.name,live.filter(c=>c.group===g.id).length,g.color]),...(arch?[['arch',t('Архив'),arch]]:[])];
+ $('groupChips').hidden=chips.length<2;
+ $('groupChips').replaceChildren(...chips.map(([k,n,cnt,col])=>h('button',{type:'button',class:'chip'+(k===clFilter?' on':''),onclick:()=>{clFilter=k;renderClients()}},col?h('span',{class:'gdot',style:'--g:'+col}):null,n,h('small',null,String(cnt)))));
  const cb=dueClients();
- $('callbackPanel').hidden=!cb.length||!!q;$('callbackHint').textContent=t('не были {n}+ дней',{n:S.backDays});
+ $('callbackPanel').hidden=!cb.length||!!q||clFilter!=='all'||selMode;$('callbackHint').textContent=t('не были {n}+ дней',{n:S.backDays});
  $('callbackList').replaceChildren(...cb.map(({c,s})=>h('div',{class:'client-row',onclick:()=>openClient(c)},h('div',{class:'avatar'},initials(c.name)),h('div',{class:'details'},h('b',null,c.name),h('small',null,t('Не была {n} дн. · последний визит {d}',{n:daysSince(s.last),d:fmt(s.last,{day:'numeric',month:'long'})}))),
   h('button',{type:'button',class:'mini-wa',onclick:ev=>{ev.stopPropagation();openWa(c.phone,fill(S.back,{имя:c.name.split(' ')[0],мастер:S.master}));setTimeout(()=>markReminded(c),400)}},t('💬 Напомнить')))));
- const list=all.filter(({c})=>!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd))).sort((a,b)=>a.c.name.localeCompare(b.c.name,'ru'));
- $('clientCount').textContent=t('{n} чел.',{n:db.clients.length});
- $('clientList').replaceChildren(...(list.length?list.map(({c,s})=>h('div',{class:'client-row',onclick:()=>openClient(c)},h('div',{class:'avatar'},initials(c.name)),
-  h('div',{class:'details'},h('b',null,c.name,c.salon?h('span',{class:'salon-tag'},t('салон')):null),h('small',null,[c.phone||t('нет телефона'),s.visits?t('визитов: {n}',{n:s.visits}):null].filter(Boolean).join(' · ')),s.next?h('span',{class:'tag done'},t('Запись {d} в {t}',{d:fmt(s.next.date,{day:'numeric',month:'short'}),t:s.next.time})):null))):[h('div',{class:'empty'},q?t('Ничего не нашлось'):t('Пока нет клиентов. Нажмите «+ Клиент» или создайте запись в календаре.'))]))}
+ const base=clFilter==='arch'?db.clients.filter(c=>c.archived):clFilter==='all'?live:live.filter(c=>c.group===clFilter);
+ const list=base.filter(c=>!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd))).sort((a,b)=>a.name.localeCompare(b.name,LOCALE[LANG]));
+ const g=db.groups.find(x=>x.id===clFilter);
+ $('clientListTitle').textContent=clFilter==='arch'?t('Архив'):g?g.name:t('Все клиенты');
+ $('clientCount').textContent=t('{n} чел.',{n:list.length});
+ const out=[];let L='';for(const c of list){const l=(c.name.trim()[0]||'#').toUpperCase();if(l!==L&&list.length>8&&!q){L=l;out.push(h('div',{class:'letter'},l))}out.push(clientRow(c,stats(c)))}
+ $('clientList').replaceChildren(...(out.length?out:[h('div',{class:'empty'},q?t('Ничего не нашлось'):clFilter==='all'?t('Пока нет клиентов. Нажмите «+ Клиент» — можно загрузить сразу всех из контактов телефона.'):t('В этой группе пока никого нет'))]));
+ $('selBar').hidden=!selMode||view!=='clients';$('view-clients').classList.toggle('selecting',selMode);if(selMode)$('toast').hidden=true;$('selCount').textContent=t('Выбрано: {n}',{n:selIds.size});
+ $('selArch').textContent=clFilter==='arch'?t('Из архива'):t('В архив');
+ $('selAll').textContent=list.length&&list.every(c=>selIds.has(c.id))?t('Снять все'):t('Все');
+ $('selAll').onclick=()=>{if(list.every(c=>selIds.has(c.id)))list.forEach(c=>selIds.delete(c.id));else list.forEach(c=>selIds.add(c.id));renderClients()}}
 $('clientSearch').oninput=renderClients;
 let cEditId=null;
-function openClient(c){cEditId=c?c.id:null;$('cTitle').textContent=c?c.name:t('Новый клиент');$('cName').value=c?c.name:'';$('cPhone').value=c?(c.phone||''):'';$('cNotes').value=c?(c.notes||''):'';$('cSalon').checked=!!(c&&c.salon);
+function openClient(c){cEditId=c?c.id:null;$('cTitle').textContent=c?c.name:t('Новый клиент');$('cName').value=c?c.name:'';$('cPhone').value=c?(c.phone||''):'';$('cNotes').value=c?(c.notes||''):'';drawGroupSelect($('cGroup'),c?c.group||'':'');$('cArch').checked=!!(c&&c.archived);
  $('cExtra').hidden=!c;$('cDelete').hidden=!c;
  if(c){const s=stats(c);$('cVisits').textContent=s.visits;$('cSpent').textContent=money(s.spent);$('cLast').textContent=s.last?fmt(s.last,{day:'numeric',month:'short'}):'—';
   $('cWa').href=waLink(c.phone,fill(db.settings.back,{имя:c.name.split(' ')[0],мастер:db.settings.master}));
@@ -1281,8 +1379,63 @@ function openClient(c){cEditId=c?c.id:null;$('cTitle').textContent=c?c.name:t('�
   $('cHistory').replaceChildren(...(s.recs.length?s.recs.map(r=>h('div',{class:'slot-booked',onclick:()=>{$('cdlg').close();show('cal');goTo(r.date);renderCal();openEdit(r)}},h('div',{class:'time-col'},h('strong',null,fmt(r.date,{day:'numeric',month:'short'})),h('small',null,fmt(r.date,{year:'numeric'})+' · '+r.time)),
    h('div',{class:'details'},h('small',{style:'margin:0'},r.services.map(y=>y.name).join(' + ')),r.status!=='planned'?h('span',{class:'tag '+r.status},t(STATUS[r.status])):null),h('div',{class:'price'},money(r.price)))):[h('div',{class:'empty'},t('Визитов пока нет'))]))}
  $('cdlg').showModal();if(c)document.activeElement&&document.activeElement.blur()}
-function saveClientForm(){const name=$('cName').value.trim();if(!name)return null;let c=cEditId&&getClient(cEditId);if(!c){c={id:uid()};db.clients.push(c)}c.name=name;c.phone=$('cPhone').value.trim();c.notes=$('cNotes').value.trim();c.salon=$('cSalon').checked;for(const r of db.records)if(r.clientId===c.id){r.name=c.name;r.phone=c.phone}persist();return c}
-$('addClient').onclick=()=>openClient(null);
+function saveClientForm(){const name=$('cName').value.trim();if(!name)return null;let c=cEditId&&getClient(cEditId);if(!c){c={id:uid()};db.clients.push(c)}c.name=name;c.phone=$('cPhone').value.trim();c.notes=$('cNotes').value.trim();c.group=$('cGroup').value||'';if(c.group==='__new')c.group='';c.archived=$('cArch').checked;for(const r of db.records)if(r.clientId===c.id){r.name=c.name;r.phone=c.phone}persist();return c}
+function sheet(title,items,hint){$('actTitle').textContent=title;$('actHint').hidden=!hint;$('actHint').textContent=hint||'';
+ $('actList').replaceChildren(...items.filter(Boolean).map(([label,fn,cls])=>h('button',{type:'button',class:'button '+(cls||'outline'),onclick:()=>{$('actdlg').close();fn()}},label)));$('actdlg').showModal();document.activeElement&&document.activeElement.blur()}
+$('actClose').onclick=()=>$('actdlg').close();
+const canPick=()=>!!(navigator.contacts&&navigator.contacts.select);
+$('addClient').onclick=()=>sheet(t('Новая клиентка'),[[t('Добавить вручную'),()=>openClient(null)],[t('Из контактов телефона'),importContacts],[t('Новая группа'),()=>openGroup(null)]],
+ canPick()?null:t('На iPhone: «Контакты» → «Списки» (слева вверху) → нажмите и подержите список → «Экспортировать» → «Сохранить в Файлы». Затем здесь выберите этот файл.'));
+$('clientMenu').onclick=()=>{const g=db.groups.find(x=>x.id===clFilter);sheet(t('Выберите действие'),[[t('Выбрать клиенток'),()=>{selMode=true;selIds.clear();renderClients()}],[t('Новая группа'),()=>openGroup(null)],g?[t('Изменить группу «{n}»',{n:g.name}),()=>openGroup(g)]:null,[t('Загрузить из контактов'),importContacts]])};
+function drawGroupSelect(sel,val){sel.replaceChildren(h('option',{value:''},t('Без группы')),...db.groups.map(g=>h('option',{value:g.id},g.name)),h('option',{value:'__new'},t('+ Новая группа…')));sel.value=val||'';
+ sel.onchange=()=>{if(sel.value==='__new'){sel.value=val||'';openGroup(null,id=>{drawGroupSelect(sel,id)})}}}
+let gEdit=null,gColor=GROUP_COLORS[0],gAfter=null;
+function openGroup(g,after){gEdit=g;gAfter=after||null;gColor=g?g.color:GROUP_COLORS[db.groups.length%GROUP_COLORS.length];$('gTitle').textContent=g?t('Группа'):t('Новая группа');$('gName').value=g?g.name:'';$('gDelete').hidden=!g;drawSwatches();$('gdlg').showModal();if(!g)$('gName').focus()}
+function drawSwatches(){$('gColors').replaceChildren(...GROUP_COLORS.map(c=>h('button',{type:'button',class:c===gColor?'on':'',style:'--g:'+c,'aria-label':c,onclick:()=>{gColor=c;drawSwatches()}})))}
+$('gClose').onclick=()=>$('gdlg').close();
+$('gform').onsubmit=e=>{e.preventDefault();const name=$('gName').value.trim();if(!name)return;let g=gEdit;if(!g){g={id:uid()};db.groups.push(g)}g.name=name;g.color=gColor;persist();$('gdlg').close();const a=gAfter;gAfter=null;if(a)a(g.id);renderAll()};
+$('gDelete').onclick=()=>{if(!gEdit||!confirm(t('Удалить группу «{n}»? Клиентки останутся, просто без группы.',{n:gEdit.name})))return;const id=gEdit.id;db.groups=db.groups.filter(g=>g.id!==id);for(const c of db.clients)if(c.group===id)c.group='';persist();$('gdlg').close();renderAll()};
+/* --- загрузка контактов --- */
+function normPhone(p){let d=digits(p);if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d}
+function fmtPhone(p){const d=normPhone(p);return d.length===11&&d[0]==='7'?'+7 '+d.slice(1,4)+' '+d.slice(4,7)+' '+d.slice(7,9)+' '+d.slice(9):String(p||'').trim()}
+function qpDecode(v){try{const b=[];for(let i=0;i<v.length;i++){if(v[i]==='='&&/^[0-9A-F]{2}$/i.test(v.substr(i+1,2))){b.push(parseInt(v.substr(i+1,2),16));i+=2}else b.push(v.charCodeAt(i))}return new TextDecoder().decode(new Uint8Array(b))}catch(e){return v}}
+function parseVcf(text){const out=[];text=text.replace(/\r\n/g,'\n').replace(/=\n/g,'').replace(/\n[ \t]/g,'');
+ for(const card of text.split(/BEGIN:VCARD/i).slice(1)){let fn='',n='',org='',tels=[];
+  for(const line of card.split('\n')){const k=line.indexOf(':');if(k<0)continue;let key=line.slice(0,k),val=line.slice(k+1).trim();const KEY=key.toUpperCase().replace(/^ITEM\d+\./,'');
+   if(/ENCODING=QUOTED-PRINTABLE/i.test(key))val=qpDecode(val);val=val.replace(/\\([,;\\])/g,'$1').replace(/\\n/gi,' ');
+   if(KEY.startsWith('FN'))fn=val;else if(KEY==='N'||KEY.startsWith('N;'))n=val.split(';').slice(0,2).reverse().filter(Boolean).join(' ');else if(KEY.startsWith('ORG'))org=val.split(';')[0];
+   else if(KEY.startsWith('TEL'))tels.push({v:val,pref:/CELL|MOBILE|PREF|IPHONE/i.test(key)})}
+  const name=(fn||n||org).trim(),tel=(tels.find(x=>x.pref)||tels[0]||{}).v||'';if(name||tel)out.push({name:name||tel,phone:tel})}
+ return out}
+let impItems=[],impSel=new Set();
+async function importContacts(){if(canPick()){try{const r=await navigator.contacts.select(['name','tel'],{multiple:true});openImport(r.map(x=>({name:(x.name&&x.name[0]||'').trim()||(x.tel&&x.tel[0])||'',phone:x.tel&&x.tel[0]||''})).filter(x=>x.name));return}catch(e){console.warn(e)}}
+ $('vcfFile').click()}
+$('vcfFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const list=parseVcf(await f.text());if(!list.length){alert(t('В файле не нашлось контактов. Нужен файл .vcf из «Контактов».'));return}openImport(list)};
+function openImport(list){const have=new Set(db.clients.map(c=>normPhone(c.phone)).filter(Boolean)),seen=new Set();
+ impItems=list.map((x,i)=>{const d=normPhone(x.phone),dup=!!d&&(have.has(d)||seen.has(d));if(d)seen.add(d);return {i,name:x.name,phone:fmtPhone(x.phone),dup}}).sort((a,b)=>a.name.localeCompare(b.name,LOCALE[LANG]));
+ impSel=new Set(impItems.filter(x=>!x.dup).map(x=>x.i));$('impSearch').value='';drawGroupSelect($('impGroup'),clFilter!=='all'&&clFilter!=='arch'?clFilter:'');
+ const dups=impItems.filter(x=>x.dup).length;$('impInfo').textContent=t('Найдено контактов: {n}',{n:impItems.length})+(dups?' · '+t('уже в TEMPO: {n}',{n:dups}):'')+'. '+t('Снимите галочки с тех, кого не нужно добавлять.');
+ drawImport();$('impdlg').showModal();document.activeElement&&document.activeElement.blur()}
+function drawImport(){const q=$('impSearch').value.trim().toLowerCase(),qd=digits(q),vis=impItems.filter(x=>!q||x.name.toLowerCase().includes(q)||(qd&&digits(x.phone).includes(qd)));
+ $('impList').replaceChildren(vis.length?h('div',{class:'svc-list'},...vis.map(x=>{const on=impSel.has(x.i);return h('button',{type:'button',class:'svc-item'+(on?' on':'')+(x.dup?' dup':''),disabled:x.dup,onclick:()=>{on?impSel.delete(x.i):impSel.add(x.i);drawImport()}},h('div',null,h('b',null,x.name),h('small',null,(x.phone||t('нет телефона'))+(x.dup?' · '+t('уже есть'):''))),h('span',{class:'ck'},on?'✓':''))})):h('div',{class:'empty'},t('Ничего не нашлось')));
+ const free=vis.filter(x=>!x.dup),all=free.length&&free.every(x=>impSel.has(x.i));
+ $('impSel').textContent=t('Выбрано: {n}',{n:impSel.size});$('impToggle').textContent=all?t('Снять все'):t('Выбрать все');
+ $('impToggle').onclick=()=>{free.forEach(x=>all?impSel.delete(x.i):impSel.add(x.i));drawImport()};
+ $('impDo').textContent=t('Добавить: {n}',{n:impSel.size});$('impDo').disabled=!impSel.size}
+$('impSearch').oninput=drawImport;$('impClose').onclick=()=>$('impdlg').close();
+$('impDo').onclick=()=>{const grp=$('impGroup').value==='__new'?'':$('impGroup').value;let n=0;for(const x of impItems)if(impSel.has(x.i)&&!x.dup){db.clients.push({id:uid(),name:x.name,phone:x.phone,notes:'',group:grp});n++}
+ persist();$('impdlg').close();if(grp)clFilter=grp;renderAll();showToast(t('Добавлено клиенток: {n}',{n}))};
+/* --- выбор нескольких --- */
+const selected_=()=>db.clients.filter(c=>selIds.has(c.id));
+function endSel(){selMode=false;selIds.clear();renderClients()}
+$('selDone').onclick=endSel;
+$('selGroup').onclick=()=>{if(!selIds.size)return;sheet(t('В группу'),[...db.groups.map(g=>[g.name,()=>{selected_().forEach(c=>c.group=g.id);persist();endSel()}]),[t('Без группы'),()=>{selected_().forEach(c=>c.group='');persist();endSel()}],[t('+ Новая группа…'),()=>openGroup(null,id=>{selected_().forEach(c=>c.group=id);persist();endSel()})]])};
+$('selArch').onclick=()=>{if(!selIds.size)return;const back=clFilter==='arch';selected_().forEach(c=>c.archived=!back);persist();endSel()};
+$('selDel').onclick=()=>{if(!selIds.size||!confirm(t('Удалить выбранных клиенток ({n})? Их записи в календаре останутся.',{n:selIds.size})))return;const ids=new Set(selIds);db.clients=db.clients.filter(c=>!ids.has(c.id));for(const r of db.records)if(ids.has(r.clientId))r.clientId=null;for(const p of db.photos)if(ids.has(p.clientId))p.clientId=null;persist();endSel()};
+$('selWa').onclick=()=>{const list=selected_().filter(c=>c.phone);if(!list.length){alert(t('У выбранных нет номеров телефона'));return}const S=db.settings;
+ $('waList').replaceChildren(...list.map(c=>{const row=h('div',{class:'wa-row'},h('div',null,h('b',null,c.name),h('small',null,c.phone)));row.append(h('a',{class:'button wa',href:waLink(c.phone,fill(S.back,{имя:c.name.split(' ')[0],мастер:S.master})),target:'_blank',rel:'noopener',onclick:()=>setTimeout(()=>row.classList.add('done'),300)},'💬'));return row}));
+ $('wadlg').showModal()};
+$('waClose').onclick=()=>$('wadlg').close();
 $('cClose').onclick=()=>$('cdlg').close();
 $('cform').onsubmit=e=>{e.preventDefault();if(saveClientForm()){$('cdlg').close();renderAll()}};
 $('cBook').onclick=()=>{const c=saveClientForm();if(!c)return;$('cdlg').close();show('cal');openEdit(null,null,c)};
@@ -1569,10 +1722,10 @@ async function pull(){if(!cloudOn()||!auth||pulling||pushing)return;pulling=true
  if(then==='push')await push(true)}
 
 function applyRemote(row){const s=row.data||{};
- db.records=(s.records||[]).map(normalize);db.clients=Array.isArray(s.clients)?s.clients:[];db.photos=Array.isArray(s.photos)?s.photos:[];db.expenses=Array.isArray(s.expenses)?s.expenses:[];
+ db.records=(s.records||[]).map(normalize);db.clients=Array.isArray(s.clients)?s.clients:[];db.photos=Array.isArray(s.photos)?s.photos:[];db.expenses=Array.isArray(s.expenses)?s.expenses:[];db.groups=Array.isArray(s.groups)?s.groups:[];
  if(Array.isArray(s.catalog)&&s.catalog.length)db.catalog=s.catalog;db.settings={...DEFAULT_SETTINGS,...(s.settings||{})};
  if(LANGS[db.settings.lang])LANG=db.settings.lang;
- applySkin(db.settings.theme||'');
+ applySkin(db.settings.theme||'');migrateGroups();
  try{localStorage.setItem(KEY,JSON.stringify(db));localStorage.setItem('tempo_lang',LANG)}catch(e){}
  sync.syncedAt=row.updated_at;sync.dirty=false;saveSync();applyStatic();renderAll();fetchPhotos()}
 

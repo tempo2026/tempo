@@ -173,6 +173,8 @@ dialog.wide{padding:12px}
 .selbar .button{padding:9px 12px}
 #view-clients.selecting{padding-bottom:130px}
 .acts-list{display:grid;gap:8px;margin-top:12px}.acts-list .button{width:100%;min-height:48px;font-size:15px}
+.vh{position:absolute!important;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;left:0;top:0}
+label.button{cursor:pointer}
 .hintbox{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:12px}
 .swatches{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}.swatches button{width:34px;height:34px;border-radius:50%;border:3px solid transparent;background:var(--g);cursor:pointer;box-shadow:0 0 0 1px #0001}
 .swatches button.on{border-color:var(--card);box-shadow:0 0 0 2px var(--g)}
@@ -294,7 +296,6 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
     <div class="head"><h2 id="clientListTitle">Все клиенты</h2><span class="small" id="clientCount"></span></div>
     <div id="clientList"></div>
   </section>
-  <input type="file" id="vcfFile" accept=".vcf,.vcard,text/vcard,text/x-vcard,text/directory" hidden>
   <div class="selbar" id="selBar" hidden><div class="in"><b id="selCount"></b>
     <button class="button outline" type="button" id="selAll">Все</button>
     <button class="button outline" type="button" id="selGroup">В группу</button>
@@ -429,7 +430,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
       <label class="button outline" style="margin:0">Загрузить копию<input type="file" id="importFile" accept=".json,application/json" hidden></label>
     </div>
   </section>
-  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 15</p>
+  <p class="small" style="text-align:center;margin-top:20px">TEMPO · версия 16</p>
 </section>
 </main>
 
@@ -579,6 +580,7 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   <div class="head"><h2 id="actTitle">Выберите действие</h2><button class="icon-btn" type="button" id="actClose" aria-label="Закрыть">×</button></div>
   <div class="acts-list" id="actList"></div>
   <div class="hintbox" id="actHint" hidden></div>
+  <input type="file" id="vcfFile" class="vh">
 </dialog>
 
 <!-- ЗАГРУЗКА КОНТАКТОВ -->
@@ -590,6 +592,14 @@ dialog.sheet{max-width:520px;width:calc(100% - 16px);max-height:94dvh;padding:16
   <div id="impList" style="margin-top:8px"></div>
   <label for="impGroup">Добавить в группу</label><select id="impGroup"></select>
   <div class="sdone"><span></span><button type="button" class="button" id="impDo">Добавить</button></div>
+</dialog>
+
+<!-- ВСТАВИТЬ СПИСКОМ -->
+<dialog id="pastedlg" class="sheet">
+  <div class="head"><h2>Вставить списком</h2><button class="icon-btn" type="button" id="pasteClose" aria-label="Закрыть">×</button></div>
+  <p class="small" style="margin:8px 0 0">По одной клиентке на строку: имя и телефон в любом виде. Например:<br>Айгерим +7 701 778 7874<br>Асема 8 777 307 65 70</p>
+  <textarea id="pasteText" rows="9" style="margin-top:10px" placeholder="Имя  телефон"></textarea>
+  <div class="formactions"><button type="button" class="button" id="pasteDo">Дальше</button></div>
 </dialog>
 
 <!-- ГРУППА -->
@@ -690,7 +700,7 @@ const I18N={kk:{},en:{}};
 ['Все данные хранятся только в этом браузере на этом телефоне. Время от времени скачивайте копию (фото работ тоже в неё входят): если что-то случится с телефоном, её можно будет загрузить обратно.','Барлық деректер тек осы телефондағы осы браузерде сақталады. Анда-санда көшірмесін жүктеп алып отырыңыз (жұмыс фотолары да кіреді): телефонға бірдеңе болса, оны қайта жүктеуге болады.','All data is stored only in this browser on this phone. Download a backup from time to time (photos included): if something happens to your phone, you can restore it.'],
 ['Скачать копию','Көшірмені жүктеп алу','Download backup'],
 ['Загрузить копию','Көшірмені қалпына келтіру','Restore backup'],
-['TEMPO · версия 15','TEMPO · 15-нұсқа','TEMPO · version 15'],
+['TEMPO · версия 16','TEMPO · 16-нұсқа','TEMPO · version 16'],
 ['сейчас','қазір','now'],['через {d}','{d} кейін','in {d}'],
 ['Нужно внимание: {n}','Назар аударыңыз: {n}','Needs attention: {n}'],['Отметить визиты: {n}','Келгендерді белгілеу: {n}','Mark visits: {n}'],
 ['Отметьте, кто пришёл','Кім келгенін белгілеңіз','Mark who came'],
@@ -705,8 +715,13 @@ const I18N={kk:{},en:{}};
 ['Салон','Салон','Salon'],['Группа','Топ','Group'],['Без группы','Топсыз','No group'],['+ Новая группа…','+ Жаңа топ…','+ New group…'],['Новая группа','Жаңа топ','New group'],
 ['В архиве — скрыта из списков','Мұрағатта — тізімдерде көрсетілмейді','Archived — hidden from lists'],['Архив','Мұрағат','Archive'],['Все','Барлығы','All'],
 ['Ещё действия','Басқа әрекеттер','More actions'],['Выберите действие','Әрекетті таңдаңыз','Choose an action'],['Новая клиентка','Жаңа клиент','New client'],['Добавить вручную','Қолмен қосу','Add manually'],
-['Из контактов телефона','Телефон контактілерінен','From phone contacts'],['Загрузить из контактов','Контактілерден жүктеу','Import from contacts'],['Выбрать клиенток','Клиенттерді таңдау','Select clients'],
+['Из контактов телефона','Телефон контактілерінен','From phone contacts'],['Загрузить клиенток','Клиенттерді жүктеу','Import clients'],['Из файла контактов (.vcf)','Контактілер файлынан (.vcf)','From a contacts file (.vcf)'],['Вставить списком','Тізіммен қою','Paste a list'],['Дальше','Әрі қарай','Next'],['Выбрать клиенток','Клиенттерді таңдау','Select clients'],
 ['Изменить группу «{n}»','«{n}» тобын өзгерту','Edit group “{n}”'],
+['Файл контактов на iPhone: «Контакты» → «Списки» (слева вверху) → нажмите и подержите список → «Экспортировать» → «Сохранить в Файлы». Затем нажмите «Из файла контактов» и выберите его. Если так не выходит — «Вставить списком».','iPhone-дағы контактілер файлы: «Контактілер» → «Тізімдер» (сол жақ жоғарыда) → тізімді басып ұстап тұрыңыз → «Экспорттау» → «Файлдарға сақтау». Содан кейін «Контактілер файлынан» басып, оны таңдаңыз. Болмаса — «Тізіммен қою».','Contacts file on iPhone: Contacts → Lists (top left) → touch and hold a list → Export → Save to Files. Then tap “From a contacts file” and choose it. If that doesn’t work, use “Paste a list”.'],
+['Не получилось прочитать файл: {m}','Файлды оқу мүмкін болмады: {m}','Couldn’t read the file: {m}'],
+['В файле «{f}» не нашлось контактов. Нужен файл .vcf из «Контактов» — или вставьте список кнопкой «Вставить списком».','«{f}» файлында контакт табылмады. «Контактілерден» алынған .vcf файлы керек — немесе «Тізіммен қою» батырмасымен тізімді қойыңыз.','No contacts found in “{f}”. Use a .vcf file from Contacts, or paste a list with “Paste a list”.'],
+['Не нашлось ни одного имени. Вставьте по одной клиентке на строку: имя и телефон.','Бірде-бір есім табылмады. Әр жолға бір клиент қойыңыз: есімі мен телефоны.','No names found. Paste one client per line: name and phone.'],
+['По одной клиентке на строку: имя и телефон в любом виде. Например:','Әр жолға бір клиент: есімі мен телефоны кез келген түрде. Мысалы:','One client per line: name and phone in any format. For example:'],
 ['На iPhone: «Контакты» → «Списки» (слева вверху) → нажмите и подержите список → «Экспортировать» → «Сохранить в Файлы». Затем здесь выберите этот файл.','iPhone-да: «Контактілер» → «Тізімдер» (сол жақ жоғарыда) → тізімді басып ұстап тұрыңыз → «Экспорттау» → «Файлдарға сақтау». Содан кейін осы файлды осында таңдаңыз.','On iPhone: Contacts → Lists (top left) → touch and hold a list → Export → Save to Files. Then choose that file here.'],
 ['Загрузка контактов','Контактілерді жүктеу','Import contacts'],['Добавить в группу','Топқа қосу','Add to group'],['Добавить','Қосу','Add'],
 ['Найдено контактов: {n}','Табылған контактілер: {n}','Contacts found: {n}'],['уже в TEMPO: {n}','TEMPO-да бар: {n}','already in TEMPO: {n}'],['Снимите галочки с тех, кого не нужно добавлять.','Қоспайтындардың белгісін алып тастаңыз.','Untick anyone you don’t want to add.'],
@@ -1381,12 +1396,13 @@ function openClient(c){cEditId=c?c.id:null;$('cTitle').textContent=c?c.name:t('�
  $('cdlg').showModal();if(c)document.activeElement&&document.activeElement.blur()}
 function saveClientForm(){const name=$('cName').value.trim();if(!name)return null;let c=cEditId&&getClient(cEditId);if(!c){c={id:uid()};db.clients.push(c)}c.name=name;c.phone=$('cPhone').value.trim();c.notes=$('cNotes').value.trim();c.group=$('cGroup').value||'';if(c.group==='__new')c.group='';c.archived=$('cArch').checked;for(const r of db.records)if(r.clientId===c.id){r.name=c.name;r.phone=c.phone}persist();return c}
 function sheet(title,items,hint){$('actTitle').textContent=title;$('actHint').hidden=!hint;$('actHint').textContent=hint||'';
- $('actList').replaceChildren(...items.filter(Boolean).map(([label,fn,cls])=>h('button',{type:'button',class:'button '+(cls||'outline'),onclick:()=>{$('actdlg').close();fn()}},label)));$('actdlg').showModal();document.activeElement&&document.activeElement.blur()}
+ $('actList').replaceChildren(...items.filter(Boolean).map(([label,fn,cls])=>fn==='file'?h('label',{class:'button '+(cls||'outline'),for:'vcfFile'},label):h('button',{type:'button',class:'button '+(cls||'outline'),onclick:()=>{$('actdlg').close();fn()}},label)));$('actdlg').showModal();document.activeElement&&document.activeElement.blur()}
 $('actClose').onclick=()=>$('actdlg').close();
 const canPick=()=>!!(navigator.contacts&&navigator.contacts.select);
-$('addClient').onclick=()=>sheet(t('Новая клиентка'),[[t('Добавить вручную'),()=>openClient(null)],[t('Из контактов телефона'),importContacts],[t('Новая группа'),()=>openGroup(null)]],
- canPick()?null:t('На iPhone: «Контакты» → «Списки» (слева вверху) → нажмите и подержите список → «Экспортировать» → «Сохранить в Файлы». Затем здесь выберите этот файл.'));
-$('clientMenu').onclick=()=>{const g=db.groups.find(x=>x.id===clFilter);sheet(t('Выберите действие'),[[t('Выбрать клиенток'),()=>{selMode=true;selIds.clear();renderClients()}],[t('Новая группа'),()=>openGroup(null)],g?[t('Изменить группу «{n}»',{n:g.name}),()=>openGroup(g)]:null,[t('Загрузить из контактов'),importContacts]])};
+function openAddSheet(){sheet(t('Новая клиентка'),[[t('Добавить вручную'),()=>openClient(null)],canPick()?[t('Из контактов телефона'),importContacts]:null,[t('Из файла контактов (.vcf)'),'file'],[t('Вставить списком'),openPaste],[t('Новая группа'),()=>openGroup(null)]],
+ canPick()?null:t('Файл контактов на iPhone: «Контакты» → «Списки» (слева вверху) → нажмите и подержите список → «Экспортировать» → «Сохранить в Файлы». Затем нажмите «Из файла контактов» и выберите его. Если так не выходит — «Вставить списком».'))}
+$('addClient').onclick=openAddSheet;
+$('clientMenu').onclick=()=>{const g=db.groups.find(x=>x.id===clFilter);sheet(t('Выберите действие'),[[t('Выбрать клиенток'),()=>{selMode=true;selIds.clear();renderClients()}],[t('Новая группа'),()=>openGroup(null)],g?[t('Изменить группу «{n}»',{n:g.name}),()=>openGroup(g)]:null,[t('Загрузить клиенток'),openAddSheet]])};
 function drawGroupSelect(sel,val){sel.replaceChildren(h('option',{value:''},t('Без группы')),...db.groups.map(g=>h('option',{value:g.id},g.name)),h('option',{value:'__new'},t('+ Новая группа…')));sel.value=val||'';
  sel.onchange=()=>{if(sel.value==='__new'){sel.value=val||'';openGroup(null,id=>{drawGroupSelect(sel,id)})}}}
 let gEdit=null,gColor=GROUP_COLORS[0],gAfter=null;
@@ -1409,8 +1425,20 @@ function parseVcf(text){const out=[];text=text.replace(/\r\n/g,'\n').replace(/=\
  return out}
 let impItems=[],impSel=new Set();
 async function importContacts(){if(canPick()){try{const r=await navigator.contacts.select(['name','tel'],{multiple:true});openImport(r.map(x=>({name:(x.name&&x.name[0]||'').trim()||(x.tel&&x.tel[0])||'',phone:x.tel&&x.tel[0]||''})).filter(x=>x.name));return}catch(e){console.warn(e)}}
- $('vcfFile').click()}
-$('vcfFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const list=parseVcf(await f.text());if(!list.length){alert(t('В файле не нашлось контактов. Нужен файл .vcf из «Контактов».'));return}openImport(list)};
+ openAddSheet()}
+$('vcfFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;$('actdlg').close();let text='';
+ try{const buf=await f.arrayBuffer(),u=new Uint8Array(buf);text=(u[0]===0xFF&&u[1]===0xFE)||(u[0]===0xFE&&u[1]===0xFF)?new TextDecoder(u[0]===0xFF?'utf-16le':'utf-16be').decode(buf):new TextDecoder().decode(buf)}catch(err){alert(t('Не получилось прочитать файл: {m}',{m:err.message||err}));return}
+ const list=/BEGIN:VCARD/i.test(text)?parseVcf(text):parsePasted(text);
+ if(!list.length){alert(t('В файле «{f}» не нашлось контактов. Нужен файл .vcf из «Контактов» — или вставьте список кнопкой «Вставить списком».',{f:f.name}));return}openImport(list)};
+/* --- вставить списком --- */
+function parsePasted(text){if(/BEGIN:VCARD/i.test(text))return parseVcf(text);const out=[];
+ for(let line of String(text).split(/\r?\n/)){line=line.trim();if(!line)continue;const m=line.match(/\+?\d[\d\s\-().]{8,}\d/);let phone='',name=line;
+  if(m&&digits(m[0]).length>=10){phone=m[0].trim();name=(line.slice(0,m.index)+' '+line.slice(m.index+m[0].length)).replace(/[\t,;:|–—-]+/g,' ').replace(/\s+/g,' ').trim()}
+  if(!name&&!phone)continue;out.push({name:name||phone,phone})}
+ return out}
+function openPaste(){$('pasteText').value='';$('pastedlg').showModal();setTimeout(()=>$('pasteText').focus(),50)}
+$('pasteClose').onclick=()=>$('pastedlg').close();
+$('pasteDo').onclick=()=>{const list=parsePasted($('pasteText').value);if(!list.length){alert(t('Не нашлось ни одного имени. Вставьте по одной клиентке на строку: имя и телефон.'));return}$('pastedlg').close();openImport(list)};
 function openImport(list){const have=new Set(db.clients.map(c=>normPhone(c.phone)).filter(Boolean)),seen=new Set();
  impItems=list.map((x,i)=>{const d=normPhone(x.phone),dup=!!d&&(have.has(d)||seen.has(d));if(d)seen.add(d);return {i,name:x.name,phone:fmtPhone(x.phone),dup}}).sort((a,b)=>a.name.localeCompare(b.name,LOCALE[LANG]));
  impSel=new Set(impItems.filter(x=>!x.dup).map(x=>x.i));$('impSearch').value='';drawGroupSelect($('impGroup'),clFilter!=='all'&&clFilter!=='arch'?clFilter:'');
